@@ -146,7 +146,7 @@ function SimulationsPage() {
             </div>
             <div className="flex justify-between text-xs">
               <span className="text-muted-foreground">XP em jogo:</span>
-              <span className="font-medium text-secondary">{activeCase.xp}</span>
+              <span className="font-medium text-secondary">{'xp_reward' in activeCase ? activeCase.xp_reward : activeCase.xp}</span>
             </div>
           </CardContent>
         </Card>
