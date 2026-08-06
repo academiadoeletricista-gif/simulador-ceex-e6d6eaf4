@@ -23,7 +23,7 @@ export class SimulationAPI {
     
     // Inject fault based on caseData or random if not specified
     const faults: FaultType[] = ['OPEN_FUSE', 'BROKEN_COIL', 'OPEN_START_BUTTON', 'TRIPPED_RELAY'];
-    const randomFault = faults[Math.floor(Math.random() * faults.length)];
+    const randomFault = faults[Math.floor(Math.random() * faults.length)] as FaultType;
     this.engine.injectFault(randomFault);
   }
 
