@@ -27,6 +27,8 @@ import {
   X,
   Briefcase,
   CreditCard,
+  ShieldCheck,
+  BarChart3,
 } from "lucide-react";
 
 import appCss from "../styles.css?url";
@@ -149,6 +151,8 @@ function RootComponent() {
     { icon: User, label: "Perfil", path: "/profile" },
     { icon: CreditCard, label: "Assinatura", path: "/billing" },
     { icon: Settings, label: "Configurações", path: "/settings" },
+    { icon: ShieldCheck, label: "Admin", path: "/admin" },
+    { icon: BarChart3, label: "Enterprise", path: "/analytics" },
   ];
 
   return (

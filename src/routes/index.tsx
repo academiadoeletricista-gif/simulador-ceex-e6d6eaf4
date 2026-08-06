@@ -1,10 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-/** Execute esta instrucao no projeto: baixar arquivos */
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { useAppStore } from "@/store/useAppStore";
+import { cases } from "./library";
 import { 
   Zap, 
   Clock, 
@@ -25,6 +25,7 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const { 
+    userName,
     xp, 
     level, 
     streak, 
@@ -33,10 +34,14 @@ function Index() {
     dailyChallenges, 
     achievements,
     accuracy,
-    avgTime
+    avgTime,
+    sessions
   } = useAppStore();
 
   const xpProgress = (xp / nextLevelXp) * 100;
+  
+  // Encontrar um caso não concluído como recomendação
+  const recommendedCase = cases.find(c => !sessions[c.id] || sessions[c.id]?.status !== 'completed') || cases[0];
 
   return (
     <div className="p-8 space-y-8 max-w-7xl mx-auto pb-20">
@@ -45,10 +50,10 @@ function Index() {
         <div className="relative z-10 flex flex-col md:flex-row gap-8 items-center justify-between">
           <div className="space-y-4 text-center md:text-left">
             <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 px-3 py-1">
-              Fase 5: Gamificação Inteligente
+              Sprint P0: Fluxo Real Ativado
             </Badge>
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-              Bom trabalho, <span className="text-primary">Carlos</span>
+              Bom trabalho, <span className="text-primary">{userName.split(' ')[0]}</span>
             </h1>
             <p className="text-muted-foreground text-lg max-w-md">
               Você está a apenas {nextLevelXp - xp} XP do próximo nível. Continue sua jornada para se tornar uma <span className="text-foreground font-semibold">Lenda Industrial</span>.
@@ -69,7 +74,7 @@ function Index() {
               </div>
               <Progress value={xpProgress} className="h-3 bg-primary/10" />
               <p className="text-[10px] text-center text-muted-foreground italic">
-                +150 XP hoje • Meta semanal: 75% concluída
+                Sua evolução é constante • {accuracy}% de Precisão Global
               </p>
             </CardContent>
           </Card>
@@ -109,37 +114,41 @@ function Index() {
           </div>
 
           {/* Featured Recommendation */}
-          <section>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold flex items-center gap-2">
-                <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" /> 
-                Recomendação da IA
-              </h2>
-            </div>
-            <Card className="group relative overflow-hidden border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
-              <CardContent className="p-0 flex flex-col md:flex-row">
-                <div className="w-full md:w-48 bg-muted/20 flex items-center justify-center p-8">
-                  <div className="text-5xl group-hover:scale-110 transition-transform duration-500">⚙️</div>
-                </div>
-                <div className="p-6 flex-1 space-y-4">
-                  <div>
-                    <Badge className="mb-2">Intermediário</Badge>
-                    <h3 className="text-xl font-bold">Falha Intermitente em Soft Starter</h3>
-                    <p className="text-muted-foreground text-sm mt-1">
-                      Analise os logs de erro e identifique o parâmetro de proteção de subcorrente configurado incorretamente.
-                    </p>
+          {recommendedCase && (
+            <section>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold flex items-center gap-2">
+                  <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" /> 
+                  Próximo Desafio
+                </h2>
+              </div>
+              <Card className="group relative overflow-hidden border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
+                <CardContent className="p-0 flex flex-col md:flex-row">
+                  <div className="w-full md:w-48 bg-muted/20 flex items-center justify-center p-8 overflow-hidden">
+                    <img src={recommendedCase.image} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                   </div>
-                  <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                    <span className="flex items-center gap-1.5"><Zap className="h-4 w-4 text-primary" /> +450 XP</span>
-                    <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" /> 8-12 min</span>
+                  <div className="p-6 flex-1 space-y-4">
+                    <div>
+                      <Badge className="mb-2">{recommendedCase.level}</Badge>
+                      <h3 className="text-xl font-bold">{recommendedCase.title}</h3>
+                      <p className="text-muted-foreground text-sm mt-1 line-clamp-2">
+                        {recommendedCase.description}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-6 text-sm text-muted-foreground">
+                      <span className="flex items-center gap-1.5"><Zap className="h-4 w-4 text-primary" /> +{recommendedCase.xp} XP</span>
+                      <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" /> {recommendedCase.time}</span>
+                    </div>
+                    <Button asChild className="w-full md:w-auto gap-2 group-hover:gap-3 transition-all">
+                      <Link to="/simulations" search={{ id: recommendedCase.id }}>
+                        Iniciar Diagnóstico <ArrowRight className="h-4 w-4" />
+                      </Link>
+                    </Button>
                   </div>
-                  <Button className="w-full md:w-auto gap-2 group-hover:gap-3 transition-all">
-                    Iniciar Desafio <ArrowRight className="h-4 w-4" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </section>
+                </CardContent>
+              </Card>
+            </section>
+          )}
 
           {/* Daily Challenges */}
           <section>
@@ -216,7 +225,7 @@ function Index() {
               <div className="space-y-4">
                 {[
                   { pos: 1, name: "Eng. Roberto M.", xp: "4,200", trend: "up" },
-                  { pos: 2, name: "Carlos Alberto", xp: "2,450", trend: "none", current: true },
+                  { pos: 2, name: userName, xp: xp.toLocaleString(), trend: "none", current: true },
                   { pos: 3, name: "Mariana S.", xp: "2,100", trend: "down" },
                 ].map((user) => (
                   <div key={user.name} className={cn(

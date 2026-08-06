@@ -36,7 +36,7 @@ export interface StreakData {
   current: number;
   best: number;
   lastActivity: string | null;
-  history: string[]; // dates of activity
+  history: string[]; 
 }
 
 export interface SkillNode {
@@ -82,31 +82,67 @@ export interface Product {
   description?: string;
 }
 
+export interface Case {
+  id: string;
+  title: string;
+  category: string;
+  level: 'Iniciante' | 'Intermediário' | 'Avançado' | 'Especialista';
+  xp: number;
+  timeEstimate: string;
+  description: string;
+  symptoms: string[];
+  checklist: string[];
+  image: string;
+  diagram?: string;
+}
+
+export interface CaseSession {
+  caseId: string;
+  currentStep: number;
+  status: 'available' | 'in_progress' | 'completed';
+  answers: Record<string, any>;
+  startTime?: string;
+}
+
 interface AppState {
-  // User Progression
+  // User Data
   userName: string;
+  userAvatar: string;
+  userPhone: string;
+  userBio: string;
+  userCity: string;
+  userState: string;
+  userCompany: string;
   xp: number;
   level: number;
   levelTitle: UserLevel;
   nextLevelXp: number;
   
+  // Settings
+  theme: 'light' | 'dark';
+  language: string;
+  notifications: boolean;
+  
   // B2B & Billing
   organization: Organization | null;
   marketplace: Product[];
-  cart: string[]; // product ids
+  cart: string[];
   
   // Stats
   streak: StreakData;
   accuracy: number;
   totalDiagnoses: number;
-  avgTime: number; // in seconds
+  avgTime: number; 
   
-  // Gamification
+  // Progression
   badges: Badge[];
-  userBadges: string[]; // badge ids
+  userBadges: string[];
   achievements: Achievement[];
   dailyChallenges: DailyChallenge[];
   skillTree: SkillNode[];
+  
+  // Core Game State
+  sessions: Record<string, CaseSession>;
   
   // Actions
   addXp: (amount: number) => void;
@@ -116,6 +152,26 @@ interface AppState {
   updateSkill: (id: string, xpAmount: number) => void;
   addToCart: (id: string) => void;
   removeFromCart: (id: string) => void;
+  
+  // Profile Actions
+  updateProfile: (data: Partial<{
+    userName: string;
+    userAvatar: string;
+    userPhone: string;
+    userBio: string;
+    userCity: string;
+    userState: string;
+    userCompany: string;
+  }>) => void;
+  
+  // Settings Actions
+  setTheme: (theme: 'light' | 'dark') => void;
+  setLanguage: (lang: string) => void;
+  toggleNotifications: () => void;
+  
+  // Case Actions
+  startCase: (caseId: string) => void;
+  completeCase: (caseId: string, success: boolean, timeTaken: number) => void;
 }
 
 const INITIAL_SKILLS: SkillNode[] = [
@@ -140,10 +196,20 @@ export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
       userName: 'Eng. Carlos Alberto',
+      userAvatar: '',
+      userPhone: '(11) 98765-4321',
+      userBio: 'Especialista em comandos elétricos e automação industrial.',
+      userCity: 'São Paulo',
+      userState: 'SP',
+      userCompany: 'Industrial Tech',
       xp: 2450,
       level: 12,
       levelTitle: 'Técnico Pleno',
       nextLevelXp: 3000,
+      
+      theme: 'dark',
+      language: 'pt-br',
+      notifications: true,
       
       organization: {
         id: 'org-1',
@@ -176,9 +242,9 @@ export const useAppStore = create<AppState>()(
       },
       accuracy: 98,
       totalDiagnoses: 42,
-      avgTime: 252, // 4.2 min
+      avgTime: 252, 
       
-      badges: [], // Would be populated with master list
+      badges: [], 
       userBadges: ['badge-1', 'badge-3'],
       achievements: INITIAL_ACHIEVEMENTS,
       dailyChallenges: [
@@ -186,15 +252,16 @@ export const useAppStore = create<AppState>()(
         { id: 'd2', title: 'Leitura de Diagrama', description: 'Responda 5 perguntas sobre o diagrama trifásico.', difficulty: 'Fácil', xpReward: 100, completed: true },
       ],
       skillTree: INITIAL_SKILLS,
+      sessions: {},
       
       addXp: (amount) => set((state) => {
         const newXp = state.xp + amount;
         let newLevel = state.level;
         let newNextXp = state.nextLevelXp;
         
-        if (newXp >= state.nextLevelXp) {
+        while (newXp >= newNextXp) {
           newLevel += 1;
-          newNextXp = Math.floor(state.nextLevelXp * 1.2);
+          newNextXp = Math.floor(newNextXp * 1.2);
         }
         
         const titleIndex = Math.min(Math.floor(newLevel / 5), LEVEL_TITLES.length - 1);
@@ -263,7 +330,48 @@ export const useAppStore = create<AppState>()(
 
       removeFromCart: (id) => set((state) => ({
         cart: state.cart.filter(itemId => itemId !== id)
-      }))
+      })),
+
+      updateProfile: (data) => set((state) => ({ ...state, ...data })),
+      
+      setTheme: (theme) => set({ theme }),
+      setLanguage: (language) => set({ language }),
+      toggleNotifications: () => set((state) => ({ notifications: !state.notifications })),
+
+      startCase: (caseId) => set((state) => ({
+        sessions: {
+          ...state.sessions,
+          [caseId]: {
+            caseId,
+            currentStep: 0,
+            status: 'in_progress',
+            answers: {},
+            startTime: new Date().toISOString()
+          }
+        }
+      })),
+
+      completeCase: (caseId, success, timeTaken) => set((state) => {
+        const session = state.sessions[caseId];
+        if (!session) return state;
+
+        const newTotalDiagnoses = state.totalDiagnoses + 1;
+        const newAccuracy = success ? (state.accuracy * state.totalDiagnoses + 100) / newTotalDiagnoses : (state.accuracy * state.totalDiagnoses) / newTotalDiagnoses;
+        const newAvgTime = (state.avgTime * state.totalDiagnoses + timeTaken) / newTotalDiagnoses;
+
+        return {
+          totalDiagnoses: newTotalDiagnoses,
+          accuracy: Number(newAccuracy.toFixed(1)),
+          avgTime: Math.floor(newAvgTime),
+          sessions: {
+            ...state.sessions,
+            [caseId]: {
+              ...session,
+              status: 'completed'
+            }
+          }
+        };
+      })
     }),
     {
       name: 'industrial-lab-storage',

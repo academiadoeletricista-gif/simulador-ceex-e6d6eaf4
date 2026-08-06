@@ -4,12 +4,20 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useAppStore } from "@/store/useAppStore";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/settings")({
   component: SettingsPage,
 });
 
 function SettingsPage() {
+  const { theme, setTheme, language, setLanguage, notifications, toggleNotifications } = useAppStore();
+
+  const handleSave = () => {
+    toast.success("Configurações salvas com sucesso!");
+  };
+
   return (
     <div className="p-8 space-y-8 max-w-3xl mx-auto">
       <header>
@@ -28,14 +36,17 @@ function SettingsPage() {
                 <Label>Tema Escuro</Label>
                 <p className="text-xs text-muted-foreground">Alternar entre light e dark mode</p>
               </div>
-              <Switch checked={true} />
+              <Switch 
+                checked={theme === 'dark'} 
+                onCheckedChange={(checked) => setTheme(checked ? 'dark' : 'light')} 
+              />
             </div>
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label>Idioma</Label>
                 <p className="text-xs text-muted-foreground">Selecione seu idioma preferido</p>
               </div>
-              <Select defaultValue="pt-br">
+              <Select value={language} onValueChange={setLanguage}>
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Idioma" />
                 </SelectTrigger>
@@ -56,18 +67,18 @@ function SettingsPage() {
           <CardContent className="space-y-6">
             <div className="flex items-center justify-between">
               <Label>Alertas de novos casos</Label>
-              <Switch checked={true} />
+              <Switch checked={notifications} onCheckedChange={toggleNotifications} />
             </div>
             <div className="flex items-center justify-between">
               <Label>Lembretes de sequência diária</Label>
-              <Switch checked={false} />
+              <Switch checked={notifications} onCheckedChange={toggleNotifications} />
             </div>
           </CardContent>
         </Card>
 
         <div className="flex justify-end gap-4">
           <Button variant="outline">Cancelar</Button>
-          <Button>Salvar Alterações</Button>
+          <Button onClick={handleSave}>Salvar Alterações</Button>
         </div>
       </div>
     </div>
