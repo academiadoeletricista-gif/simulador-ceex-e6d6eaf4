@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Outlet } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { 
   Search, 
   Filter, 
-  BookOpen, 
   Clock, 
   Zap, 
   ChevronRight,
@@ -27,6 +26,7 @@ function Library() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState<string>("all");
+  const { labId } = Route.useParams() as { labId?: string };
 
   const { data: laboratoriesResult, isLoading } = useLaboratories();
 
@@ -43,6 +43,10 @@ function Library() {
       (filter === "all" || lab.level === filter)
     )
     .sort((a, b) => (b.totalXp || 0) - (a.totalXp || 0));
+
+  if (labId) {
+    return <Outlet />;
+  }
 
   return (
     <div className="p-8 space-y-8 max-w-7xl mx-auto pb-20">
@@ -87,7 +91,7 @@ function Library() {
           <Card 
             key={lab.id} 
             className="group hover:border-primary/50 transition-all cursor-pointer overflow-hidden border-2"
-            onClick={() => navigate({ to: `/library/${lab.id}` })}
+            onClick={() => navigate({ to: '/library/$labId', params: { labId: lab.id } })}
           >
             <div className="h-32 bg-muted relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent group-hover:scale-110 transition-transform duration-500" />
