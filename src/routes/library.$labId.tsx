@@ -21,7 +21,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useLaboratory } from "@/hooks/useLaboratory";
 import { useCasesByLab } from "@/hooks/useCase";
-import { useSessions } from "@/hooks/useSession";
+import { useSessions, useStartSession } from "@/hooks/useSession";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/library/$labId")({
