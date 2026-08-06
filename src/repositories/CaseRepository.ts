@@ -5,20 +5,9 @@ import { DiagnosticCase } from "@/types/diagnosis";
 export class CaseRepository {
   async findAll(): Promise<Result<DiagnosticCase[]>> {
     try {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('cases')
-        .select(`
-          *,
-          occurrence:case_occurrences(*),
-          symptoms:case_symptoms(*),
-          components:case_components(*),
-          measurements:case_measurements(*),
-          actions:case_actions(*),
-          hypotheses:case_hypotheses(*),
-          hints:case_hints(*),
-          errors:case_errors(*),
-          lesson:case_lessons(*)
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (error) return fail(error.message, error.code);
@@ -30,20 +19,9 @@ export class CaseRepository {
 
   async findById(id: string): Promise<Result<DiagnosticCase | null>> {
     try {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('cases')
-        .select(`
-          *,
-          occurrence:case_occurrences(*),
-          symptoms:case_symptoms(*),
-          components:case_components(*),
-          measurements:case_measurements(*),
-          actions:case_actions(*),
-          hypotheses:case_hypotheses(*),
-          hints:case_hints(*),
-          errors:case_errors(*),
-          lesson:case_lessons(*)
-        `)
+        .select('*')
         .eq('id', id)
         .single();
 
@@ -59,7 +37,7 @@ export class CaseRepository {
 
   async findByLaboratoryId(labId: string): Promise<Result<DiagnosticCase[]>> {
     try {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('cases')
         .select('*')
         .eq('laboratory_id', labId);
@@ -72,10 +50,11 @@ export class CaseRepository {
   }
 
   private mapToCamelCase(item: any): DiagnosticCase {
+    // Map database snake_case fields to domain camelCase fields
+    // Based on the 'cases' table schema in migrations
     return {
       id: item.id,
       laboratoryId: item.laboratory_id,
-      circuitId: item.circuit_id,
       code: item.code,
       title: item.title,
       description: item.description,
@@ -83,38 +62,20 @@ export class CaseRepository {
       level: item.level,
       xpReward: item.xp_reward,
       timeEstimate: item.time_estimate,
-      complexity: item.complexity,
+      complexity: item.complexity || 0,
       author: item.author,
-      version: item.version,
-      status: item.status,
+      version: item.version || '1.0.0',
+      status: (item.published ? 'published' : 'draft') as any,
       createdAt: item.created_at,
       updatedAt: item.updated_at,
-      occurrence: item.occurrence ? {
-        id: item.occurrence.id,
-        caseId: item.occurrence.case_id,
-        title: item.occurrence.title,
-        description: item.occurrence.description,
-        operationalContext: item.occurrence.operational_context,
-        equipment: item.occurrence.equipment,
-        location: item.occurrence.location,
-        occurrenceDate: item.occurrence.occurrence_date,
-        shift: item.occurrence.shift,
-        responsible: item.occurrence.responsible,
-        history: item.occurrence.history,
-        initialCondition: item.occurrence.initial_condition,
-        urgency: item.occurrence.urgency,
-        criticality: item.occurrence.criticality,
-        operationalRisk: item.occurrence.operational_risk,
-        operatorMessage: item.occurrence.operator_message
-      } : undefined,
-      symptoms: item.symptoms?.map((s: any) => ({ ...s, caseId: s.case_id })),
-      components: item.components?.map((c: any) => ({ ...c, caseId: c.case_id, componentTag: c.component_tag })),
-      measurements: item.measurements?.map((m: any) => ({ ...m, caseId: m.case_id, pointCode: m.point_code })),
-      actions: item.actions?.map((a: any) => ({ ...a, caseId: a.case_id, timeCost: a.time_cost, xpReward: a.xp_reward })),
-      hypotheses: item.hypotheses?.map((h: any) => ({ ...h, caseId: h.case_id })),
-      hints: item.hints?.map((h: any) => ({ ...h, caseId: h.case_id, xpPenalty: h.xp_penalty })),
-      errors: item.errors?.map((e: any) => ({ ...e, caseId: e.case_id, xpPenalty: e.xp_penalty })),
-      lesson: item.lesson ? { ...item.lesson, caseId: item.lesson.case_id } : undefined
+      
+      // Handle array fields or JSONB content if present
+      symptoms: Array.isArray(item.symptoms) 
+        ? item.symptoms.map((s: string, i: number) => ({ id: `${item.id}-s-${i}`, description: s }))
+        : [],
+      
+      // Map other fields from JSONB 'content' if it exists
+      ...(item.content || {})
     } as unknown as DiagnosticCase;
   }
 }
