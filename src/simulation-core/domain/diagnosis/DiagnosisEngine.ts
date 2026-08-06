@@ -7,23 +7,9 @@ import { COMPONENT_QUIZ_POOL, FAULT_QUIZ_POOL } from '../quiz/QuizPool';
 import { ReportGenerator } from '../reports/ReportGenerator';
 import { TechnicalReport } from '../reports/ReportTypes';
 import { DiagnosticCase } from '@/types/diagnosis';
+import { FaultType } from './FaultType';
 
-
-export enum FaultType {
-  OPEN_FUSE = 'OPEN_FUSE',
-  BROKEN_COIL = 'BROKEN_COIL',
-  SHORTED_COIL = 'SHORTED_COIL',
-  OPEN_START_BUTTON = 'OPEN_START_BUTTON',
-  OPEN_STOP_BUTTON = 'OPEN_STOP_BUTTON',
-  BROKEN_AUX_CONTACT = 'BROKEN_AUX_CONTACT',
-  WELDED_AUX_CONTACT = 'WELDED_AUX_CONTACT',
-  TRIPPED_RELAY = 'TRIPPED_RELAY',
-  BROKEN_WIRE = 'BROKEN_WIRE',
-  LOOSE_TERMINAL = 'LOOSE_TERMINAL',
-  MISSING_VOLTAGE = 'MISSING_VOLTAGE',
-  MECHANICAL_FAILURE = 'MECHANICAL_FAILURE',
-  NONE = 'NONE'
-}
+export { FaultType };
 
 export class DiagnosisEngine {
   private solver: CircuitSolver;

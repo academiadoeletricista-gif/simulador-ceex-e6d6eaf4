@@ -1,5 +1,5 @@
 import { QuizQuestion, QuizDifficulty } from './QuizTypes';
-import { FaultType } from '../diagnosis/DiagnosisEngine';
+import { FaultType } from '../diagnosis/FaultType';
 
 export const COMPONENT_QUIZ_POOL: Record<string, QuizQuestion[]> = {
   'K1': [
