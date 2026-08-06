@@ -100,7 +100,35 @@ function SimulationsPage() {
   const isCompleted = state.status === 'COMPLETED';
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] overflow-hidden bg-background">
+    <div className="flex flex-col h-[calc(100vh-4rem)] overflow-hidden bg-background">
+      {/* Top Progress Bar for the entire Workflow */}
+      <div className="border-b bg-card px-8 py-2 flex items-center justify-between">
+        <div className="flex items-center gap-8 flex-1">
+          <div className="flex items-center gap-2">
+            <span className={cn("h-6 w-6 rounded-full flex items-center justify-center text-[10px] font-bold border-2", activeTab === 'problem' ? "border-primary bg-primary text-primary-foreground" : "border-muted text-muted-foreground")}>1</span>
+            <span className="text-[10px] font-bold uppercase tracking-wider hidden sm:inline">Descrição</span>
+          </div>
+          <div className="h-px w-8 bg-muted" />
+          <div className="flex items-center gap-2">
+            <span className={cn("h-6 w-6 rounded-full flex items-center justify-center text-[10px] font-bold border-2", activeTab === 'inspect' ? "border-primary bg-primary text-primary-foreground" : "border-muted text-muted-foreground")}>2</span>
+            <span className="text-[10px] font-bold uppercase tracking-wider hidden sm:inline">Inspeção</span>
+          </div>
+          <div className="h-px w-8 bg-muted" />
+          <div className="flex items-center gap-2">
+            <span className={cn("h-6 w-6 rounded-full flex items-center justify-center text-[10px] font-bold border-2", activeTab === 'measure' ? "border-primary bg-primary text-primary-foreground" : "border-muted text-muted-foreground")}>3</span>
+            <span className="text-[10px] font-bold uppercase tracking-wider hidden sm:inline">Medição</span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-4">
+           <Badge variant="outline" className="font-mono text-[10px]">{state.xp} XP</Badge>
+           <Button variant="outline" size="sm" className="h-8 gap-2" onClick={() => setShowDiagram(true)}>
+             <BookOpen size={14} /> Esquema
+           </Button>
+        </div>
+      </div>
+
+      <div className="flex-1 flex overflow-hidden">
       {/* Quiz Modal Overlay */}
       {state.status === 'QUIZ_PENDING' && state.quiz?.currentQuestion && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
