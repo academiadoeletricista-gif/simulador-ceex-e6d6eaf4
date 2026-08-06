@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAppStore } from "@/store/useAppStore";
 import { Zap, Clock, Target, Award, ArrowRight } from "lucide-react";
 
@@ -12,7 +12,7 @@ function Index() {
   const { xp, level, streak } = useAppStore();
 
   return (
-    <div className="min-h-screen bg-background p-8 space-y-8">
+    <div className="p-8 space-y-8 max-w-7xl mx-auto">
       {/* Top Header */}
       <header className="flex items-center justify-between">
         <div>
@@ -20,12 +20,12 @@ function Index() {
           <p className="text-muted-foreground">Bem-vindo ao Laboratório de Diagnóstico em Comandos Elétricos</p>
         </div>
         <div className="flex gap-4">
-          <div className="flex items-center gap-2 bg-secondary/50 px-4 py-2 rounded-full font-medium">
-            <Zap className="h-5 w-5 text-primary" />
+          <div className="flex items-center gap-2 bg-secondary/10 text-secondary px-4 py-2 rounded-full font-medium border border-secondary/20">
+            <Zap className="h-5 w-5" />
             <span>Nível {level}</span>
           </div>
-          <div className="flex items-center gap-2 bg-secondary/50 px-4 py-2 rounded-full font-medium">
-            <Award className="h-5 w-5 text-secondary" />
+          <div className="flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full font-medium border border-primary/20">
+            <Award className="h-5 w-5" />
             <span>{xp} XP</span>
           </div>
         </div>
@@ -40,7 +40,7 @@ function Index() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">{streak} dias</div>
-            <p className="text-xs text-muted-foreground">Continue mantendo o foco!</p>
+            <p className="text-xs text-muted-foreground mt-1">Continue mantendo o foco!</p>
           </CardContent>
         </Card>
         <Card>
@@ -50,7 +50,7 @@ function Index() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">98%</div>
-            <p className="text-xs text-muted-foreground">Baseado nos últimos 50 diagnósticos</p>
+            <p className="text-xs text-muted-foreground mt-1">Baseado nos últimos 50 diagnósticos</p>
           </CardContent>
         </Card>
         <Card>
@@ -60,7 +60,7 @@ function Index() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">4.2 min</div>
-            <p className="text-xs text-muted-foreground">Diagnóstico rápido e eficiente</p>
+            <p className="text-xs text-muted-foreground mt-1">Diagnóstico rápido e eficiente</p>
           </CardContent>
         </Card>
       </div>
@@ -68,18 +68,18 @@ function Index() {
       {/* Featured Case */}
       <section>
         <h2 className="text-xl font-semibold mb-4">Recomendação do Dia</h2>
-        <Card className="flex flex-col md:flex-row overflow-hidden">
-          <div className="w-full md:w-1/3 bg-muted p-8 flex items-center justify-center">
-            <div className="text-6xl">⚡</div>
+        <Card className="flex flex-col md:flex-row overflow-hidden border-none bg-card/50">
+          <div className="w-full md:w-1/3 bg-muted/20 p-8 flex items-center justify-center">
+            <div className="text-6xl animate-pulse">⚡</div>
           </div>
-          <div className="flex-1 p-6 flex flex-col justify-center gap-4">
+          <div className="flex-1 p-8 flex flex-col justify-center gap-6">
             <div>
               <h3 className="text-2xl font-bold">Diagnóstico de Partida Estrela-Triângulo</h3>
-              <p className="text-muted-foreground">Identifique falhas no contator principal e temporizador.</p>
+              <p className="text-muted-foreground mt-2 max-w-lg">Identifique falhas comuns no contator principal e no temporizador eletrônico em sistemas de partida de motores trifásicos.</p>
             </div>
             <div className="flex gap-4">
-              <Button>Iniciar Diagnóstico <ArrowRight className="ml-2 h-4 w-4" /></Button>
-              <Button variant="outline">Ver Biblioteca</Button>
+              <Button size="lg" className="gap-2">Iniciar Diagnóstico <ArrowRight className="h-4 w-4" /></Button>
+              <Button variant="outline" size="lg">Ver Biblioteca</Button>
             </div>
           </div>
         </Card>
