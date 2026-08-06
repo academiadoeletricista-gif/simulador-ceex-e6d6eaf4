@@ -162,7 +162,7 @@ export class DiagnosisEngine {
         break;
       }
       case FaultType.OPEN_START_BUTTON: {
-        const s2 = this.components.get(targetId || 'S2');
+        const s2 = this.components.get(targetId || 'S2') || this.components.get('S1');
         if (s2) {
           s2.failureStatus = 'STUCK_OPEN';
           console.log(`[DiagnosisEngine] START BUTTON ${s2.id} set to STUCK_OPEN`);
@@ -172,7 +172,7 @@ export class DiagnosisEngine {
         break;
       }
       case FaultType.OPEN_STOP_BUTTON: {
-        const s1 = this.components.get(targetId || 'S1');
+        const s1 = this.components.get(targetId || 'S1') || this.components.get('S0');
         if (s1) {
           s1.failureStatus = 'STUCK_OPEN';
           console.log(`[DiagnosisEngine] STOP BUTTON ${s1.id} set to STUCK_OPEN`);
