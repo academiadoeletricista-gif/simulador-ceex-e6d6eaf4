@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
-import { Trophy, Award, Clock, Target, Calendar } from "lucide-react";
+import { Trophy, Award, Clock, Target, Calendar, Zap } from "lucide-react";
 
 export const Route = createFileRoute("/profile")({
   component: ProfilePage,
@@ -23,7 +23,7 @@ function ProfilePage() {
           </div>
         </div>
         <div className="space-y-2 flex-1">
-          <h1 className="text-4xl font-bold tracking-tight">Eng. Carlos Alberto</h1>
+          <h1 className="text-4xl font-bold tracking-tight text-foreground">Eng. Carlos Alberto</h1>
           <p className="text-xl text-muted-foreground italic">Especialista em Automação Industrial</p>
           <div className="flex flex-wrap gap-3 mt-4">
             <Badge className="bg-primary/20 text-primary border-primary/20">Membro Premium</Badge>
