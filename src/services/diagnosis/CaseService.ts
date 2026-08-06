@@ -3,7 +3,7 @@ import { DiagnosticCase } from "@/types/diagnosis";
 
 export const CaseService = {
   async getAll(): Promise<DiagnosticCase[]> {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('diagnostic_cases')
       .select(`
         *,
@@ -20,11 +20,11 @@ export const CaseService = {
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    return data as unknown as DiagnosticCase[];
+    return (data as any[]).map(this.mapToCamelCase);
   },
 
   async getById(id: string): Promise<DiagnosticCase | null> {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('diagnostic_cases')
       .select(`
         *,
@@ -45,17 +45,65 @@ export const CaseService = {
       if (error.code === 'PGRST116') return null;
       throw error;
     }
-    return data as unknown as DiagnosticCase;
+    return this.mapToCamelCase(data);
   },
 
   async getByLab(labId: string): Promise<DiagnosticCase[]> {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('diagnostic_cases')
       .select('*')
       .eq('laboratory_id', labId)
       .eq('status', 'published');
 
     if (error) throw error;
-    return data as unknown as DiagnosticCase[];
+    return (data as any[]).map(this.mapToCamelCase);
+  },
+
+  mapToCamelCase(item: any): DiagnosticCase {
+    return {
+      id: item.id,
+      laboratoryId: item.laboratory_id,
+      circuitId: item.circuit_id,
+      code: item.code,
+      title: item.title,
+      description: item.description,
+      category: item.category,
+      level: item.level,
+      xpReward: item.xp_reward,
+      timeEstimate: item.time_estimate,
+      complexity: item.complexity,
+      author: item.author,
+      version: item.version,
+      status: item.status,
+      createdAt: item.created_at,
+      updatedAt: item.updated_at,
+      occurrence: item.occurrence ? {
+        id: item.occurrence.id,
+        caseId: item.occurrence.case_id,
+        title: item.occurrence.title,
+        description: item.occurrence.description,
+        operationalContext: item.occurrence.operational_context,
+        equipment: item.occurrence.equipment,
+        location: item.occurrence.location,
+        occurrenceDate: item.occurrence.occurrence_date,
+        shift: item.occurrence.shift,
+        responsible: item.occurrence.responsible,
+        history: item.occurrence.history,
+        initialCondition: item.occurrence.initial_condition,
+        urgency: item.occurrence.urgency,
+        criticality: item.occurrence.criticality,
+        operationalRisk: item.occurrence.operational_risk,
+        operatorMessage: item.occurrence.operator_message
+      } : undefined,
+      // Simplified mapping for arrays for brevity in this initial implementation
+      symptoms: item.symptoms?.map((s: any) => ({ ...s, caseId: s.case_id })),
+      components: item.components?.map((c: any) => ({ ...c, caseId: c.case_id, componentTag: c.component_tag })),
+      measurements: item.measurements?.map((m: any) => ({ ...m, caseId: m.case_id, pointCode: m.point_code })),
+      actions: item.actions?.map((a: any) => ({ ...a, caseId: a.case_id, timeCost: a.time_cost, xpReward: a.xp_reward })),
+      hypotheses: item.hypotheses?.map((h: any) => ({ ...h, caseId: h.case_id })),
+      hints: item.hints?.map((h: any) => ({ ...h, caseId: h.case_id, xpPenalty: h.xp_penalty })),
+      errors: item.errors?.map((e: any) => ({ ...e, caseId: e.case_id, xpPenalty: e.xp_penalty })),
+      lesson: item.lesson ? { ...item.lesson, caseId: item.lesson.case_id } : undefined
+    } as unknown as DiagnosticCase;
   }
 };
