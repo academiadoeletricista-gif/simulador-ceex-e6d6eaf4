@@ -116,6 +116,12 @@ export class DiagnosisEngine {
 
     let observation = "Ação executada.";
 
+    // Handle narrative node transitions if the action matches a choice in the current node
+    if (this.currentCase?.occurrence) {
+      // For now, if the action is a choice label from the reference project style
+      // We map these to the narrative flow
+    }
+
     if (action === 'PRESS_START') {
       const targetId = params.id || 'S2';
       const start = this.components.get(targetId) as SwitchComponent;
@@ -155,7 +161,7 @@ export class DiagnosisEngine {
         if (this.activeFault) {
           const faultComponentMap: Record<string, string> = {
             'F1': FaultType.OPEN_FUSE,
-            'K1': FaultType.BROKEN_COIL, // Simple mapping, could be refined
+            'K1': FaultType.BROKEN_COIL,
             'S2': FaultType.OPEN_START_BUTTON,
             'S1': FaultType.OPEN_STOP_BUTTON,
             'F2': FaultType.TRIPPED_RELAY
@@ -166,6 +172,9 @@ export class DiagnosisEngine {
         }
         observation = `Componente ${params.id} substituído por um novo.`;
       }
+    } else if (action === 'NEXT_STEP') {
+        // Explicit narrative transition
+        this.currentNodeId = params.nextId || this.currentNodeId;
     }
     
     this.components.forEach(c => c.updateState());
