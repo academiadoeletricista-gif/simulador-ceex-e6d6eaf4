@@ -180,9 +180,11 @@ function SimulationsPage() {
                         className="text-[10px] h-8"
                         onClick={async () => {
                           const [n1, n2] = pair.split('-');
-                          const v = measure(n1, n2);
-                          setMultimeterValue(v);
-                          await selectChoice('MEASURE_VOLTAGE', { node1: n1, node2: n2 });
+                          if (n1 && n2) {
+                            const v = measure(n1, n2);
+                            setMultimeterValue(v);
+                            await selectChoice('MEASURE_VOLTAGE', { node1: n1, node2: n2 });
+                          }
                         }}
                       >
                         {pair}
