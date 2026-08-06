@@ -60,6 +60,28 @@ export interface DailyChallenge {
   completed: boolean;
 }
 
+export interface Organization {
+  id: string;
+  name: string;
+  departments: string[];
+  teams: { id: string; name: string; memberCount: number }[];
+  subscription: {
+    plan: 'Free' | 'Starter' | 'Professional' | 'Enterprise';
+    status: 'active' | 'past_due' | 'canceled';
+    renewDate: string;
+  };
+}
+
+export interface Product {
+  id: string;
+  title: string;
+  price: number;
+  type: 'Curso' | 'Biblioteca' | 'Simulador' | 'Mentoria' | 'Plano' | 'Certificação';
+  rating: number;
+  image?: string;
+  description?: string;
+}
+
 interface AppState {
   // User Progression
   userName: string;
@@ -67,6 +89,11 @@ interface AppState {
   level: number;
   levelTitle: UserLevel;
   nextLevelXp: number;
+  
+  // B2B & Billing
+  organization: Organization | null;
+  marketplace: Product[];
+  cart: string[]; // product ids
   
   // Stats
   streak: StreakData;
@@ -87,6 +114,8 @@ interface AppState {
   unlockBadge: (id: string) => void;
   recordActivity: () => void;
   updateSkill: (id: string, xpAmount: number) => void;
+  addToCart: (id: string) => void;
+  removeFromCart: (id: string) => void;
 }
 
 const INITIAL_SKILLS: SkillNode[] = [
@@ -115,6 +144,29 @@ export const useAppStore = create<AppState>()(
       level: 12,
       levelTitle: 'Técnico Pleno',
       nextLevelXp: 3000,
+      
+      organization: {
+        id: 'org-1',
+        name: 'Indústrias Metalúrgicas S.A.',
+        departments: ['Manutenção Elétrica', 'Automação', 'Engenharia de Campo'],
+        teams: [
+          { id: 't1', name: 'Turno A', memberCount: 12 },
+          { id: 't2', name: 'Turno B', memberCount: 15 },
+          { id: 't3', name: 'Especialistas', memberCount: 5 },
+        ],
+        subscription: {
+          plan: 'Professional',
+          status: 'active',
+          renewDate: '2026-09-15',
+        }
+      },
+      marketplace: [
+        { id: '1', title: 'Curso Avançado CLP', price: 2500, type: 'Curso', rating: 4.8 },
+        { id: '2', title: 'Biblioteca de Simbologia', price: 500, type: 'Biblioteca', rating: 4.5 },
+        { id: '3', title: 'Simulador de Falhas 3D', price: 5000, type: 'Simulador', rating: 4.9 },
+        { id: '4', title: 'Mentoria Técnica Individual', price: 10000, type: 'Mentoria', rating: 5.0 },
+      ],
+      cart: [],
       
       streak: {
         current: 7,
@@ -203,6 +255,14 @@ export const useAppStore = create<AppState>()(
           }
           return node;
         })
+      })),
+
+      addToCart: (id) => set((state) => ({
+        cart: state.cart.includes(id) ? state.cart : [...state.cart, id]
+      })),
+
+      removeFromCart: (id) => set((state) => ({
+        cart: state.cart.filter(itemId => itemId !== id)
       }))
     }),
     {
