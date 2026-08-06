@@ -41,6 +41,165 @@ export type Database = {
         }
         Relationships: []
       }
+      asset_links: {
+        Row: {
+          asset_id: string | null
+          created_at: string | null
+          entity_id: string
+          entity_type: string
+          id: string
+        }
+        Insert: {
+          asset_id?: string | null
+          created_at?: string | null
+          entity_id: string
+          entity_type: string
+          id?: string
+        }
+        Update: {
+          asset_id?: string | null
+          created_at?: string | null
+          entity_id?: string
+          entity_type?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "asset_links_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      asset_tags: {
+        Row: {
+          asset_id: string
+          tag: string
+        }
+        Insert: {
+          asset_id: string
+          tag: string
+        }
+        Update: {
+          asset_id?: string
+          tag?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "asset_tags_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      asset_versions: {
+        Row: {
+          asset_id: string | null
+          author: string | null
+          changes: string | null
+          created_at: string | null
+          id: string
+          path: string
+          public_url: string | null
+          version: string
+        }
+        Insert: {
+          asset_id?: string | null
+          author?: string | null
+          changes?: string | null
+          created_at?: string | null
+          id?: string
+          path: string
+          public_url?: string | null
+          version: string
+        }
+        Update: {
+          asset_id?: string | null
+          author?: string | null
+          changes?: string | null
+          created_at?: string | null
+          id?: string
+          path?: string
+          public_url?: string | null
+          version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "asset_versions_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      assets: {
+        Row: {
+          author: string | null
+          bucket: string
+          category: Database["public"]["Enums"]["asset_category"]
+          code: string
+          created_at: string | null
+          description: string | null
+          format: string
+          id: string
+          language: string | null
+          metadata: Json | null
+          path: string
+          public_url: string | null
+          status: Database["public"]["Enums"]["asset_status"] | null
+          thumbnail_url: string | null
+          title: string
+          type: string
+          updated_at: string | null
+          version: string | null
+        }
+        Insert: {
+          author?: string | null
+          bucket: string
+          category: Database["public"]["Enums"]["asset_category"]
+          code: string
+          created_at?: string | null
+          description?: string | null
+          format: string
+          id?: string
+          language?: string | null
+          metadata?: Json | null
+          path: string
+          public_url?: string | null
+          status?: Database["public"]["Enums"]["asset_status"] | null
+          thumbnail_url?: string | null
+          title: string
+          type: string
+          updated_at?: string | null
+          version?: string | null
+        }
+        Update: {
+          author?: string | null
+          bucket?: string
+          category?: Database["public"]["Enums"]["asset_category"]
+          code?: string
+          created_at?: string | null
+          description?: string | null
+          format?: string
+          id?: string
+          language?: string | null
+          metadata?: Json | null
+          path?: string
+          public_url?: string | null
+          status?: Database["public"]["Enums"]["asset_status"] | null
+          thumbnail_url?: string | null
+          title?: string
+          type?: string
+          updated_at?: string | null
+          version?: string | null
+        }
+        Relationships: []
+      }
       case_sessions: {
         Row: {
           answers: Json | null
@@ -150,6 +309,56 @@ export type Database = {
           },
         ]
       }
+      diagram_hotspots: {
+        Row: {
+          asset_id: string | null
+          component_id: string | null
+          created_at: string | null
+          height: number
+          id: string
+          metadata: Json | null
+          tag: string | null
+          type: string | null
+          width: number
+          x: number
+          y: number
+        }
+        Insert: {
+          asset_id?: string | null
+          component_id?: string | null
+          created_at?: string | null
+          height: number
+          id?: string
+          metadata?: Json | null
+          tag?: string | null
+          type?: string | null
+          width: number
+          x: number
+          y: number
+        }
+        Update: {
+          asset_id?: string | null
+          component_id?: string | null
+          created_at?: string | null
+          height?: number
+          id?: string
+          metadata?: Json | null
+          tag?: string | null
+          type?: string | null
+          width?: number
+          x?: number
+          y?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diagram_hotspots_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       laboratories: {
         Row: {
           base_circuit_data: Json | null
@@ -206,6 +415,53 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      panel_hotspots: {
+        Row: {
+          asset_id: string | null
+          component_id: string | null
+          created_at: string | null
+          height: number
+          id: string
+          metadata: Json | null
+          tooltip: string | null
+          width: number
+          x: number
+          y: number
+        }
+        Insert: {
+          asset_id?: string | null
+          component_id?: string | null
+          created_at?: string | null
+          height: number
+          id?: string
+          metadata?: Json | null
+          tooltip?: string | null
+          width: number
+          x: number
+          y: number
+        }
+        Update: {
+          asset_id?: string | null
+          component_id?: string | null
+          created_at?: string | null
+          height?: number
+          id?: string
+          metadata?: Json | null
+          tooltip?: string | null
+          width?: number
+          x?: number
+          y?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "panel_hotspots_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "assets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -319,7 +575,29 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      asset_category:
+        | "Diagrama de Potência"
+        | "Diagrama de Comando"
+        | "Diagrama Funcional"
+        | "Diagrama Multifilar"
+        | "Diagrama Unifilar"
+        | "Painel Frontal"
+        | "Painel Interno"
+        | "Foto"
+        | "Vídeo"
+        | "Áudio"
+        | "Animação"
+        | "PDF"
+        | "Manual"
+        | "Catálogo"
+        | "Datasheet"
+        | "Checklist"
+        | "Norma"
+        | "Fluxograma"
+        | "Modelo 3D"
+        | "Símbolo Elétrico"
+        | "Documento Técnico"
+      asset_status: "active" | "inactive" | "archived" | "draft"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -446,6 +724,31 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      asset_category: [
+        "Diagrama de Potência",
+        "Diagrama de Comando",
+        "Diagrama Funcional",
+        "Diagrama Multifilar",
+        "Diagrama Unifilar",
+        "Painel Frontal",
+        "Painel Interno",
+        "Foto",
+        "Vídeo",
+        "Áudio",
+        "Animação",
+        "PDF",
+        "Manual",
+        "Catálogo",
+        "Datasheet",
+        "Checklist",
+        "Norma",
+        "Fluxograma",
+        "Modelo 3D",
+        "Símbolo Elétrico",
+        "Documento Técnico",
+      ],
+      asset_status: ["active", "inactive", "archived", "draft"],
+    },
   },
 } as const

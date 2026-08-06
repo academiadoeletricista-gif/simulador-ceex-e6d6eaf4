@@ -1,4 +1,5 @@
 import { CaseDifficulty } from "@/domains/diagnosis/types/enums";
+import { Asset } from "./assets";
 
 export interface ComponentCategory {
   id: string;
@@ -30,6 +31,7 @@ export interface Component {
   power?: string;
   observations?: string;
   status: 'active' | 'inactive';
+  assets?: Asset[];
 }
 
 export interface Circuit {
@@ -51,6 +53,7 @@ export interface Circuit {
   bibliography?: string;
   version: string;
   status: 'active' | 'inactive';
+  assets?: Asset[];
 }
 
 export interface MeasurementPoint {
@@ -68,6 +71,7 @@ export interface MeasurementPoint {
   unit?: string;
   observations?: string;
   status: 'active' | 'inactive';
+  assets?: Asset[];
 }
 
 export interface LearningResource {
@@ -80,6 +84,7 @@ export interface LearningResource {
   url: string;
   metadata?: any;
   status: 'active' | 'inactive';
+  asset?: Asset;
 }
 
 export interface Laboratory {
@@ -117,6 +122,7 @@ export interface Laboratory {
   components?: Component[];
   measurementMap?: MeasurementPoint[];
   resources?: LearningResource[];
+  assets?: Asset[];
 }
 
 export interface LabDefect {
@@ -140,6 +146,7 @@ export interface LabDefect {
   explanations?: string;
   lessonsLearned?: string[];
   scoring?: any;
-  assets?: any;
+  assets?: Asset[]; // Updated to use real Asset type
   checklist?: string[];
 }
+

@@ -1,3 +1,7 @@
+export * from './laboratory';
+export * from './enterprise';
+export * from './assets';
+
 export interface Case {
   id: string;
   title: string;
@@ -21,3 +25,4 @@ export interface UserProfile {
   avgTime: string;
   medals: number;
 }
+
