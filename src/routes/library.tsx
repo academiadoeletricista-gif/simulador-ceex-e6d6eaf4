@@ -135,19 +135,29 @@ function LibraryPage() {
           return (
             <Card 
               key={c.id} 
-              className="cursor-pointer hover:border-primary/50 transition-all group overflow-hidden"
+              className={cn(
+                "cursor-pointer hover:border-primary/50 transition-all group overflow-hidden border-2",
+                status === 'completed' ? "border-green-500/30" : "border-border"
+              )}
               onClick={() => handleCaseClick(c.id)}
             >
-              <div className="h-32 w-full overflow-hidden bg-muted">
+              <div className="relative h-32 w-full overflow-hidden bg-muted">
                 <img src={c.image} alt={c.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                {status === 'completed' && (
+                  <div className="absolute inset-0 bg-green-500/10 flex items-center justify-center backdrop-blur-[1px]">
+                    <div className="bg-green-500 text-white p-1 rounded-full shadow-lg">
+                      <Search className="h-4 w-4" />
+                    </div>
+                  </div>
+                )}
               </div>
               <CardHeader>
                 <div className="flex justify-between items-start mb-2">
                   <Badge variant="outline">{c.category}</Badge>
                   <div className="flex gap-2">
-                    {status === 'completed' && <Badge variant="default" className="bg-green-500">Concluído</Badge>}
+                    {status === 'completed' && <Badge variant="default" className="bg-green-500 hover:bg-green-600">Concluído</Badge>}
                     {status === 'in_progress' && <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-500">Em andamento</Badge>}
-                    <span className="text-xs font-medium text-primary">{c.xp} XP</span>
+                    <span className="text-xs font-medium text-primary">+{c.xp} XP</span>
                   </div>
                 </div>
                 <CardTitle className="group-hover:text-primary transition-colors text-lg">{c.title}</CardTitle>
