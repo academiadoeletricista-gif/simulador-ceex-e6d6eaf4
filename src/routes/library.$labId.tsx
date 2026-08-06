@@ -29,7 +29,7 @@ export const Route = createFileRoute("/library/$labId")({
 });
 
 function LabDetail() {
-  const { labId } = useParams({ from: '/library/$labId' });
+  const { labId } = Route.useParams();
   const navigate = useNavigate();
 
   const { data: labResult, isLoading: labLoading } = useLaboratory(labId);

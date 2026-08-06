@@ -87,7 +87,7 @@ function Library() {
           <Card 
             key={lab.id} 
             className="group hover:border-primary/50 transition-all cursor-pointer overflow-hidden border-2"
-            onClick={() => navigate({ to: `/library/${lab.id}` })}
+            onClick={() => navigate({ to: '/library/$labId', params: { labId: lab.id } })}
           >
             <div className="h-32 bg-muted relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent group-hover:scale-110 transition-transform duration-500" />
