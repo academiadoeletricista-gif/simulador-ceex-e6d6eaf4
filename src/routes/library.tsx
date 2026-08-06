@@ -72,7 +72,6 @@ export const cases = [
 function LibraryPage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const { sessions } = useAppStore();
   const navigate = useNavigate();
 
   const { profile, cases: dbCases, sessions } = useAppStore();
