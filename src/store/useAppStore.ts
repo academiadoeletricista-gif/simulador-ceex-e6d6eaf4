@@ -49,6 +49,8 @@ export interface Achievement {
 
 export interface Case {
   id: string;
+  laboratory_id: string | null;
+  code: string | null;
   slug: string;
   title: string;
   category: string;
@@ -62,6 +64,7 @@ export interface Case {
   diagram_url: string | null;
   content?: any;
 }
+
 
 export interface CaseSession {
   case_id: string;
@@ -175,7 +178,10 @@ export const useAppStore = create<AppState>((set, get) => ({
 
       const formattedCases: Case[] = (casesData || []).map(c => ({
         id: c.id,
+        laboratory_id: c.laboratory_id,
+        code: c.code,
         slug: c.slug,
+
         title: c.title,
         category: c.category,
         level: c.level,

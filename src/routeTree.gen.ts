@@ -21,6 +21,7 @@ import { Route as RankingRouteImport } from './routes/ranking'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SimulationsRouteImport } from './routes/simulations'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as LibraryLabIdRouteImport } from './routes/library.$labId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -82,6 +83,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/admin/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LibraryLabIdRoute = LibraryLabIdRouteImport.update({
+  id: '/$labId',
+  path: '/$labId',
+  getParentRoute: () => LibraryRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -89,12 +95,13 @@ export interface FileRoutesByFullPath {
   '/b2b': typeof B2bRoute
   '/billing': typeof BillingRoute
   '/certifications': typeof CertificationsRoute
-  '/library': typeof LibraryRoute
+  '/library': typeof LibraryRouteWithChildren
   '/marketplace': typeof MarketplaceRoute
   '/profile': typeof ProfileRoute
   '/ranking': typeof RankingRoute
   '/settings': typeof SettingsRoute
   '/simulations': typeof SimulationsRoute
+  '/library/$labId': typeof LibraryLabIdRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
@@ -103,12 +110,13 @@ export interface FileRoutesByTo {
   '/b2b': typeof B2bRoute
   '/billing': typeof BillingRoute
   '/certifications': typeof CertificationsRoute
-  '/library': typeof LibraryRoute
+  '/library': typeof LibraryRouteWithChildren
   '/marketplace': typeof MarketplaceRoute
   '/profile': typeof ProfileRoute
   '/ranking': typeof RankingRoute
   '/settings': typeof SettingsRoute
   '/simulations': typeof SimulationsRoute
+  '/library/$labId': typeof LibraryLabIdRoute
   '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
@@ -118,12 +126,13 @@ export interface FileRoutesById {
   '/b2b': typeof B2bRoute
   '/billing': typeof BillingRoute
   '/certifications': typeof CertificationsRoute
-  '/library': typeof LibraryRoute
+  '/library': typeof LibraryRouteWithChildren
   '/marketplace': typeof MarketplaceRoute
   '/profile': typeof ProfileRoute
   '/ranking': typeof RankingRoute
   '/settings': typeof SettingsRoute
   '/simulations': typeof SimulationsRoute
+  '/library/$labId': typeof LibraryLabIdRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -140,6 +149,7 @@ export interface FileRouteTypes {
     | '/ranking'
     | '/settings'
     | '/simulations'
+    | '/library/$labId'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -154,6 +164,7 @@ export interface FileRouteTypes {
     | '/ranking'
     | '/settings'
     | '/simulations'
+    | '/library/$labId'
     | '/admin'
   id:
     | '__root__'
@@ -168,6 +179,7 @@ export interface FileRouteTypes {
     | '/ranking'
     | '/settings'
     | '/simulations'
+    | '/library/$labId'
     | '/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -177,7 +189,7 @@ export interface RootRouteChildren {
   B2bRoute: typeof B2bRoute
   BillingRoute: typeof BillingRoute
   CertificationsRoute: typeof CertificationsRoute
-  LibraryRoute: typeof LibraryRoute
+  LibraryRoute: typeof LibraryRouteWithChildren
   MarketplaceRoute: typeof MarketplaceRoute
   ProfileRoute: typeof ProfileRoute
   RankingRoute: typeof RankingRoute
@@ -272,8 +284,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/library/$labId': {
+      id: '/library/$labId'
+      path: '/$labId'
+      fullPath: '/library/$labId'
+      preLoaderRoute: typeof LibraryLabIdRouteImport
+      parentRoute: typeof LibraryRoute
+    }
   }
 }
+
+interface LibraryRouteChildren {
+  LibraryLabIdRoute: typeof LibraryLabIdRoute
+}
+
+const LibraryRouteChildren: LibraryRouteChildren = {
+  LibraryLabIdRoute: LibraryLabIdRoute,
+}
+
+const LibraryRouteWithChildren =
+  LibraryRoute._addFileChildren(LibraryRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -281,7 +311,7 @@ const rootRouteChildren: RootRouteChildren = {
   B2bRoute: B2bRoute,
   BillingRoute: BillingRoute,
   CertificationsRoute: CertificationsRoute,
-  LibraryRoute: LibraryRoute,
+  LibraryRoute: LibraryRouteWithChildren,
   MarketplaceRoute: MarketplaceRoute,
   ProfileRoute: ProfileRoute,
   RankingRoute: RankingRoute,
