@@ -31,7 +31,7 @@ export class CaseRepository {
   async findById(id: string): Promise<Result<DiagnosticCase | null>> {
     try {
       const { data, error } = await (supabase as any)
-        .from('diagnostic_cases')
+        .from('cases')
         .select(`
           *,
           occurrence:case_occurrences(*),
