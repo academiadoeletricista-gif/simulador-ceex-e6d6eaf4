@@ -72,7 +72,7 @@ function SimulationsPage() {
           {state.history.map((actionId, index) => (
             <div key={index} className="p-4 hover:bg-muted/30 transition-colors border-l-2 border-primary/20">
               <p className="text-sm font-medium">Ação #{index + 1}</p>
-              <p className="text-[10px] text-muted-foreground">Executada com sucesso.</p>
+              <p className="text-[10px] text-muted-foreground">{(actionId as any).result || 'Ação executada.'}</p>
             </div>
           ))}
           {isCompleted && (
