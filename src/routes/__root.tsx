@@ -137,13 +137,10 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const sidebarOpen = useAppStore(state => state.isSidebarOpen);
+  const toggleSidebar = useAppStore(state => state.toggleSidebar);
   const location = useLocation();
-  const fetchInitialData = useAppStore(state => state.fetchInitialData);
 
-  useEffect(() => {
-    fetchInitialData();
-  }, [fetchInitialData]);
 
 
   const menuItems = [
