@@ -25,6 +25,8 @@ import {
   Settings,
   Menu,
   X,
+  Briefcase,
+  CreditCard,
 } from "lucide-react";
 
 import appCss from "../styles.css?url";
@@ -142,9 +144,10 @@ function RootComponent() {
     { icon: Trophy, label: "Ranking", path: "/ranking" },
     { icon: Award, label: "Conquistas", path: "/achievements" },
     { icon: Award, label: "Certificações", path: "/certifications" },
-    { icon: Users, label: "Comunidade", path: "/community" },
+    { icon: Briefcase, label: "Empresas", path: "/b2b" },
     { icon: Store, label: "Marketplace", path: "/marketplace" },
     { icon: User, label: "Perfil", path: "/profile" },
+    { icon: CreditCard, label: "Assinatura", path: "/billing" },
     { icon: Settings, label: "Configurações", path: "/settings" },
   ];
 
