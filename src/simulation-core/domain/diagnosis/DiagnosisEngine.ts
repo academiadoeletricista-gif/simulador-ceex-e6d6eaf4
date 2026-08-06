@@ -2,6 +2,11 @@ import { CircuitSolver } from '../solver/CircuitSolver';
 import { SimulationState, SessionStatus } from '../sessions/SimulationSession';
 import { ElectricalComponent, SwitchComponent, ContactorComponent } from '../components/ElectricalComponent';
 import { CircuitBreakerComponent, ThermalRelayComponent, MotorComponent } from '../components/IndustrialComponents';
+import { QuizState, QuizQuestion } from '../quiz/QuizTypes';
+import { COMPONENT_QUIZ_POOL, FAULT_QUIZ_POOL } from '../quiz/QuizPool';
+import { ReportGenerator } from '../reports/ReportGenerator';
+import { TechnicalReport } from '../reports/ReportTypes';
+
 
 export enum FaultType {
   OPEN_FUSE = 'OPEN_FUSE',
@@ -26,6 +31,15 @@ export class DiagnosisEngine {
   private startTime: number = Date.now();
   private status: SessionStatus = SessionStatus.IN_PROGRESS;
   private activeFault: FaultType | null = null;
+  private quizState: QuizState = {
+    currentQuestion: null,
+    answeredQuestions: [],
+    totalPoints: 0
+  };
+  private report: TechnicalReport | null = null;
+  private totalXP: number = 0;
+  private totalScore: number = 100;
+
 
   constructor() {
     this.solver = new CircuitSolver();
