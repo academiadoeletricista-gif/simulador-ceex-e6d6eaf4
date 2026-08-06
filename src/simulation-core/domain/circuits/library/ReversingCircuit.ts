@@ -53,6 +53,13 @@ export class ReversingCircuit {
 
     // S0 - STOP (NC)
     const s0 = new SwitchComponent('S0', ComponentType.PUSHBUTTON_STOP, false);
+    // Add alias for standard STOP (S1) in some cases
+    const s1_alias = new SwitchComponent('S1', ComponentType.PUSHBUTTON_STOP, false);
+    s1_alias.terminals = {
+      '1': { id: 't1', name: '1', voltage: 0, nodeId: 'ctrl_in' },
+      '2': { id: 't2', name: '2', voltage: 0, nodeId: 'ctrl_stop' }
+    };
+    solver.addComponent(s1_alias);
     s0.terminals = {
       '1': { id: 't1', name: '1', voltage: 0, nodeId: 'ctrl_in' },
       '2': { id: 't2', name: '2', voltage: 0, nodeId: 'ctrl_stop' }

@@ -12,7 +12,7 @@ export const useDiagnosis = (caseId?: string) => {
   const player = SimulationPlayer.getInstance();
   const [state, setState] = useState<SimulationState>(player.getPlayerState());
   
-  const { data: sessionResult, isLoading: sessionLoading } = useSession(caseId || '');
+  const { data: sessionResult, isLoading: sessionLoading, error: sessionError } = useSession(caseId || '');
   const updateSessionMutation = useUpdateSession();
 
   const loadCase = useCallback((dbCase: DiagnosticCase) => {
@@ -54,6 +54,6 @@ export const useDiagnosis = (caseId?: string) => {
     answerQuiz,
     measure: player.performMeasurement.bind(player),
     isLoading: sessionLoading,
-    isError: !!sessionResult && !sessionResult.success
+    isError: (!!sessionResult && !sessionResult.success) || state.status === SessionStatus.ERROR || !!sessionError
   };
 };
