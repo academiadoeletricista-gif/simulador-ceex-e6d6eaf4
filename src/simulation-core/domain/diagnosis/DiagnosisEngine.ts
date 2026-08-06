@@ -366,6 +366,7 @@ export class DiagnosisEngine {
       currentNodeId: this.currentNodeId,
       xp: this.totalXP,
       score: this.totalScore,
+      error: this.errorMessage,
       quiz: {
         currentQuestion: this.quizState.currentQuestion,
         isCorrect: null
