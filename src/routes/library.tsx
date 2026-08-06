@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Search, Filter, BookOpen, Clock } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/library")({
   component: LibraryPage,
@@ -25,6 +27,16 @@ const cases = [
 ];
 
 function LibraryPage() {
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredCases = cases.filter(c => {
+    const matchesCategory = selectedCategory ? c.category === selectedCategory : true;
+    const matchesSearch = c.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          c.category.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
+
   return (
     <div className="p-8 space-y-8 max-w-7xl mx-auto">
       <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -34,13 +46,33 @@ function LibraryPage() {
         </div>
         <div className="relative w-full md:w-80">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Pesquisar casos..." className="pl-10" />
+          <Input 
+            placeholder="Pesquisar casos..." 
+            className="pl-10" 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
       </header>
 
       <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+        <Badge 
+          variant={selectedCategory === null ? "default" : "secondary"}
+          className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors whitespace-nowrap"
+          onClick={() => setSelectedCategory(null)}
+        >
+          Todos
+        </Badge>
         {categories.map((cat) => (
-          <Badge key={cat} variant="secondary" className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors whitespace-nowrap">
+          <Badge 
+            key={cat} 
+            variant={selectedCategory === cat ? "default" : "secondary"}
+            className={cn(
+              "cursor-pointer transition-colors whitespace-nowrap",
+              selectedCategory === cat ? "bg-primary text-primary-foreground" : "hover:bg-primary/20"
+            )}
+            onClick={() => setSelectedCategory(selectedCategory === cat ? null : cat)}
+          >
             {cat}
           </Badge>
         ))}
@@ -50,7 +82,7 @@ function LibraryPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {cases.map((c) => (
+        {filteredCases.map((c) => (
           <Card key={c.id} className="cursor-pointer hover:border-primary/50 transition-all group">
             <CardHeader>
               <div className="flex justify-between items-start mb-2">
@@ -65,6 +97,11 @@ function LibraryPage() {
             </CardHeader>
           </Card>
         ))}
+        {filteredCases.length === 0 && (
+          <div className="col-span-full py-12 text-center text-muted-foreground">
+            Nenhum caso encontrado para os critérios selecionados.
+          </div>
+        )}
       </div>
     </div>
   );
