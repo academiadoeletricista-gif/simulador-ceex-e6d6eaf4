@@ -29,7 +29,7 @@ export const useAchievements = () => {
 
         if (error) return fail(error.message, error.code);
 
-        const achievements = (data || []).map(a => ({
+        const achievements = (data || []).map((a: any) => ({
           id: a.id,
           title: a.title,
           description: a.description,
