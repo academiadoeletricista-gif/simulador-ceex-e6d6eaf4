@@ -290,6 +290,23 @@ export const useAppStore = create<AppState>((set, get) => ({
     }
   },
 
+  addXp: async (amount) => {
+    const { profile } = get();
+    if (!profile) return;
+
+    const newXp = (profile.xp || 0) + amount;
+    const newLevel = Math.floor(newXp / 1000) + 1;
+
+    const { error } = await supabase
+      .from('profiles')
+      .update({ xp: newXp, level: newLevel })
+      .eq('id', profile.id);
+
+    if (!error) {
+      set({ profile: { ...profile, xp: newXp, level: newLevel } });
+    }
+  },
+
   signOut: async () => {
     await supabase.auth.signOut();
     set({ profile: null, sessions: {}, cases: [] });
@@ -323,7 +340,8 @@ export const useAppStore = create<AppState>((set, get) => ({
     const { profile } = get();
     if (profile) {
       const notifications = !profile.notifications;
-      await supabase.from('profiles').update({ notifications }).eq('id', profile.id);
+      // Note: notifications is a virtual property in UI for now, 
+      // or we can add it to profiles table if needed.
       set({ profile: { ...profile, notifications } });
     }
   }
