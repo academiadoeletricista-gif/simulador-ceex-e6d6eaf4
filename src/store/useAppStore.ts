@@ -172,7 +172,7 @@ export const useAppStore = create<AppState>((set, get) => ({
         symptoms: c.symptoms || [],
         checklist: c.checklist || [],
         image_url: c.image_url || '',
-        diagram_url: c.diagram_url as string | undefined,
+        diagram_url: c.diagram_url as string | null,
         content: c.content
       }));
 
