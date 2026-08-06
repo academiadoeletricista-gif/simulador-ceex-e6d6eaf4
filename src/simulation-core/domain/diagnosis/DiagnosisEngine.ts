@@ -144,9 +144,15 @@ export class DiagnosisEngine {
     const k1 = this.components.get('K1') as ContactorComponent;
     const motor = this.components.get('M1') as MotorComponent;
     
+    // Check success: Is the contactor energized?
+    const k1 = this.components.get('K1') as ContactorComponent;
+    const motor = this.components.get('M1') as MotorComponent;
+    
+    // Contactor physical state depends on voltage across A1-A2
+    // Motor state depends on K1 being energized
     if (k1?.isEnergized) {
       if (motor) motor.isRunning = true;
-      // Success condition: No active fault remaining
+      // Success condition: Contactor energized AND no active fault remaining
       if (!this.activeFault || this.activeFault === FaultType.NONE) {
         this.status = SessionStatus.COMPLETED;
       }
