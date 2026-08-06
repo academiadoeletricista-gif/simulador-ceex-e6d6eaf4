@@ -194,6 +194,13 @@ export class DiagnosisEngine {
       if (motor) motor.isRunning = false;
     }
 
+    console.log('DiagnosisEngine state update:', {
+      k1_energized: k1?.isEnergized,
+      q1_closed: q1?.isClosed,
+      motor_running: motor?.isRunning,
+      active_fault: this.activeFault
+    });
+
     this.history.push({ 
       action, 
       params, 
