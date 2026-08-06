@@ -66,6 +66,9 @@ export class DOLCircuit {
 
     // F1 - Control Fuse
     const f1 = new SwitchComponent('F1', ComponentType.FUSE, false);
+    // Add alias for cases referring to 'FUSE' generic tag
+    solver.addNode({ id: 'alias_f1_in', voltage: 0, connections: ['ctrl_in'] });
+    solver.addNode({ id: 'alias_f1_out', voltage: 0, connections: ['ctrl_f1'] });
     f1.terminals = {
       '1': { id: 't1', name: '1', voltage: 0, nodeId: 'ctrl_in' },
       '2': { id: 't2', name: '2', voltage: 0, nodeId: 'ctrl_f1' }
@@ -74,6 +77,13 @@ export class DOLCircuit {
 
     // S1 - STOP Button (NC)
     const s1 = new SwitchComponent('S1', ComponentType.PUSHBUTTON_STOP, false);
+    // Interlock check: add alias for S0
+    const s0_alias = new SwitchComponent('S0', ComponentType.PUSHBUTTON_STOP, false);
+    s0_alias.terminals = {
+      '1': { id: 't1', name: '1', voltage: 0, nodeId: 'ctrl_f1' },
+      '2': { id: 't2', name: '2', voltage: 0, nodeId: 'ctrl_stop' }
+    };
+    solver.addComponent(s0_alias);
     s1.terminals = {
       '1': { id: 't1', name: '1', voltage: 0, nodeId: 'ctrl_f1' },
       '2': { id: 't2', name: '2', voltage: 0, nodeId: 'ctrl_stop' }
