@@ -1,10 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { useAppStore, getLevelTitle } from "@/store/useAppStore";
-// cases removed from library.tsx
 import { 
   Zap, 
   Clock, 
@@ -15,7 +14,9 @@ import {
   CheckCircle2, 
   Calendar,
   Trophy,
-  Star
+  Star,
+  BookOpen,
+  ArrowUpRight
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -40,8 +41,12 @@ function Index() {
 
   const xpProgress = (xp / nextLevelXp) * 100;
   
-  const { cases: dbCases } = useAppStore();
+  const { cases: dbCases, laboratories } = useAppStore();
   const allCases = dbCases;
+  const navigate = useNavigate();
+  
+  // Encontrar um laboratório com progresso pendente
+  const recommendedLab = laboratories.find(l => l.progress < 100) || laboratories[0];
   
   // Encontrar um caso não concluído como recomendação
   const recommendedCase = allCases.find(c => !sessions[c.id] || sessions[c.id]?.status !== 'completed') || allCases[0];
@@ -117,42 +122,69 @@ function Index() {
             </Card>
           </div>
 
-          {/* Featured Recommendation */}
-          {recommendedCase && (
-            <section>
-              <div className="flex items-center justify-between mb-4">
+          {/* Recommendation Section */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Featured Laboratory */}
+            {recommendedLab && (
+              <section className="space-y-4">
+                <h2 className="text-xl font-bold flex items-center gap-2">
+                  <BookOpen className="h-5 w-5 text-primary" /> 
+                  Laboratório Sugerido
+                </h2>
+                <Card className="group overflow-hidden border-2 bg-card hover:border-primary/50 transition-all cursor-pointer" onClick={() => navigate({ to: `/library/${recommendedLab.id}` })}>
+                  <CardContent className="p-6 space-y-4">
+                    <div className="flex justify-between items-start">
+                      <Badge variant="outline" className="font-mono text-[10px] uppercase border-2">{recommendedLab.code}</Badge>
+                      <Badge variant="secondary" className="bg-primary/10 text-primary">{recommendedLab.level}</Badge>
+                    </div>
+                    <div className="space-y-1">
+                      <h3 className="font-bold text-lg group-hover:text-primary transition-colors">{recommendedLab.name}</h3>
+                      <p className="text-xs text-muted-foreground line-clamp-2">{recommendedLab.description}</p>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-[10px] font-bold uppercase">
+                        <span className="text-muted-foreground">Seu Progresso</span>
+                        <span>{recommendedLab.progress}%</span>
+                      </div>
+                      <Progress value={recommendedLab.progress} className="h-1.5" />
+                    </div>
+                    <Button variant="ghost" className="w-full h-8 text-xs p-0 group-hover:gap-3 transition-all">
+                      Acessar Laboratório <ArrowRight className="h-3 w-3" />
+                    </Button>
+                  </CardContent>
+                </Card>
+              </section>
+            )}
+
+            {/* Featured Case */}
+            {recommendedCase && (
+              <section className="space-y-4">
                 <h2 className="text-xl font-bold flex items-center gap-2">
                   <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" /> 
                   Próximo Desafio
                 </h2>
-              </div>
-              <Card className="group relative overflow-hidden border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
-                <CardContent className="p-0 flex flex-col md:flex-row">
-                  <div className="w-full md:w-48 bg-muted/20 flex items-center justify-center p-8 overflow-hidden">
-                    <img src={recommendedCase.image_url} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                  </div>
-                  <div className="p-6 flex-1 space-y-4">
-                    <div>
-                      <Badge className="mb-2">{recommendedCase.level}</Badge>
-                      <h3 className="text-xl font-bold">{recommendedCase.title}</h3>
-                      <p className="text-muted-foreground text-sm mt-1 line-clamp-2">
-                        {recommendedCase.description}
-                      </p>
+                <Card className="group overflow-hidden border-2 bg-card hover:border-primary/50 transition-all cursor-pointer" onClick={() => navigate({ to: '/simulations', search: { id: recommendedCase.id } })}>
+                  <CardContent className="p-6 space-y-4">
+                    <div className="flex justify-between items-start">
+                      <Badge variant="outline" className="font-mono text-[10px] uppercase border-2">{recommendedCase.code}</Badge>
+                      <Badge variant="secondary" className="bg-secondary/10 text-secondary">{recommendedCase.level}</Badge>
                     </div>
-                    <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                      <span className="flex items-center gap-1.5"><Zap className="h-4 w-4 text-primary" /> +{recommendedCase.xp_reward} XP</span>
-                      <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" /> {recommendedCase.time_estimate}</span>
+                    <div className="space-y-1">
+                      <h3 className="font-bold text-lg group-hover:text-primary transition-colors">{recommendedCase.title}</h3>
+                      <p className="text-xs text-muted-foreground line-clamp-2">{recommendedCase.description}</p>
                     </div>
-                    <Button asChild className="w-full md:w-auto gap-2 group-hover:gap-3 transition-all">
-                      <Link to="/simulations" search={{ id: recommendedCase.id }}>
-                        Iniciar Diagnóstico <ArrowRight className="h-4 w-4" />
-                      </Link>
+                    <div className="flex items-center gap-4 text-xs font-bold text-muted-foreground">
+                      <span className="flex items-center gap-1"><Zap className="h-3 w-3 text-primary" /> +{recommendedCase.xp_reward} XP</span>
+                      <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {recommendedCase.time_estimate}</span>
+                    </div>
+                    <Button variant="ghost" className="w-full h-8 text-xs p-0 group-hover:gap-3 transition-all">
+                      Iniciar Diagnóstico <ArrowUpRight className="h-3 w-3" />
                     </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </section>
-          )}
+                  </CardContent>
+                </Card>
+              </section>
+            )}
+          </div>
 
 
           {/* Daily Challenges */}
