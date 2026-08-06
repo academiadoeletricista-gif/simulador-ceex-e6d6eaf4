@@ -80,8 +80,13 @@ function SimulationsPage() {
     }
   }, [caseResult, loadCase]);
 
-  if (caseLoading || (diagnosisLoading && !isError)) {
-    return <div className="p-8"><Skeleton className="w-full h-[600px]" /></div>;
+  if (caseLoading || diagnosisLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[calc(100vh-4rem)] space-y-4">
+        <Activity size={48} className="text-primary animate-pulse" />
+        <p className="text-muted-foreground animate-pulse">Carregando ambiente de física...</p>
+      </div>
+    );
   }
 
   const activeCase = caseResult?.success ? caseResult.data : null;
@@ -90,14 +95,24 @@ function SimulationsPage() {
     return (
       <div className="flex flex-col items-center justify-center h-[calc(100vh-4rem)] space-y-4">
         <div className="p-8 text-center max-w-md space-y-4">
-          <BookOpen size={48} className="mx-auto text-muted-foreground opacity-20" />
-          <h2 className="text-2xl font-bold">{isError ? "Erro ao carregar sessão" : "Nenhuma simulação ativa"}</h2>
+          <div className="bg-red-500/10 p-4 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
+            <BookOpen size={40} className="text-red-500" />
+          </div>
+          <h2 className="text-2xl font-bold tracking-tight">Erro ao carregar sessão</h2>
           <p className="text-muted-foreground">
-            {isError 
-              ? "Houve um problema ao carregar os dados do seu diagnóstico. Tente iniciar novamente pela biblioteca." 
-              : "Selecione um caso na biblioteca para iniciar seu diagnóstico."}
+            Houve um problema ao carregar os dados do seu diagnóstico. Tente iniciar novamente pela biblioteca.
           </p>
-          <Button onClick={() => navigate({ to: "/library" })}>Ir para Biblioteca</Button>
+          {state.error && (
+            <div className="text-xs bg-red-500/5 p-3 rounded font-mono text-red-400 mt-4 text-left border border-red-500/20">
+              {state.error}
+            </div>
+          )}
+          <Button 
+            className="w-full mt-6"
+            onClick={() => navigate({ to: "/library" })}
+          >
+            Ir para Biblioteca
+          </Button>
         </div>
       </div>
     );
