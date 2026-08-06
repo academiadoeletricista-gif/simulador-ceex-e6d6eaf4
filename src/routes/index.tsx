@@ -1,3 +1,4 @@
+// SPRINT CORE-001: CEEX DIAGNOSIS ENGINE RESTORATION
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";

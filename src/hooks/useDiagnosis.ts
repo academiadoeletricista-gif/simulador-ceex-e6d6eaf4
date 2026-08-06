@@ -130,6 +130,7 @@ export const useDiagnosis = (caseId?: string) => {
   }, [engine, caseId, sessionResult, updateSessionMutation]);
 
   return {
+    engine,
     state,
     currentNode: engine.getCurrentNode(),
     choices: engine.getAvailableChoices(),
