@@ -21,8 +21,8 @@ export const Route = createFileRoute("/simulations")({
 function SimulationsPage() {
   const { id } = Route.useSearch();
   const navigate = useNavigate();
-  const { sessions, startCase, completeCase, addXp } = useAppStore();
-  const [activeCase, setActiveCase] = useState<typeof cases[0] | null>(null);
+  const { sessions, startCase, completeCase, addXp, profile } = useAppStore();
+  const [activeCase, setActiveCase] = useState<any>(null);
 
   useEffect(() => {
     if (id) {
