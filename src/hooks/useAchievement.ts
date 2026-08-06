@@ -36,7 +36,8 @@ export const useAchievements = () => {
           progress: 0, // Placeholder
           maxProgress: a.max_progress,
           completed: false, // Placeholder
-          xpReward: a.xp_reward
+          xpReward: a.xp_reward,
+          icon: a.icon || 'Award'
         }));
 
         return ok(achievements);
