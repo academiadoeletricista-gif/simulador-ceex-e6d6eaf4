@@ -456,14 +456,17 @@ function SimulationsPage() {
                       )}
 
                       {(comp.id === 'S1' || comp.id === 'S2') && (
-                        <Button 
-                          size="sm" 
-                          className="w-full text-[10px] h-7"
-                          onMouseDown={() => selectChoice('PRESS_START', { id: comp.id })}
-                          onMouseUp={() => selectChoice('RELEASE_START', { id: comp.id })}
-                        >
-                          Pressionar
-                        </Button>
+                        <div className="flex gap-1">
+                          <Button 
+                            size="sm" 
+                            className="flex-1 text-[10px] h-7"
+                            onMouseDown={() => selectChoice('PRESS_START', { id: comp.id })}
+                            onMouseUp={() => selectChoice('RELEASE_START', { id: comp.id })}
+                            onMouseLeave={() => selectChoice('RELEASE_START', { id: comp.id })}
+                          >
+                            Pulsar
+                          </Button>
+                        </div>
                       )}
 
                       {comp.type !== 'POWER_SUPPLY' && comp.type !== 'MOTOR' && !comp.id.startsWith('S') && !comp.id.startsWith('Q') && (
