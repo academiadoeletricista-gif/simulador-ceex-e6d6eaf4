@@ -84,7 +84,7 @@ function Index() {
         <div className="relative z-10 flex flex-col md:flex-row gap-8 items-center justify-between">
           <div className="space-y-4 text-center md:text-left">
             <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 px-3 py-1">
-              Sprint 2B.6: Core Migration
+              Execute esta instrucao no projeto: Realize uma nova auditoria tecnica
             </Badge>
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
               Bom trabalho, <span className="text-primary">{userName.split(' ')[0]}</span>
