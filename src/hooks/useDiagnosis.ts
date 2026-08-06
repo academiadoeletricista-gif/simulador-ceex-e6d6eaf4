@@ -46,7 +46,7 @@ export const useDiagnosis = (caseId?: string) => {
 
     nodes.set(initialNodeId, new DiagnosisNode(
       initialNodeId,
-      NodeType.STORY,
+      NodeType.START,
       dbCase.title,
       dbCase.description || '',
       initialChoices
@@ -55,7 +55,7 @@ export const useDiagnosis = (caseId?: string) => {
     // Simple success/failure nodes
     nodes.set('success', new DiagnosisNode(
       'success',
-      NodeType.RESULT,
+      NodeType.SUCCESS,
       'Diagnóstico Concluído',
       'Parabéns! Você identificou a falha corretamente.',
       []
@@ -63,7 +63,7 @@ export const useDiagnosis = (caseId?: string) => {
 
     nodes.set('failure', new DiagnosisNode(
       'failure',
-      NodeType.RESULT,
+      NodeType.FAILURE,
       'Diagnóstico Incorreto',
       'Infelizmente sua hipótese estava incorreta. Tente novamente.',
       []
@@ -74,7 +74,7 @@ export const useDiagnosis = (caseId?: string) => {
       dbCase.actions.forEach(action => {
         nodes.set(`action-${action.id}`, new DiagnosisNode(
           `action-${action.id}`,
-          NodeType.ACTION,
+          NodeType.DECISION,
           action.name,
           action.realResult || 'Ação executada com sucesso.',
           [new DiagnosisChoice('back', 'Voltar para Diagnóstico', initialNodeId)]
@@ -94,15 +94,9 @@ export const useDiagnosis = (caseId?: string) => {
     const domainCase = convertToDomain(dbCase);
     engine.load(domainCase);
     
-    // If session exists, resume state
-    if (sessionResult?.success && sessionResult.data) {
-      // In a real scenario, we'd have the engine state in the DB
-      // For now, we'll just start it
-    }
-    
     engine.start();
     setState(engine.getState());
-  }, [engine, convertToDomain, sessionResult]);
+  }, [engine, convertToDomain]);
 
   const selectChoice = useCallback(async (choiceId: string) => {
     engine.selectChoice(choiceId);
@@ -110,18 +104,20 @@ export const useDiagnosis = (caseId?: string) => {
     setState(newState);
 
     // Persist session
-    if (caseId) {
+    if (caseId && sessionResult?.success && sessionResult.data) {
       await updateSessionMutation.mutateAsync({
-        case_id: caseId,
-        status: newState.status as any,
-        xp_earned: newState.xp,
-        metadata: { 
-          currentNodeId: newState.currentNodeId,
-          history: newState.history
+        id: sessionResult.data.id,
+        data: {
+          status: newState.status as any,
+          xp_earned: newState.xp,
+          metadata: { 
+            currentNodeId: newState.currentNodeId,
+            history: newState.history
+          }
         }
       });
     }
-  }, [engine, caseId, updateSessionMutation]);
+  }, [engine, caseId, sessionResult, updateSessionMutation]);
 
   return {
     state,
