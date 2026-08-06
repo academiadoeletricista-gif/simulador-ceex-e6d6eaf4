@@ -39,11 +39,17 @@ export class CircuitSolver {
         // Simple propagation: if terminals are connected (continuity), they share the same voltage
         const terminalNames = Object.keys(comp.terminals);
         for (let i = 0; i < terminalNames.length; i++) {
+          const t1Name = terminalNames[i];
+          if (!t1Name) continue;
+          
           for (let j = i + 1; j < terminalNames.length; j++) {
-            const t1 = comp.terminals[terminalNames[i]];
-            const t2 = comp.terminals[terminalNames[j]];
+            const t2Name = terminalNames[j];
+            if (!t2Name) continue;
+
+            const t1 = comp.terminals[t1Name];
+            const t2 = comp.terminals[t2Name];
             
-            if (t1 && t2 && comp.getContinuity(terminalNames[i], terminalNames[j])) {
+            if (t1 && t2 && comp.getContinuity(t1Name, t2Name)) {
               const n1 = this.nodes.get(t1.nodeId);
               const n2 = this.nodes.get(t2.nodeId);
 
