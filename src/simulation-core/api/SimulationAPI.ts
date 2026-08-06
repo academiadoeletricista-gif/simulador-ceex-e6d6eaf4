@@ -20,20 +20,27 @@ export class SimulationAPI {
   }
 
   public createSession(caseData: any) {
-    this.engine = new DiagnosisEngine();
-    
-    // circuitId determines which topology to load
-    const circuitId = caseData?.circuitId || 'DOL';
-    
-    this.engine.loadCase(caseData, (solver) => {
-      if (circuitId === 'STAR_DELTA') {
-        StarDeltaCircuit.setup(solver);
-      } else if (circuitId === 'REVERSING') {
-        ReversingCircuit.setup(solver);
-      } else {
-        DOLCircuit.setup(solver);
-      }
-    });
+    try {
+      console.log(`[SimulationAPI] Creating new session for case: ${caseData?.id}`);
+      this.engine = new DiagnosisEngine();
+      
+      // circuitId determines which topology to load
+      const circuitId = caseData?.circuitId || 'DOL';
+      console.log(`[SimulationAPI] Loading circuit topology: ${circuitId}`);
+      
+      this.engine.loadCase(caseData, (solver) => {
+        if (circuitId === 'STAR_DELTA') {
+          StarDeltaCircuit.setup(solver);
+        } else if (circuitId === 'REVERSING') {
+          ReversingCircuit.setup(solver);
+        } else {
+          DOLCircuit.setup(solver);
+        }
+      });
+    } catch (error) {
+      console.error(`[SimulationAPI] Error creating session:`, error);
+      // Engine handles status update to ERROR
+    }
   }
 
   public getSessionState(): SimulationState {
