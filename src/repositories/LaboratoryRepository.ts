@@ -7,8 +7,7 @@ export class LaboratoryRepository {
     try {
       const { data, error } = await supabase
         .from('laboratories')
-        .select('*')
-        .eq('published', true);
+        .select('*');
 
       if (error) return fail(error.message, error.code);
       
