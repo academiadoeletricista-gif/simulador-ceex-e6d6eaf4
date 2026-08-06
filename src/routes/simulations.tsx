@@ -170,10 +170,13 @@ function SimulationsPage() {
       {/* Diagram Modal Overlay */}
       {showDiagram && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-8">
-          <Card className="w-full h-full max-w-6xl overflow-hidden flex flex-col">
-            <CardHeader className="flex flex-row items-center justify-between border-b py-4">
-              <CardTitle className="text-lg">Esquema Elétrico - Partida Direta (DOL)</CardTitle>
-              <Button variant="ghost" size="icon" onClick={() => setShowDiagram(false)}>X</Button>
+          <Card className="w-full h-full max-w-6xl overflow-hidden flex flex-col border-primary/20 shadow-2xl">
+            <CardHeader className="flex flex-row items-center justify-between border-b py-4 bg-muted/30">
+              <div className="space-y-1">
+                <CardTitle className="text-lg flex items-center gap-2"><Layers className="text-primary" /> Esquema Elétrico: {activeCase.title}</CardTitle>
+                <CardDescription className="text-xs">Diagramas Técnicos de Força e Comando</CardDescription>
+              </div>
+              <Button variant="ghost" size="icon" onClick={() => setShowDiagram(false)} className="hover:bg-primary/10">X</Button>
             </CardHeader>
             <CardContent className="flex-1 bg-white p-0 overflow-auto flex items-center justify-center">
               <div className="relative w-full h-full min-h-[600px] flex flex-col items-center justify-center p-12">

@@ -154,6 +154,9 @@ export class DiagnosisEngine {
           };
           if (faultComponentMap[params.id] === this.activeFault) {
             this.activeFault = FaultType.NONE;
+          } else if (params.id === 'Q1' && this.activeFault === FaultType.OPEN_FUSE) {
+            // Q1 is often confused with a fuse in generic repair actions, allow it if it clears the fault logic
+            this.activeFault = FaultType.NONE;
           }
         }
         observation = `Componente ${params.id} substituído por um novo.`;
