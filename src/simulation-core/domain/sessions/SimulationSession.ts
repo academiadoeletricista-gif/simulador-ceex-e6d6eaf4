@@ -2,7 +2,8 @@ export enum SessionStatus {
   IN_PROGRESS = 'IN_PROGRESS',
   QUIZ_PENDING = 'QUIZ_PENDING',
   COMPLETED = 'COMPLETED',
-  FAILED = 'FAILED'
+  FAILED = 'FAILED',
+  ERROR = 'ERROR'
 }
 
 export interface SimulationState {
