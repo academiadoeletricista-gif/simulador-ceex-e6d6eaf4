@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Search, Filter, BookOpen } from "lucide-react";
+import { Search, Filter, BookOpen, Clock } from "lucide-react";
 
 export const Route = createFileRoute("/library")({
   component: LibraryPage,
@@ -58,8 +59,8 @@ function LibraryPage() {
               </div>
               <CardTitle className="group-hover:text-primary transition-colors">{c.title}</CardTitle>
               <CardDescription className="flex items-center gap-4 mt-2">
-                <span className="flex items-center gap-1"><BookOpen className="h-3 w-3" /> {c.level}</span>
-                <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {c.time}</span>
+                <span className="flex items-center gap-1 text-xs"><BookOpen className="h-3 w-3" /> {c.level}</span>
+                <span className="flex items-center gap-1 text-xs"><Clock className="h-3 w-3" /> {c.time}</span>
               </CardDescription>
             </CardHeader>
           </Card>
