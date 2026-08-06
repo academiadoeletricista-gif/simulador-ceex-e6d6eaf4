@@ -202,34 +202,94 @@ function LabDetail() {
           </TabsContent>
 
           <TabsContent value="circuit">
-            <Card className="border-2 dashed bg-muted/20 min-h-[400px] flex flex-col items-center justify-center text-center p-8 space-y-4">
-              <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
-                <Layers className="h-8 w-8 text-primary" />
-              </div>
-              <div>
-                <CardTitle>Esquemas Interativos</CardTitle>
-                <CardDescription className="max-w-md mx-auto">
-                  Visualize diagramas unifilares e multifilares. Identifique pontos de medição e hotspots térmicos.
-                </CardDescription>
-              </div>
-              <Button variant="outline" size="sm" className="gap-2">
-                <Lock className="h-3 w-3" /> Liberado após Nível 5
-              </Button>
-            </Card>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card className="border-2 overflow-hidden hover:border-primary/50 transition-all cursor-pointer">
+                <div className="aspect-video bg-muted relative flex items-center justify-center border-b">
+                  <Layers className="h-12 w-12 text-muted-foreground/50" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent flex items-end p-4">
+                    <Badge variant="outline" className="bg-background/50">Principal</Badge>
+                  </div>
+                </div>
+                <CardHeader className="p-4 pb-2">
+                  <CardTitle className="text-base">Diagrama de Força</CardTitle>
+                  <CardDescription className="text-[10px]">Circuito de potência e conexões do motor</CardDescription>
+                </CardHeader>
+                <CardContent className="p-4 pt-0">
+                  <Button variant="ghost" size="sm" className="w-full text-[10px] h-8 gap-2">
+                    <Info className="h-3 w-3" /> Ver Detalhes
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card className="border-2 overflow-hidden hover:border-primary/50 transition-all cursor-pointer">
+                <div className="aspect-video bg-muted relative flex items-center justify-center border-b">
+                  <Layers className="h-12 w-12 text-muted-foreground/50" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent flex items-end p-4">
+                    <Badge variant="outline" className="bg-background/50">Lógica</Badge>
+                  </div>
+                </div>
+                <CardHeader className="p-4 pb-2">
+                  <CardTitle className="text-base">Diagrama de Comando</CardTitle>
+                  <CardDescription className="text-[10px]">Lógica de controle e sinalização</CardDescription>
+                </CardHeader>
+                <CardContent className="p-4 pt-0">
+                  <Button variant="ghost" size="sm" className="w-full text-[10px] h-8 gap-2">
+                    <Info className="h-3 w-3" /> Ver Detalhes
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
           <TabsContent value="components">
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <Card key={i} className="group hover:border-primary transition-all cursor-pointer">
+              {[
+                { name: "Contator KM1", type: "Manobra", ref: "KM1" },
+                { name: "Relé Térmico F1", type: "Proteção", ref: "F1" },
+                { name: "Disjuntor Q1", type: "Proteção", ref: "Q1" },
+                { name: "Motor Trifásico M1", type: "Carga", ref: "M1" },
+                { name: "Botão Start S1", type: "Comando", ref: "S1" },
+                { name: "Botão Stop S0", type: "Comando", ref: "S0" },
+              ].map((comp, i) => (
+                <Card key={i} className="group hover:border-primary transition-all cursor-pointer border-2">
                   <CardContent className="p-4 text-center space-y-3">
                     <div className="h-12 w-12 bg-muted rounded-lg mx-auto flex items-center justify-center group-hover:bg-primary/10 transition-colors">
                       <Cpu className="h-6 w-6 text-muted-foreground group-hover:text-primary" />
                     </div>
-                    <p className="text-xs font-bold leading-tight">Componente T{i+1}</p>
-                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                    <div className="space-y-1">
+                      <p className="text-[10px] font-mono text-primary leading-none">{comp.ref}</p>
+                      <p className="text-xs font-bold leading-tight">{comp.name}</p>
+                      <p className="text-[9px] text-muted-foreground">{comp.type}</p>
+                    </div>
+                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-primary/10">
                       <Info className="h-3 w-3" />
                     </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="docs">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[
+                { title: "Manual de Operação", size: "2.4 MB", type: "PDF" },
+                { title: "Guia de Manutenção", size: "1.8 MB", type: "PDF" },
+                { title: "Datasheet Contator", size: "0.9 MB", type: "PDF" },
+                { title: "Norma NR-10", size: "4.2 MB", type: "PDF" },
+              ].map((doc, i) => (
+                <Card key={i} className="hover:border-primary/50 transition-all cursor-pointer border-2">
+                  <CardHeader className="p-4 flex flex-row items-center gap-4 space-y-0">
+                    <div className="h-10 w-10 bg-primary/10 rounded flex items-center justify-center text-primary">
+                      <FileText className="h-5 w-5" />
+                    </div>
+                    <div className="flex-1">
+                      <CardTitle className="text-sm">{doc.title}</CardTitle>
+                      <CardDescription className="text-[10px]">{doc.type} • {doc.size}</CardDescription>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-4 pt-0">
+                    <Button variant="outline" size="sm" className="w-full text-[10px] h-8">Baixar Documento</Button>
                   </CardContent>
                 </Card>
               ))}

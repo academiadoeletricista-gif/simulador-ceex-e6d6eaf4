@@ -62,8 +62,7 @@ export class CaseRepository {
       const { data, error } = await (supabase as any)
         .from('diagnostic_cases')
         .select('*')
-        .eq('laboratory_id', labId)
-        .eq('status', 'published');
+        .eq('laboratory_id', labId);
 
       if (error) return fail(error.message, error.code);
       return ok(data.map(this.mapToCamelCase));
