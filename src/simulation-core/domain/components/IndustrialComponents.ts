@@ -52,8 +52,13 @@ export class ThermalRelayComponent extends ElectricalComponent {
     const is95_96 = (t1 === '95' && t2 === '96') || (t1 === '96' && t2 === '95');
     const is97_98 = (t1 === '97' && t2 === '98') || (t1 === '98' && t2 === '97');
 
-    if (is95_96) return this.state === ElectricalState.CLOSED;
-    if (is97_98) return this.state === ElectricalState.OPEN; // Inverted logic for NO
+    if (this.failureStatus === 'TRIPPED' || this.isTripped) {
+      if (is95_96) return false;
+      if (is97_98) return true;
+    } else {
+      if (is95_96) return true;
+      if (is97_98) return false;
+    }
     return false;
   }
 
