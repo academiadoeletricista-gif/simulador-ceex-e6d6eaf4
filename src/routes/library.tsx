@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, Outlet } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Outlet, useParams } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -26,7 +26,7 @@ function Library() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState<string>("all");
-  const params = Route.useParams() as { labId?: string };
+  const params = useParams({ strict: false }) as { labId?: string };
   const labId = params.labId;
 
   const { data: laboratoriesResult, isLoading } = useLaboratories();
