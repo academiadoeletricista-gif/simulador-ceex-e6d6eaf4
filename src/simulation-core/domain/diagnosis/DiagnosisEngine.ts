@@ -169,20 +169,23 @@ export class DiagnosisEngine {
     // Check success: Is the contactor energized?
     const k1 = this.components.get('K1') as ContactorComponent;
     const motor = this.components.get('M1') as MotorComponent;
+    const q1 = this.components.get('Q1') as CircuitBreakerComponent;
     
-    // Contactor physical state depends on voltage across A1-A2
-    // Motor state depends on K1 being energized
-    if (k1?.isEnergized) {
+    // Motor state depends on KM1 power contacts having voltage
+    // For DOL, if KM1 is energized and Q1 is closed, motor should run
+    if (k1?.isEnergized && q1?.isClosed) {
       if (motor) motor.isRunning = true;
       // Success condition: Contactor energized AND no active fault remaining
       if (!this.activeFault || this.activeFault === FaultType.NONE) {
-        // Debounce completion check to ensure UI handles state updates correctly
-        setTimeout(() => {
-          this.generateQuiz();
-          if (!this.quizState.currentQuestion) {
-            this.completeSession();
-          }
-        }, 100);
+        // Only complete if the motor is actually running (meaning power path is OK)
+        if (motor?.isRunning) {
+          setTimeout(() => {
+            this.generateQuiz();
+            if (!this.quizState.currentQuestion) {
+              this.completeSession();
+            }
+          }, 100);
+        }
       }
     } else {
       if (motor) motor.isRunning = false;
