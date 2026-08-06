@@ -36,15 +36,39 @@ export class DiagnosisEngine {
   }
 
   loadCase(caseData: DiagnosticCase, setupFn: (solver: CircuitSolver) => void) {
-    this.currentCase = caseData;
-    this.currentNodeId = 's0';
-    this.loadCircuit(setupFn);
-    
-    // Inject fault based on case components if applicable
-    const faultyComp = caseData.components?.find(c => c.isFaulty);
-    if (faultyComp) {
-      const faultType = (FaultType as any)[faultyComp.failureDetails || ''] || FaultType.OPEN_FUSE;
-      this.injectFault(faultType, faultyComp.componentTag);
+    try {
+      console.log(`[DiagnosisEngine] Loading case: ${caseData.code} - ${caseData.title}`);
+      this.currentCase = caseData;
+      this.currentNodeId = 's0';
+      this.status = SessionStatus.IN_PROGRESS;
+      this.errorMessage = null;
+
+      this.loadCircuit(setupFn);
+      console.log(`[DiagnosisEngine] Circuit initialized with ${this.components.size} components`);
+      
+      // Inject fault based on case components if applicable
+      const faultyComp = caseData.components?.find(c => c.isFaulty);
+      if (faultyComp) {
+        console.log(`[DiagnosisEngine] Found faulty component: ${faultyComp.componentTag}`);
+        
+        // Use FaultMapper for normalization and validation
+        const faultType = FaultMapper.map(faultyComp.failureDetails);
+        console.log(`[DiagnosisEngine] Normalized fault: ${faultType}`);
+
+        // Validate component exists in initialized circuit
+        if (!this.components.has(faultyComp.componentTag)) {
+          throw new Error(`Component "${faultyComp.componentTag}" not found in current circuit topology.`);
+        }
+
+        this.injectFault(faultType, faultyComp.componentTag);
+      } else {
+        console.log('[DiagnosisEngine] No faulty component defined in case data');
+      }
+    } catch (error: any) {
+      console.error(`[DiagnosisEngine] CRITICAL ERROR during case loading:`, error);
+      this.status = SessionStatus.ERROR;
+      this.errorMessage = error.message;
+      throw error; // Re-throw to be handled by API/Player
     }
   }
 
