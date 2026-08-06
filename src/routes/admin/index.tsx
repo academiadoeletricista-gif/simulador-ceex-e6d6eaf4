@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 
-export const Route = createFileRoute('/admin')({
+export const Route = createFileRoute('/admin/')({
   component: AdminDashboard,
 });
 
