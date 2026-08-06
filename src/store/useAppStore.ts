@@ -57,7 +57,7 @@ export interface Case {
   symptoms: string[];
   checklist: string[];
   image_url: string;
-  diagram_url?: string;
+  diagram_url: string | null;
   content?: any;
 }
 
