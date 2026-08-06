@@ -20,7 +20,7 @@ export class CircuitSolver {
 
   solve() {
     this.nodes.forEach(node => {
-      if (!['L1', 'L2', 'L3', 'N'].includes(node.id)) {
+      if (!['L1', 'L2', 'L3', 'N', 'PE'].includes(node.id)) {
         node.voltage = 0;
       }
     });

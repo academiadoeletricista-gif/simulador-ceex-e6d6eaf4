@@ -21,7 +21,14 @@ export class CircuitBreakerComponent extends ElectricalComponent {
   }
 
   getContinuity(t1: string, t2: string): boolean {
-    return this.state === ElectricalState.CLOSED;
+    if (this.state !== ElectricalState.CLOSED) return false;
+    
+    // Continuity between 1-2, 3-4, 5-6 (poles)
+    const isPole1 = (t1 === '1' && t2 === '2') || (t1 === '2' && t2 === '1');
+    const isPole2 = (t1 === '3' && t2 === '4') || (t1 === '4' && t2 === '3');
+    const isPole3 = (t1 === '5' && t2 === '6') || (t1 === '6' && t2 === '5');
+    
+    return isPole1 || isPole2 || isPole3;
   }
 
   toggle(): void {
@@ -52,14 +59,15 @@ export class ThermalRelayComponent extends ElectricalComponent {
     const is95_96 = (t1 === '95' && t2 === '96') || (t1 === '96' && t2 === '95');
     const is97_98 = (t1 === '97' && t2 === '98') || (t1 === '98' && t2 === '97');
 
-    if (this.failureStatus === 'TRIPPED' || this.isTripped) {
-      if (is95_96) return false;
-      if (is97_98) return true;
-    } else {
-      if (is95_96) return true;
-      if (is97_98) return false;
-    }
-    return false;
+    if (is95_96) return !(this.failureStatus === 'TRIPPED' || this.isTripped);
+    if (is97_98) return (this.failureStatus === 'TRIPPED' || this.isTripped);
+
+    // Power poles continuity (1-2, 3-4, 5-6)
+    const isPole1 = (t1 === '1' && t2 === '2') || (t1 === '2' && t2 === '1');
+    const isPole2 = (t1 === '3' && t2 === '4') || (t1 === '4' && t2 === '3');
+    const isPole3 = (t1 === '5' && t2 === '6') || (t1 === '6' && t2 === '5');
+
+    return isPole1 || isPole2 || isPole3;
   }
 
   reset(): void {
