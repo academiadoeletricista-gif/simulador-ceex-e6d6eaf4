@@ -14,6 +14,7 @@ export interface SimulationState {
   currentNodeId: string;
   xp: number;
   score: number;
+  error?: string | null;
   components: any[];
   quiz?: {
     currentQuestion: any;
