@@ -20,7 +20,8 @@ import {
   Search,
   Hammer,
   HelpCircle,
-  RefreshCcw
+  RefreshCcw,
+  Layers
 } from "lucide-react";
 import { useDiagnosis } from "@/hooks/useDiagnosis";
 import { useCase } from "@/hooks/useCase";
