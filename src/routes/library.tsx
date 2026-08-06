@@ -18,6 +18,9 @@ function LibraryPage() {
   const navigate = useNavigate();
   const { laboratories, isLoading } = useAppStore();
 
+  console.log('LibraryPage render:', { labsCount: laboratories.length, isLoading });
+
+
   const filteredLabs = laboratories.filter(lab => 
     lab.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
     lab.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
