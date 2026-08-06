@@ -8,6 +8,7 @@ import { ReportGenerator } from '../reports/ReportGenerator';
 import { TechnicalReport } from '../reports/ReportTypes';
 import { DiagnosticCase } from '@/types/diagnosis';
 import { FaultType } from './FaultType';
+import { FaultMapper } from './FaultMapper';
 
 export { FaultType };
 
