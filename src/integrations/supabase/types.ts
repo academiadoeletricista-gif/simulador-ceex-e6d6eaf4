@@ -86,12 +86,14 @@ export type Database = {
         Row: {
           category: string
           checklist: string[] | null
+          code: string | null
           content: Json | null
           created_at: string | null
           description: string | null
           diagram_url: string | null
           id: string
           image_url: string | null
+          laboratory_id: string | null
           level: string
           published: boolean | null
           slug: string
@@ -103,12 +105,14 @@ export type Database = {
         Insert: {
           category: string
           checklist?: string[] | null
+          code?: string | null
           content?: Json | null
           created_at?: string | null
           description?: string | null
           diagram_url?: string | null
           id?: string
           image_url?: string | null
+          laboratory_id?: string | null
           level: string
           published?: boolean | null
           slug: string
@@ -120,12 +124,14 @@ export type Database = {
         Update: {
           category?: string
           checklist?: string[] | null
+          code?: string | null
           content?: Json | null
           created_at?: string | null
           description?: string | null
           diagram_url?: string | null
           id?: string
           image_url?: string | null
+          laboratory_id?: string | null
           level?: string
           published?: boolean | null
           slug?: string
@@ -133,6 +139,71 @@ export type Database = {
           time_estimate?: string
           title?: string
           xp_reward?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cases_laboratory_id_fkey"
+            columns: ["laboratory_id"]
+            isOneToOne: false
+            referencedRelation: "laboratories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      laboratories: {
+        Row: {
+          base_circuit_data: Json | null
+          code: string
+          components: Json | null
+          created_at: string | null
+          description: string | null
+          estimated_time: string | null
+          id: string
+          learning_objectives: string[] | null
+          level: string
+          measurements: Json | null
+          name: string
+          panel_data: Json | null
+          prerequisites: string[] | null
+          published: boolean | null
+          total_xp: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          base_circuit_data?: Json | null
+          code: string
+          components?: Json | null
+          created_at?: string | null
+          description?: string | null
+          estimated_time?: string | null
+          id?: string
+          learning_objectives?: string[] | null
+          level: string
+          measurements?: Json | null
+          name: string
+          panel_data?: Json | null
+          prerequisites?: string[] | null
+          published?: boolean | null
+          total_xp?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          base_circuit_data?: Json | null
+          code?: string
+          components?: Json | null
+          created_at?: string | null
+          description?: string | null
+          estimated_time?: string | null
+          id?: string
+          learning_objectives?: string[] | null
+          level?: string
+          measurements?: Json | null
+          name?: string
+          panel_data?: Json | null
+          prerequisites?: string[] | null
+          published?: boolean | null
+          total_xp?: number | null
+          updated_at?: string | null
         }
         Relationships: []
       }
