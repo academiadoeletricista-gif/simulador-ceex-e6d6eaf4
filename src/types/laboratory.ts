@@ -1,69 +1,122 @@
 import { CaseDifficulty } from "@/domains/diagnosis/types/enums";
 
-export interface ComponentFichaTecnica {
-  code: string;
+export interface ComponentCategory {
+  id: string;
   name: string;
-  function: string;
-  coilVoltage?: string;
+  description?: string;
+}
+
+export interface Component {
+  id: string;
+  code: string;
+  tag?: string;
+  name: string;
+  description?: string;
+  categoryId?: string;
   manufacturer?: string;
   model?: string;
-  auxContacts?: string;
-  mainContacts?: string;
+  serialNumber?: string;
+  function?: string;
   electricalSymbol?: string;
-  image?: string;
-  location?: string;
+  imageUrl?: string;
+  datasheetUrl?: string;
+  manualUrl?: string;
+  locationPanel?: string;
+  locationDiagram?: string;
+  terminals?: any;
+  contacts?: any;
+  voltage?: string;
+  current?: string;
+  power?: string;
+  observations?: string;
+  status: 'active' | 'inactive';
+}
+
+export interface Circuit {
+  id: string;
+  laboratoryId: string;
+  name: string;
+  description?: string;
+  objective?: string;
+  industrialApplication?: string;
+  operationalSequence?: string;
+  powerDiagramUrl?: string;
+  controlDiagramUrl?: string;
+  functionalDiagramUrl?: string;
+  terminalList?: any;
+  wireList?: any;
+  nominalVoltages?: any;
+  technicalObservations?: string;
+  relatedNorms?: string;
+  bibliography?: string;
+  version: string;
+  status: 'active' | 'inactive';
 }
 
 export interface MeasurementPoint {
   id: string;
-  label: string;
+  laboratoryId: string;
+  circuitId?: string;
+  code: string;
+  name: string;
   description?: string;
+  type?: string;
+  category?: string;
+  diagramCoordinates?: any;
+  panelCoordinates?: any;
+  expectedValue?: string;
+  unit?: string;
+  observations?: string;
+  status: 'active' | 'inactive';
 }
 
-export interface BaseCircuit {
-  electricalDiagram?: string;
-  functionalDiagram?: string;
-  powerDiagram?: string;
-  controlDiagram?: string;
-  panelLayout?: string;
-  internalPanelImage?: string;
-  terminalList?: string[];
-  wireList?: string[];
-  components?: string[];
-  measurements?: string[];
-}
-
-export interface PanelView {
-  frontView?: string;
-  internalView?: string;
-  numberedComponents?: string[];
-  terminalId?: string[];
-  cableId?: string[];
+export interface LearningResource {
+  id: string;
+  laboratoryId: string;
+  categoryId: string;
+  title: string;
+  description?: string;
+  type: string;
+  url: string;
+  metadata?: any;
+  status: 'active' | 'inactive';
 }
 
 export interface Laboratory {
   id: string;
   code: string;
+  slug: string;
   name: string;
   description: string;
   learningObjectives: string[];
+  competencies: string[];
   prerequisites: string[];
   level: CaseDifficulty;
-  estimatedTime: string;
+  estimatedDuration: string;
+  estimatedTime: string; // compatibility with old UI
   totalXp: number;
   defectCount: number;
-  
+  componentCount: number;
+  measurementPointCount: number;
+  diagramCount: number;
+  resourceCount: number;
+  status: 'active' | 'inactive';
+  version: string;
+  author?: string;
+  createdAt: string;
+  updatedAt: string;
+
   // Progress/Stats (for current user)
   progress: number;
   averageAccuracy: number;
   bestStreak: number;
   achievements: string[];
 
-  // Technical Data
-  baseCircuit: BaseCircuit;
-  panel: PanelView;
-  components: ComponentFichaTecnica[];
-  measurementMap: MeasurementPoint[];
+  // Relationships (loaded if needed)
+  baseCircuit?: Circuit;
+  components?: Component[];
+  measurementMap?: MeasurementPoint[];
+  resources?: LearningResource[];
 }
 
 export interface LabDefect {
@@ -75,7 +128,7 @@ export interface LabDefect {
   difficulty: CaseDifficulty;
   xpReward: number;
   
-  // Universal Case Schema fields (future integration)
+  // Universal Case Schema fields
   initialState?: any;
   activeDefect?: any;
   nodes?: any[];
