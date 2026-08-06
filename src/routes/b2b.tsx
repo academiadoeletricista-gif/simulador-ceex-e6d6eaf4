@@ -23,9 +23,14 @@ export const Route = createFileRoute("/b2b")({
 });
 
 function B2BPage() {
-  const { organization } = useAppStore();
-
-  if (!organization) return <div>Acesso restrito para empresas.</div>;
+  const organization = {
+    name: "Indústria Global S.A.",
+    subscription: { plan: "Enterprise" },
+    teams: [
+      { id: 't1', name: 'Manutenção Elétrica', memberCount: 12 },
+      { id: 't2', name: 'Engenharia de Automação', memberCount: 8 }
+    ]
+  };
 
   return (
     <div className="p-8 space-y-8 max-w-7xl mx-auto pb-20">
