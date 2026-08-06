@@ -60,7 +60,7 @@ export class CaseRepository {
   async findByLaboratoryId(labId: string): Promise<Result<DiagnosticCase[]>> {
     try {
       const { data, error } = await (supabase as any)
-        .from('diagnostic_cases')
+        .from('cases')
         .select('*')
         .eq('laboratory_id', labId);
 
