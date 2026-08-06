@@ -1,6 +1,8 @@
 import { DiagnosisEngine, FaultType } from '../domain/diagnosis/DiagnosisEngine';
 import { SimulationState } from '../domain/sessions/SimulationSession';
 import { DOLCircuit } from '../domain/circuits/library/DOLCircuit';
+import { StarDeltaCircuit } from '../domain/circuits/library/StarDeltaCircuit';
+import { ReversingCircuit } from '../domain/circuits/library/ReversingCircuit';
 
 export class SimulationAPI {
   private static instance: SimulationAPI;
@@ -18,13 +20,30 @@ export class SimulationAPI {
   }
 
   public createSession(caseData: any) {
-    this.engine = new DiagnosisEngine(); // Fresh engine for new session
-    this.engine.loadCircuit((solver) => DOLCircuit.setup(solver));
+    this.engine = new DiagnosisEngine();
     
-    // Inject fault based on caseData or random if not specified
-    const faults = [FaultType.OPEN_FUSE, FaultType.BROKEN_COIL, FaultType.OPEN_START_BUTTON, FaultType.TRIPPED_RELAY];
-    const randomFault = faults[Math.floor(Math.random() * faults.length)] || FaultType.OPEN_FUSE;
-    this.engine.injectFault(randomFault);
+    // circuitId determines which topology to load
+    const circuitId = caseData?.circuitId || 'DOL';
+    
+    this.engine.loadCircuit((solver) => {
+      if (circuitId === 'STAR_DELTA') {
+        StarDeltaCircuit.setup(solver);
+      } else if (circuitId === 'REVERSING') {
+        ReversingCircuit.setup(solver);
+      } else {
+        DOLCircuit.setup(solver);
+      }
+    });
+    
+    // Inject fault based on database case components
+    const faultyComp = caseData?.components?.find((c: any) => c.isFaulty);
+    const faultTypeStr = faultyComp?.failureDetails || 'OPEN_FUSE';
+    const componentTag = faultyComp?.componentTag || (faultTypeStr === 'OPEN_FUSE' ? 'F1' : 'K1');
+    
+    // Convert string to enum, fallback to OPEN_FUSE if invalid
+    const faultType = (FaultType as any)[faultTypeStr] || FaultType.OPEN_FUSE;
+    
+    this.engine.injectFault(faultType, componentTag);
   }
 
   public getSessionState(): SimulationState {

@@ -40,40 +40,40 @@ export class DiagnosisEngine {
     this.solver.solve();
   }
 
-  injectFault(type: FaultType) {
+  injectFault(type: FaultType, componentId?: string) {
     this.activeFault = type;
     
     switch (type) {
       case 'OPEN_FUSE':
-        const fuse = this.components.get('F1');
+        const fuse = this.components.get(componentId || 'F1');
         if (fuse) fuse.failureStatus = 'OPEN';
         break;
       case 'BROKEN_COIL':
-        const k1 = this.components.get('K1');
+        const k1 = this.components.get(componentId || 'K1');
         if (k1) k1.failureStatus = 'BURNT_COIL';
         break;
       case 'SHORTED_COIL':
-        const k1_short = this.components.get('K1');
+        const k1_short = this.components.get(componentId || 'K1');
         if (k1_short) k1_short.failureStatus = 'SHORTED_COIL';
         break;
       case 'OPEN_START_BUTTON':
-        const s2 = this.components.get('S2');
+        const s2 = this.components.get(componentId || 'S2');
         if (s2) s2.failureStatus = 'STUCK_OPEN';
         break;
       case 'OPEN_STOP_BUTTON':
-        const s1 = this.components.get('S1');
+        const s1 = this.components.get(componentId || 'S1');
         if (s1) s1.failureStatus = 'STUCK_OPEN';
         break;
       case 'BROKEN_AUX_CONTACT':
-        const k1_aux = this.components.get('K1');
+        const k1_aux = this.components.get(componentId || 'K1');
         if (k1_aux) k1_aux.failureStatus = 'BROKEN_AUX';
         break;
       case 'TRIPPED_RELAY':
-        const f2 = this.components.get('F2') as ThermalRelayComponent;
+        const f2 = this.components.get(componentId || 'F2') as ThermalRelayComponent;
         if (f2) f2.isTripped = true;
         break;
       case 'MECHANICAL_FAILURE':
-        const k1_mech = this.components.get('K1');
+        const k1_mech = this.components.get(componentId || 'K1');
         if (k1_mech) k1_mech.failureStatus = 'MECHANICAL_STUCK';
         break;
     }
@@ -88,16 +88,18 @@ export class DiagnosisEngine {
     let observation = "Ação executada.";
 
     if (action === 'PRESS_START') {
-      const start = this.components.get('S2') as SwitchComponent;
+      const targetId = params.id || 'S2';
+      const start = this.components.get(targetId) as SwitchComponent;
       if (start) {
         start.isPressed = true;
-        observation = "Botão START pressionado.";
+        observation = `Botão ${targetId} pressionado.`;
       }
     } else if (action === 'RELEASE_START') {
-      const start = this.components.get('S2') as SwitchComponent;
+      const targetId = params.id || 'S2';
+      const start = this.components.get(targetId) as SwitchComponent;
       if (start) {
         start.isPressed = false;
-        observation = "Botão START solto.";
+        observation = `Botão ${targetId} solto.`;
       }
     } else if (action === 'TOGGLE_BREAKER') {
       const breaker = this.components.get(params.id) as CircuitBreakerComponent;
