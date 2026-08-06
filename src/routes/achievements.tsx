@@ -49,7 +49,7 @@ function AchievementsPage() {
         <div className="flex gap-4">
           <div className="text-right">
             <p className="text-[10px] text-muted-foreground uppercase font-bold">Desbloqueadas</p>
-            <p className="text-xl font-bold">{achievements.filter(a => a.unlocked).length}/{achievements.length}</p>
+            <p className="text-xl font-bold">{achievements.filter(a => a.completed).length}/{achievements.length}</p>
           </div>
         </div>
       </div>
@@ -60,20 +60,20 @@ function AchievementsPage() {
             key={achievement.id} 
             className={cn(
               "relative overflow-hidden transition-all duration-300",
-              achievement.unlocked ? "border-primary/20 bg-primary/5" : "opacity-60 grayscale"
+              achievement.completed ? "border-primary/20 bg-primary/5" : "opacity-60 grayscale"
             )}
           >
             <CardHeader className="flex flex-row items-center gap-4 space-y-0">
               <div className={cn(
                 "h-12 w-12 rounded-lg flex items-center justify-center",
-                achievement.unlocked ? "bg-primary text-primary-foreground shadow-lg" : "bg-muted text-muted-foreground"
+                achievement.completed ? "bg-primary text-primary-foreground shadow-lg" : "bg-muted text-muted-foreground"
               )}>
-                {achievement.unlocked ? getIcon(achievement.icon) : <Lock size={20} />}
+                {achievement.completed ? getIcon(achievement.icon) : <Lock size={20} />}
               </div>
               <div className="space-y-1">
                 <CardTitle className="text-lg">{achievement.title}</CardTitle>
                 <CardDescription className="text-xs leading-none">
-                  {achievement.unlocked ? "Conquista desbloqueada" : "Bloqueado"}
+                  {achievement.completed ? "Conquista desbloqueada" : "Bloqueado"}
                 </CardDescription>
               </div>
             </CardHeader>
@@ -88,10 +88,10 @@ function AchievementsPage() {
                 <Progress value={achievement.progress} className="h-1.5" />
               </div>
 
-              {achievement.unlocked && (
+              {achievement.completed && (
                 <div className="pt-2">
                   <Badge variant="secondary" className="bg-primary/10 text-primary text-[10px]">
-                    +{achievement.xp_reward} XP Recompensado
+                    +{achievement.xpReward} XP Recompensado
                   </Badge>
                 </div>
               )}
@@ -99,6 +99,7 @@ function AchievementsPage() {
           </Card>
         ))}
       </div>
+
     </div>
   );
 }
