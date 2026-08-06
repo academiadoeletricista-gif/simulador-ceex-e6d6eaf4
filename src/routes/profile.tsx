@@ -48,7 +48,7 @@ function ProfilePage() {
     if (result.success) {
       toast.success("Perfil atualizado com sucesso!");
     } else {
-      toast.error(result.error || "Erro ao atualizar perfil");
+      toast.error(result.error?.message || "Erro ao atualizar perfil");
     }
   };
 
