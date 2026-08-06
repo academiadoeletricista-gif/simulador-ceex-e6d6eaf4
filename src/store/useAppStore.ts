@@ -146,12 +146,13 @@ export const useAppStore = create<AppState>()(
         }
         
         const titleIndex = Math.min(Math.floor(newLevel / 5), LEVEL_TITLES.length - 1);
+        const levelTitle = LEVEL_TITLES[titleIndex] as UserLevel;
         
         return { 
           xp: newXp, 
           level: newLevel, 
           nextLevelXp: newNextXp,
-          levelTitle: LEVEL_TITLES[titleIndex]
+          levelTitle
         };
       }),
       

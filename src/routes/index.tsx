@@ -9,7 +9,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const { xp, level, streak } = useAppStore();
+  const { xp, level, streak, levelTitle, nextLevelXp, dailyChallenges, achievements } = useAppStore();
 
   return (
     <div className="p-8 space-y-8 max-w-7xl mx-auto">
@@ -39,7 +39,7 @@ function Index() {
             <Zap className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{streak} dias</div>
+            <div className="text-3xl font-bold">{streak.current} dias</div>
             <p className="text-xs text-muted-foreground mt-1">Continue mantendo o foco!</p>
           </CardContent>
         </Card>
