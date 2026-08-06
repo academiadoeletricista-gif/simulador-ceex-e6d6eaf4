@@ -22,8 +22,8 @@ export class SimulationAPI {
     this.engine.loadCircuit((solver) => DOLCircuit.setup(solver));
     
     // Inject fault based on caseData or random if not specified
-    const faults: FaultType[] = ['OPEN_FUSE', 'BROKEN_COIL', 'OPEN_START_BUTTON', 'TRIPPED_RELAY'];
-    const randomFault = faults[Math.floor(Math.random() * faults.length)] as FaultType;
+    const faults = [FaultType.OPEN_FUSE, FaultType.BROKEN_COIL, FaultType.OPEN_START_BUTTON, FaultType.TRIPPED_RELAY];
+    const randomFault = faults[Math.floor(Math.random() * faults.length)];
     this.engine.injectFault(randomFault);
   }
 
