@@ -24,12 +24,12 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const { profile, sessions, achievements, getLevelTitle } = useAppStore();
+  const { profile, sessions, achievements } = useAppStore();
   const userName = profile?.full_name || "Comandante";
   const xp = profile?.xp || 0;
   const level = profile?.level || 1;
-  const streak = profile?.streak_current || 0;
-  const levelTitle = getLevelTitle ? getLevelTitle(level) : "Aprendiz";
+  const streakCount = profile?.streak_current || 0;
+  const levelTitle = getLevelTitle(level);
   const nextLevelXp = 1000;
   const dailyChallenges = [
     { id: 'd1', title: 'Completar 2 diagnósticos', description: 'Realize dois diagnósticos completos hoje', xpReward: 200, completed: false },
