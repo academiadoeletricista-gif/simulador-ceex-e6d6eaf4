@@ -40,8 +40,11 @@ function Index() {
 
   const xpProgress = (xp / nextLevelXp) * 100;
   
+  const { cases: dbCases } = useAppStore();
+  const allCases = dbCases.length > 0 ? dbCases : cases;
+  
   // Encontrar um caso não concluído como recomendação
-  const recommendedCase = cases.find(c => !sessions[c.id] || sessions[c.id]?.status !== 'completed') || cases[0];
+  const recommendedCase = allCases.find(c => !sessions[c.id] || sessions[c.id]?.status !== 'completed') || allCases[0];
 
   return (
     <div className="p-8 space-y-8 max-w-7xl mx-auto pb-20">
