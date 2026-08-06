@@ -84,7 +84,7 @@ export class ContactorComponent extends ElectricalComponent {
   isEnergized: boolean = false;
 
   updateState(): void {
-    if (this.failureStatus === 'BURNT_COIL') {
+    if (this.failureStatus === 'BURNT_COIL' || this.failureStatus === 'BROKEN_COIL') {
       this.isEnergized = false;
     }
   }
