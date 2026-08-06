@@ -169,7 +169,7 @@ function Index() {
                         </div>
                         <div>
                           <p className="text-sm font-bold">{recommendedLab.name}</p>
-                          <p className="text-xs text-muted-foreground">{recommendedLab.cases_count} Casos disponíveis</p>
+                          <p className="text-xs text-muted-foreground">{recommendedLab.defectCount} Casos disponíveis</p>
                         </div>
                       </div>
                       <ArrowUpRight className="w-4 h-4 text-muted-foreground" />
@@ -194,7 +194,7 @@ function Index() {
               <CardHeader>
                 <Badge variant="secondary" className="w-fit mb-2">Conquistas</Badge>
                 <CardTitle>Suas Medalhas</CardTitle>
-                <CardDescription>Você já desbloqueou {achievements.filter(a => a.unlocked_at).length} de {achievements.length} conquistas.</CardDescription>
+                <CardDescription>Você já desbloqueou {achievements.filter(a => a.completed).length} de {achievements.length} conquistas.</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex gap-2">
@@ -203,7 +203,7 @@ function Index() {
                       key={achievement.id} 
                       className={cn(
                         "w-10 h-10 rounded-full border flex items-center justify-center transition-all",
-                        achievement.unlocked_at ? "bg-yellow-500/10 border-yellow-500/50 text-yellow-600 scale-110 shadow-lg shadow-yellow-500/10" : "bg-muted text-muted-foreground opacity-40"
+                        achievement.completed ? "bg-yellow-500/10 border-yellow-500/50 text-yellow-600 scale-110 shadow-lg shadow-yellow-500/10" : "bg-muted text-muted-foreground opacity-40"
                       )}
                     >
                       <Award className="w-5 h-5" />
@@ -248,12 +248,12 @@ function Index() {
                           <div className="flex items-center gap-3 text-xs text-muted-foreground">
                             <span className="flex items-center gap-1">
                               <Calendar className="w-3 h-3" />
-                              {new Date(session.updated_at).toLocaleDateString()}
+                              {new Date(session.start_time).toLocaleDateString()}
                             </span>
                             <span className="w-1 h-1 rounded-full bg-muted-foreground/30" />
                             <span className="flex items-center gap-1">
                               <Star className="w-3 h-3 text-yellow-500" />
-                              {session.xp_earned || 0} XP
+                              {session.status === 'completed' ? 500 : 0} XP
                             </span>
                           </div>
                         </div>
