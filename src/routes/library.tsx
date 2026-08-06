@@ -144,7 +144,7 @@ function LibraryPage() {
               onClick={() => handleCaseClick(c.id)}
             >
               <div className="relative h-32 w-full overflow-hidden bg-muted">
-                <img src={c.image} alt={c.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                <img src={'image_url' in c ? c.image_url : c.image} alt={c.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                 {status === 'completed' && (
                   <div className="absolute inset-0 bg-green-500/10 flex items-center justify-center backdrop-blur-[1px]">
                     <div className="bg-green-500 text-white p-1 rounded-full shadow-lg">
@@ -159,13 +159,13 @@ function LibraryPage() {
                   <div className="flex gap-2">
                     {status === 'completed' && <Badge variant="default" className="bg-green-500 hover:bg-green-600">Concluído</Badge>}
                     {status === 'in_progress' && <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-500">Em andamento</Badge>}
-                    <span className="text-xs font-medium text-primary">+{c.xp} XP</span>
+                    <span className="text-xs font-medium text-primary">+{'xp_reward' in c ? c.xp_reward : c.xp} XP</span>
                   </div>
                 </div>
                 <CardTitle className="group-hover:text-primary transition-colors text-lg">{c.title}</CardTitle>
                 <CardDescription className="flex items-center gap-4 mt-2">
                   <span className="flex items-center gap-1 text-xs"><BookOpen className="h-3 w-3" /> {c.level}</span>
-                  <span className="flex items-center gap-1 text-xs"><Clock className="h-3 w-3" /> {c.time}</span>
+                  <span className="flex items-center gap-1 text-xs"><Clock className="h-3 w-3" /> {'time_estimate' in c ? c.time_estimate : c.time}</span>
                 </CardDescription>
               </CardHeader>
             </Card>
