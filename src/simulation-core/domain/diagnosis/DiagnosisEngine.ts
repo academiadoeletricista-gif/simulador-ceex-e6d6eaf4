@@ -6,6 +6,7 @@ import { QuizState, QuizQuestion } from '../quiz/QuizTypes';
 import { COMPONENT_QUIZ_POOL, FAULT_QUIZ_POOL } from '../quiz/QuizPool';
 import { ReportGenerator } from '../reports/ReportGenerator';
 import { TechnicalReport } from '../reports/ReportTypes';
+import { DiagnosticCase } from '@/types/diagnosis';
 
 
 export enum FaultType {
