@@ -84,623 +84,588 @@ function Index() {
         <div className="relative z-10 flex flex-col md:flex-row gap-8 items-center justify-between">
           <div className="space-y-4 text-center md:text-left">
             <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 px-3 py-1 text-[10px] whitespace-pre-wrap text-left max-w-full">
-              Execute esta instrucao no projeto: # SPRINT 2B.7
-# VERTICAL SLICE
-# PRIMEIRA SIMULAÇÃO COMPLETA DO CEEX
+              Execute esta instrucao no projeto: # SPRINT P0.1
+# CRITICAL FIX
+# END-TO-END DIAGNOSTIC SIMULATION
+# PRODUCTION BLOCKER
+
+## CONTEXT
+
+The CEEX platform already contains:
+
+- Authentication
+- Dashboard
+- Library
+- Laboratories
+- Diagnostic Cases
+- Universal Case Schema
+- Diagnosis Engine
+- Supabase Database
+- Services Layer
+
+However, the core product is currently non-functional.
+
+Users are unable to perform a real diagnostic simulation.
+
+This is a production blocker.
+
+No new features must be developed.
+
+This Sprint exists only to make the diagnostic workflow fully operational.
 
 ---
 
-# MISSÃO
+# PRIMARY GOAL
 
-PARE completamente o desenvolvimento de novas funcionalidades.
+Implement ONE complete diagnostic workflow from beginning to end.
 
-Não implementar IA.
-
-Não implementar Gamificação.
-
-Não implementar Marketplace.
-
-Não implementar novos Laboratórios.
-
-Não implementar novos Defeitos.
-
-Não implementar novos Diagramas.
-
-Não implementar novos Painéis.
-
-Não implementar nenhuma funcionalidade adicional.
-
-O único objetivo desta Sprint é fazer UMA simulação funcionar perfeitamente do início ao fim.
-
-Quando esta Sprint terminar, um usuário deverá conseguir realizar um diagnóstico completo exatamente como ocorrerá na versão comercial do CEEX.
-
-Este será o padrão para todas as futuras simulações.
-
----
-
-# CASO A SER IMPLEMENTADO
-
-Implementar exclusivamente:
-
-LAB-01
-
-Partida Direta
-
-↓
-
-Caso
-
-PD-001
-
-↓
-
-Motor não liga
-
-Nenhum outro caso deverá ser implementado nesta Sprint.
-
----
-
-# OBJETIVO
-
-Ao clicar em "Entrar no Laboratório", o usuário deverá conseguir concluir uma simulação completa sem encontrar qualquer tela morta, botão sem função ou fluxo interrompido.
-
----
-
-# FLUXO OBRIGATÓRIO
-
-Implementar exatamente o seguinte fluxo:
+The user MUST be able to:
 
 Login
 
 ↓
 
-Dashboard
+Open Library
 
 ↓
 
-Biblioteca
+Open Laboratory
 
 ↓
 
-Laboratório Partida Direta
+Select Diagnostic Case
 
 ↓
 
-Lista de Defeitos
+Start Diagnostic Session
 
 ↓
 
-PD-001
+Interact with the Diagnosis Engine
 
 ↓
 
-Iniciar Diagnóstico
+Perform inspections
 
 ↓
 
-Criar Session
+Perform electrical measurements
 
 ↓
 
-Diagnosis Engine
+Receive dynamic responses
 
 ↓
 
-Ocorrência
+Find the root cause
 
 ↓
 
-Inspeção
+Repair the fault
 
 ↓
 
-Primeira decisão
+Validate operation
 
 ↓
 
-Resultado
+Finish the case
 
 ↓
 
-Nova decisão
+Persist all progress
 
 ↓
 
-Nova informação
+Update Dashboard
 
-↓
+Everything must work.
 
-Nova medição
-
-↓
-
-Nova decisão
-
-↓
-
-Encontrar defeito
-
-↓
-
-Corrigir defeito
-
-↓
-
-Validar funcionamento
-
-↓
-
-Relatório Final
-
-↓
-
-Salvar Resultado
-
-↓
-
-Atualizar Dashboard
-
-Todo esse fluxo deverá funcionar.
-
-Nenhuma etapa poderá ser simulada.
-
-Nenhuma etapa poderá ser ignorada.
+Nothing may be simulated.
 
 ---
 
-# ETAPA 1
+# STRICT REQUIREMENTS
 
-## BIBLIOTECA
+The implementation MUST NOT contain:
 
-Ao clicar no Card
+Mock data
 
-Partida Direta
+Static JSON
 
-abrir:
+Fake responses
 
-/laboratories/partida-direta
+Instant success buttons
 
-Nunca permanecer na Biblioteca.
+Placeholder components
 
-Todos os Cards deverão navegar corretamente.
+Temporary arrays
 
----
+Hardcoded diagnostic results
 
-# ETAPA 2
+Automatic completion
 
-## LABORATÓRIO
+Local-only persistence
 
-Ao abrir o Laboratório apresentar:
+Legacy data structures
 
-Descrição
+Fallback diagnostic cases
 
-Objetivos
-
-Circuito Base
-
-Componentes
-
-Lista de Defeitos
-
-Selecionar:
-
-PD-001
-
-Motor não liga
-
-Ao clicar:
-
-Abrir:
-
-/laboratories/partida-direta/pd-001
+Everything MUST come from the new architecture.
 
 ---
 
-# ETAPA 3
+# STEP 1
 
-## PÁGINA DO CASO
+## DIAGNOSTIC ENTRY
 
-Exibir:
+When the user clicks
 
-Título
+"Start Diagnosis"
 
-Descrição
+the system MUST:
 
-Nível
+Create a new Case Session
 
-Tempo
+Persist it in Supabase
 
-XP
+Generate Session ID
 
-Componentes envolvidos
+Initialize Diagnosis Engine
 
-Circuito
+Load the selected Diagnostic Case
 
-Objetivos
+Load all Case Components
 
-Botão
+Load Measurements
 
-INICIAR DIAGNÓSTICO
+Load Symptoms
 
-Ao clicar:
+Load Initial State
 
-Criar automaticamente uma nova sessão.
+Redirect to
 
-Registrar:
+/simulation/:sessionId
 
-Usuário
-
-Caso
-
-Data
-
-Hora
-
-Status
-
-Estado Inicial
-
-Session ID
-
-Persistir no Supabase.
+Failure is not acceptable.
 
 ---
 
-# ETAPA 4
+# STEP 2
 
-## ABERTURA DA OCORRÊNCIA
+## SESSION INITIALIZATION
 
-A simulação deverá iniciar mostrando uma ocorrência industrial.
+The Simulation page MUST:
 
-Exemplo:
+Load the session
 
-"O operador informa que o motor da bomba de recalque não liga após pressionar o botão START.
+Recover previous progress
 
-Não existem alarmes aparentes.
+Recover current step
 
-O equipamento estava funcionando normalmente até o início do turno."
+Recover measurements
 
-Apresentar:
+Recover discovered evidence
 
-Histórico
+Recover hypotheses
 
-Criticidade
+Recover action history
 
-Local
+Recover elapsed time
 
-Equipamento
+If the session already exists, it MUST continue exactly where the user stopped.
 
-Tempo parado
-
-Mensagem do operador
+Refreshing the page MUST NEVER restart the simulation.
 
 ---
 
-# ETAPA 5
+# STEP 3
 
-## AMBIENTE DA SIMULAÇÃO
+## INITIAL INCIDENT
 
-Criar layout definitivo.
+Every simulation MUST begin with an industrial incident report.
 
-Lado esquerdo:
+Display:
 
-Histórico
+Incident title
 
-Ocorrência
+Operator report
 
-Sintomas
+Machine
 
-Anotações
+Equipment
 
-Centro:
+Location
 
-Painel Elétrico
+Symptoms
 
-Diagrama
+Priority
 
-Área de Trabalho
+Production impact
 
-Lado direito:
+Estimated downtime
 
-Ferramentas
+Initial observations
 
-Multímetro
-
-Lista de ações
-
-Hipóteses
-
-Cronômetro
-
-Rodapé:
-
-Botão Salvar
-
-Botão Encerrar
-
-Botão Ajuda
+This data MUST come from the database.
 
 ---
 
-# ETAPA 6
-
-## PRIMEIRA DECISÃO
-
-O usuário deverá escolher sua primeira ação.
-
-Exemplo:
-
-Inspecionar painel
-
-Consultar diagrama
-
-Medir tensão
-
-Verificar disjuntor
-
-Verificar fusível
-
-Verificar botão START
-
-Verificar STOP
-
-Abrir painel
-
-Nenhuma resposta pronta deverá aparecer.
-
-A Diagnosis Engine deverá processar a ação.
-
----
-
-# ETAPA 7
+# STEP 4
 
 ## DIAGNOSIS ENGINE
 
-A Engine deverá:
+The Diagnosis Engine MUST become the single source of truth.
 
-Receber ação.
+Every user action MUST pass through it.
 
-Consultar estado do Caso.
+Flow:
 
-Atualizar estado.
-
-Retornar nova informação.
-
-Atualizar sintomas.
-
-Atualizar medições.
-
-Atualizar componentes.
-
-Atualizar histórico.
-
-Persistir sessão.
-
-Tudo automaticamente.
-
----
-
-# ETAPA 8
-
-## MEDIÇÕES
-
-Implementar medições reais.
-
-Exemplo:
-
-Medir tensão A1-A2
-
-Resultado:
-
-0V
-
-ou
-
-220V
-
-Conforme o estado do defeito.
-
-Nunca retornar valores aleatórios.
-
-Todos deverão vir do banco.
-
----
-
-# ETAPA 9
-
-## HISTÓRICO
-
-Toda ação realizada deverá aparecer.
-
-Exemplo:
-
-08:10
-
-Painel aberto.
-
-08:12
-
-Tensão medida.
-
-08:14
-
-Fusível inspecionado.
-
-08:15
-
-Contato auxiliar verificado.
-
-Tudo salvo na sessão.
-
----
-
-# ETAPA 10
-
-## HIPÓTESES
-
-A cada nova informação.
-
-Atualizar automaticamente.
-
-Exemplo.
-
-Hipótese 1
-
-Falta alimentação.
-
-Hipótese 2
-
-Bobina interrompida.
-
-Hipótese 3
-
-Contato auxiliar aberto.
-
-As hipóteses não entregam resposta.
-
-Servem apenas como apoio.
-
----
-
-# ETAPA 11
-
-## CONCLUSÃO
-
-Quando o aluno encontrar o defeito.
-
-Permitir:
-
-Executar correção.
-
-Validar circuito.
-
-Ligar motor.
-
-Encerrar ocorrência.
-
----
-
-# ETAPA 12
-
-## RELATÓRIO FINAL
-
-Gerar automaticamente.
-
-Tempo.
-
-Precisão.
-
-XP.
-
-Erros.
-
-Medições.
-
-Hipóteses.
-
-Ferramentas utilizadas.
-
-Passos executados.
-
-Sequência correta.
-
-Explicação técnica.
-
-Lições aprendidas.
-
-Persistir tudo.
-
----
-
-# ETAPA 13
-
-## DASHBOARD
-
-Ao retornar.
-
-Atualizar automaticamente.
-
-XP.
-
-Nível.
-
-Casos concluídos.
-
-Tempo médio.
-
-Precisão.
-
-Última atividade.
-
-Tudo vindo do banco.
-
----
-
-# PERSISTÊNCIA
-
-Após cada ação salvar:
-
-Estado.
-
-Tempo.
-
-Histórico.
-
-XP.
-
-Etapa.
-
-Hipóteses.
-
-Medições.
-
-Se o usuário pressionar F5.
-
-A simulação deverá retornar exatamente ao ponto anterior.
-
-Nunca reiniciar o Caso.
-
----
-
-# PROIBIDO
-
-Não utilizar mocks.
-
-Não utilizar JSON local.
-
-Não utilizar arrays estáticos.
-
-Não utilizar placeholders.
-
-Não utilizar botões decorativos.
-
-Não utilizar sucesso automático.
-
-Não simular persistência.
-
-Não criar dados fake.
-
-Tudo deverá utilizar:
-
-Diagnosis Engine
-
-Services
-
-Repositories
-
-Supabase
-
----
-
-# TESTE AUTOMÁTICO OBRIGATÓRIO
-
-Ao concluir a Sprint executar automaticamente o seguinte fluxo:
-
-Novo usuário
+User Action
 
 ↓
 
-Cadastro
+Diagnosis Engine
+
+↓
+
+Validate Action
+
+↓
+
+Update Case State
+
+↓
+
+Generate Consequences
+
+↓
+
+Persist Session
+
+↓
+
+Return Updated UI
+
+No component may bypass the engine.
+
+---
+
+# STEP 5
+
+## AVAILABLE ACTIONS
+
+The user MUST be able to perform real diagnostic actions.
+
+Examples:
+
+Inspect panel
+
+Inspect contactor
+
+Inspect overload relay
+
+Inspect fuse
+
+Measure voltage
+
+Measure continuity
+
+Measure resistance
+
+Inspect auxiliary contact
+
+Inspect START pushbutton
+
+Inspect STOP pushbutton
+
+Inspect emergency button
+
+Inspect timer
+
+Inspect limit switch
+
+Replace component
+
+Reset overload relay
+
+Each action MUST generate a different result according to the current fault.
+
+---
+
+# STEP 6
+
+## ELECTRICAL MEASUREMENTS
+
+Measurements MUST be dynamic.
+
+Examples:
+
+Measure A1-A2
+
+Measure L1-L2
+
+Measure L2-L3
+
+Measure coil voltage
+
+Measure output voltage
+
+Measure continuity
+
+Measure NO contact
+
+Measure NC contact
+
+Measure overload relay
+
+Returned values MUST be calculated from the current circuit state.
+
+Never return random values.
+
+Never return fixed values.
+
+---
+
+# STEP 7
+
+## STATE MACHINE
+
+Every action MUST change the simulation state.
+
+Example:
+
+Inspect Fuse
+
+↓
+
+Fuse OK
+
+↓
+
+Hypothesis removed
+
+↓
+
+New action becomes available
+
+Another example:
+
+Measure Coil Voltage
+
+↓
+
+0 V
+
+↓
+
+New symptom unlocked
+
+↓
+
+Next investigation path
+
+The simulation MUST behave like a finite state machine.
+
+---
+
+# STEP 8
+
+## ACTION HISTORY
+
+Every executed action MUST be recorded.
+
+Persist:
+
+Timestamp
+
+Action
+
+Result
+
+Evidence
+
+XP
+
+Elapsed time
+
+Operator notes
+
+Everything must survive page refresh.
+
+---
+
+# STEP 9
+
+## DYNAMIC HYPOTHESES
+
+The engine MUST continuously update possible hypotheses.
+
+Hypotheses MUST NEVER reveal the solution.
+
+They only guide reasoning.
+
+Wrong hypotheses must disappear.
+
+Correct hypotheses become stronger as evidence accumulates.
+
+---
+
+# STEP 10
+
+## CASE COMPLETION
+
+A case may only finish after:
+
+Root cause identified
+
+Corrective action executed
+
+Machine tested
+
+Operation restored
+
+Validation successful
+
+Only then may the session close.
+
+---
+
+# STEP 11
+
+## FINAL REPORT
+
+Generate automatically:
+
+Root cause
+
+Corrective action
+
+Investigation timeline
+
+Measurements taken
+
+Evidence collected
+
+Wrong decisions
+
+Correct decisions
+
+Elapsed time
+
+Accuracy
+
+XP earned
+
+Technical explanation
+
+Lessons learned
+
+Store everything in Supabase.
+
+---
+
+# STEP 12
+
+## DASHBOARD UPDATE
+
+Immediately after completion:
+
+Update XP
+
+Update completed cases
+
+Update statistics
+
+Update accuracy
+
+Update average completion time
+
+Update recent activity
+
+Update achievements (if applicable)
+
+No manual refresh.
+
+---
+
+# DATA FLOW
+
+The following architecture is mandatory:
+
+React UI
+
+↓
+
+Hooks
+
+↓
+
+Services
+
+↓
+
+Diagnosis Engine
+
+↓
+
+Repositories
+
+↓
+
+Supabase
+
+↓
+
+Database
+
+React components MUST NEVER access Supabase directly.
+
+---
+
+# ERROR HANDLING
+
+If any required entity is missing:
+
+Display a descriptive error.
+
+Never freeze.
+
+Never show blank screens.
+
+Never silently fail.
+
+---
+
+# REMOVE LEGACY CODE
+
+Completely remove any dependency on:
+
+public.cases
+
+Legacy stores
+
+Legacy services
+
+Mock arrays
+
+Placeholder simulations
+
+Temporary diagnostic logic
+
+Old repositories
+
+Deprecated components
+
+There must be only one implementation path.
+
+---
+
+# ACCEPTANCE TEST
+
+The implementation is only accepted if a brand-new user can execute the following flow without developer intervention:
+
+Register
 
 ↓
 
@@ -708,127 +673,133 @@ Login
 
 ↓
 
-Biblioteca
+Library
 
 ↓
 
-Entrar no Laboratório
+Open Direct-On-Line Starter Laboratory
 
 ↓
 
-Selecionar PD-001
+Select Case PD-001
 
 ↓
 
-Criar sessão
+Start Diagnostic Session
 
 ↓
 
-Executar toda simulação
+Perform multiple inspections
 
 ↓
 
-Salvar
+Perform multiple measurements
 
 ↓
 
-Logout
+Receive dynamic responses
 
 ↓
 
-Novo Login
+Identify the real fault
 
 ↓
 
-Continuar sessão
+Repair the circuit
 
 ↓
 
-Finalizar
+Validate machine operation
 
 ↓
 
-Dashboard atualizado
+Finish the session
 
-Todo o fluxo deverá funcionar sem intervenção manual.
+↓
+
+Receive the technical report
+
+↓
+
+Return to Dashboard
+
+↓
+
+See updated statistics
+
+Every step MUST work.
 
 ---
 
-# AUDITORIA FINAL
+# FINAL AUDIT
 
-Gerar um relatório respondendo obrigatoriamente:
+Generate a technical report answering:
 
-O usuário consegue iniciar uma simulação?
+Can a user start a diagnostic session?
 
-SIM ou NÃO
+YES / NO
 
-O usuário consegue concluir uma simulação?
+Can a user continue a previous session?
 
-SIM ou NÃO
+YES / NO
 
-A Diagnosis Engine foi utilizada?
+Does the Diagnosis Engine control the simulation?
 
-SIM ou NÃO
+YES / NO
 
-Todas as ações passam pelos Services?
+Are measurements dynamic?
 
-SIM ou NÃO
+YES / NO
 
-Existe algum mock?
+Are actions persisted?
 
-SIM ou NÃO
+YES / NO
 
-Existe algum botão sem função?
+Does page refresh preserve progress?
 
-SIM ou NÃO
+YES / NO
 
-A sessão é salva automaticamente?
+Does the Dashboard update automatically?
 
-SIM ou NÃO
+YES / NO
 
-O F5 recupera corretamente a sessão?
+Are there any remaining mock simulations?
 
-SIM ou NÃO
+YES / NO
 
-O Dashboard é atualizado automaticamente?
+Are there any legacy diagnostic flows?
 
-SIM ou NÃO
+YES / NO
 
-O CEEX possui agora uma simulação funcional de ponta a ponta?
+Is the CEEX diagnostic simulator now fully operational?
 
-SIM ou NÃO
+YES / NO
 
 ---
 
-# CRITÉRIOS DE ACEITE
+# ACCEPTANCE CRITERIA
 
-Esta Sprint somente será considerada concluída quando:
+This Sprint is approved ONLY if:
 
-✅ Um usuário recém-cadastrado conseguir acessar a Biblioteca.
+✔ Every button required for a simulation works.
 
-✅ Conseguir entrar no Laboratório "Partida Direta".
+✔ A diagnostic session can always be created.
 
-✅ Selecionar o caso PD-001.
+✔ Every user action changes the simulation state.
 
-✅ Criar automaticamente uma sessão de diagnóstico.
+✔ Measurements are generated dynamically.
 
-✅ Executar toda a investigação utilizando a Diagnosis Engine.
+✔ Sessions are fully persisted.
 
-✅ Realizar inspeções e medições reais.
+✔ Refreshing the browser never loses progress.
 
-✅ Descobrir a causa raiz do defeito.
+✔ The Diagnosis Engine controls the complete workflow.
 
-✅ Corrigir a falha.
+✔ The final report is generated automatically.
 
-✅ Validar o funcionamento do circuito.
+✔ No mock simulation remains anywhere in the application.
 
-✅ Receber um relatório técnico completo.
-
-✅ Ter sua sessão persistida integralmente no Supabase.
-
-✅ Atualizar automaticamente seu Dashboard e estatísticas.
-
-A partir desta Sprint, o CEEX deverá possuir sua primeira simulação industrial totalmente funcional. Ela servirá como **modelo oficial** para todos os demais casos de diagnóstico da plataforma.
+✔ The CEEX platform now contains one fully functional production-ready diagnostic simulation.
             </Badge>
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
               Bom trabalho, <span className="text-primary">{userName.split(' ')[0]}</span>
