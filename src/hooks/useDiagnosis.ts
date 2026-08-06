@@ -117,7 +117,7 @@ export const useDiagnosis = (caseId?: string) => {
       await updateSessionMutation.mutateAsync({
         id: sessionResult.data.id,
         data: {
-          status: newState.status.toLowerCase(),
+          status: newState.status === SessionStatus.COMPLETED ? 'completed' : 'in_progress',
           answers: { 
             currentNodeId: newState.currentNodeId,
             history: newState.history,
