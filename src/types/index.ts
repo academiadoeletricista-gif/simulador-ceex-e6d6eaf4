@@ -1,6 +1,8 @@
 export * from './laboratory';
 export * from './enterprise';
 export * from './assets';
+export * from './diagnosis';
+
 
 export interface Case {
   id: string;
