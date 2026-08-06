@@ -83,8 +83,752 @@ function Index() {
       <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/10 via-background to-secondary/5 border p-8 md:p-12">
         <div className="relative z-10 flex flex-col md:flex-row gap-8 items-center justify-between">
           <div className="space-y-4 text-center md:text-left">
-            <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 px-3 py-1">
-              Execute esta instrucao no projeto: Realize uma nova auditoria tecnica
+            <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 px-3 py-1 text-[10px] whitespace-pre-wrap text-left max-w-full">
+              Execute esta instrucao no projeto: # SPRINT 2B.7
+# VERTICAL SLICE
+# PRIMEIRA SIMULAÇÃO COMPLETA DO CEEX
+
+---
+
+# MISSÃO
+
+PARE completamente o desenvolvimento de novas funcionalidades.
+
+Não implementar IA.
+
+Não implementar Gamificação.
+
+Não implementar Marketplace.
+
+Não implementar novos Laboratórios.
+
+Não implementar novos Defeitos.
+
+Não implementar novos Diagramas.
+
+Não implementar novos Painéis.
+
+Não implementar nenhuma funcionalidade adicional.
+
+O único objetivo desta Sprint é fazer UMA simulação funcionar perfeitamente do início ao fim.
+
+Quando esta Sprint terminar, um usuário deverá conseguir realizar um diagnóstico completo exatamente como ocorrerá na versão comercial do CEEX.
+
+Este será o padrão para todas as futuras simulações.
+
+---
+
+# CASO A SER IMPLEMENTADO
+
+Implementar exclusivamente:
+
+LAB-01
+
+Partida Direta
+
+↓
+
+Caso
+
+PD-001
+
+↓
+
+Motor não liga
+
+Nenhum outro caso deverá ser implementado nesta Sprint.
+
+---
+
+# OBJETIVO
+
+Ao clicar em "Entrar no Laboratório", o usuário deverá conseguir concluir uma simulação completa sem encontrar qualquer tela morta, botão sem função ou fluxo interrompido.
+
+---
+
+# FLUXO OBRIGATÓRIO
+
+Implementar exatamente o seguinte fluxo:
+
+Login
+
+↓
+
+Dashboard
+
+↓
+
+Biblioteca
+
+↓
+
+Laboratório Partida Direta
+
+↓
+
+Lista de Defeitos
+
+↓
+
+PD-001
+
+↓
+
+Iniciar Diagnóstico
+
+↓
+
+Criar Session
+
+↓
+
+Diagnosis Engine
+
+↓
+
+Ocorrência
+
+↓
+
+Inspeção
+
+↓
+
+Primeira decisão
+
+↓
+
+Resultado
+
+↓
+
+Nova decisão
+
+↓
+
+Nova informação
+
+↓
+
+Nova medição
+
+↓
+
+Nova decisão
+
+↓
+
+Encontrar defeito
+
+↓
+
+Corrigir defeito
+
+↓
+
+Validar funcionamento
+
+↓
+
+Relatório Final
+
+↓
+
+Salvar Resultado
+
+↓
+
+Atualizar Dashboard
+
+Todo esse fluxo deverá funcionar.
+
+Nenhuma etapa poderá ser simulada.
+
+Nenhuma etapa poderá ser ignorada.
+
+---
+
+# ETAPA 1
+
+## BIBLIOTECA
+
+Ao clicar no Card
+
+Partida Direta
+
+abrir:
+
+/laboratories/partida-direta
+
+Nunca permanecer na Biblioteca.
+
+Todos os Cards deverão navegar corretamente.
+
+---
+
+# ETAPA 2
+
+## LABORATÓRIO
+
+Ao abrir o Laboratório apresentar:
+
+Descrição
+
+Objetivos
+
+Circuito Base
+
+Componentes
+
+Lista de Defeitos
+
+Selecionar:
+
+PD-001
+
+Motor não liga
+
+Ao clicar:
+
+Abrir:
+
+/laboratories/partida-direta/pd-001
+
+---
+
+# ETAPA 3
+
+## PÁGINA DO CASO
+
+Exibir:
+
+Título
+
+Descrição
+
+Nível
+
+Tempo
+
+XP
+
+Componentes envolvidos
+
+Circuito
+
+Objetivos
+
+Botão
+
+INICIAR DIAGNÓSTICO
+
+Ao clicar:
+
+Criar automaticamente uma nova sessão.
+
+Registrar:
+
+Usuário
+
+Caso
+
+Data
+
+Hora
+
+Status
+
+Estado Inicial
+
+Session ID
+
+Persistir no Supabase.
+
+---
+
+# ETAPA 4
+
+## ABERTURA DA OCORRÊNCIA
+
+A simulação deverá iniciar mostrando uma ocorrência industrial.
+
+Exemplo:
+
+"O operador informa que o motor da bomba de recalque não liga após pressionar o botão START.
+
+Não existem alarmes aparentes.
+
+O equipamento estava funcionando normalmente até o início do turno."
+
+Apresentar:
+
+Histórico
+
+Criticidade
+
+Local
+
+Equipamento
+
+Tempo parado
+
+Mensagem do operador
+
+---
+
+# ETAPA 5
+
+## AMBIENTE DA SIMULAÇÃO
+
+Criar layout definitivo.
+
+Lado esquerdo:
+
+Histórico
+
+Ocorrência
+
+Sintomas
+
+Anotações
+
+Centro:
+
+Painel Elétrico
+
+Diagrama
+
+Área de Trabalho
+
+Lado direito:
+
+Ferramentas
+
+Multímetro
+
+Lista de ações
+
+Hipóteses
+
+Cronômetro
+
+Rodapé:
+
+Botão Salvar
+
+Botão Encerrar
+
+Botão Ajuda
+
+---
+
+# ETAPA 6
+
+## PRIMEIRA DECISÃO
+
+O usuário deverá escolher sua primeira ação.
+
+Exemplo:
+
+Inspecionar painel
+
+Consultar diagrama
+
+Medir tensão
+
+Verificar disjuntor
+
+Verificar fusível
+
+Verificar botão START
+
+Verificar STOP
+
+Abrir painel
+
+Nenhuma resposta pronta deverá aparecer.
+
+A Diagnosis Engine deverá processar a ação.
+
+---
+
+# ETAPA 7
+
+## DIAGNOSIS ENGINE
+
+A Engine deverá:
+
+Receber ação.
+
+Consultar estado do Caso.
+
+Atualizar estado.
+
+Retornar nova informação.
+
+Atualizar sintomas.
+
+Atualizar medições.
+
+Atualizar componentes.
+
+Atualizar histórico.
+
+Persistir sessão.
+
+Tudo automaticamente.
+
+---
+
+# ETAPA 8
+
+## MEDIÇÕES
+
+Implementar medições reais.
+
+Exemplo:
+
+Medir tensão A1-A2
+
+Resultado:
+
+0V
+
+ou
+
+220V
+
+Conforme o estado do defeito.
+
+Nunca retornar valores aleatórios.
+
+Todos deverão vir do banco.
+
+---
+
+# ETAPA 9
+
+## HISTÓRICO
+
+Toda ação realizada deverá aparecer.
+
+Exemplo:
+
+08:10
+
+Painel aberto.
+
+08:12
+
+Tensão medida.
+
+08:14
+
+Fusível inspecionado.
+
+08:15
+
+Contato auxiliar verificado.
+
+Tudo salvo na sessão.
+
+---
+
+# ETAPA 10
+
+## HIPÓTESES
+
+A cada nova informação.
+
+Atualizar automaticamente.
+
+Exemplo.
+
+Hipótese 1
+
+Falta alimentação.
+
+Hipótese 2
+
+Bobina interrompida.
+
+Hipótese 3
+
+Contato auxiliar aberto.
+
+As hipóteses não entregam resposta.
+
+Servem apenas como apoio.
+
+---
+
+# ETAPA 11
+
+## CONCLUSÃO
+
+Quando o aluno encontrar o defeito.
+
+Permitir:
+
+Executar correção.
+
+Validar circuito.
+
+Ligar motor.
+
+Encerrar ocorrência.
+
+---
+
+# ETAPA 12
+
+## RELATÓRIO FINAL
+
+Gerar automaticamente.
+
+Tempo.
+
+Precisão.
+
+XP.
+
+Erros.
+
+Medições.
+
+Hipóteses.
+
+Ferramentas utilizadas.
+
+Passos executados.
+
+Sequência correta.
+
+Explicação técnica.
+
+Lições aprendidas.
+
+Persistir tudo.
+
+---
+
+# ETAPA 13
+
+## DASHBOARD
+
+Ao retornar.
+
+Atualizar automaticamente.
+
+XP.
+
+Nível.
+
+Casos concluídos.
+
+Tempo médio.
+
+Precisão.
+
+Última atividade.
+
+Tudo vindo do banco.
+
+---
+
+# PERSISTÊNCIA
+
+Após cada ação salvar:
+
+Estado.
+
+Tempo.
+
+Histórico.
+
+XP.
+
+Etapa.
+
+Hipóteses.
+
+Medições.
+
+Se o usuário pressionar F5.
+
+A simulação deverá retornar exatamente ao ponto anterior.
+
+Nunca reiniciar o Caso.
+
+---
+
+# PROIBIDO
+
+Não utilizar mocks.
+
+Não utilizar JSON local.
+
+Não utilizar arrays estáticos.
+
+Não utilizar placeholders.
+
+Não utilizar botões decorativos.
+
+Não utilizar sucesso automático.
+
+Não simular persistência.
+
+Não criar dados fake.
+
+Tudo deverá utilizar:
+
+Diagnosis Engine
+
+Services
+
+Repositories
+
+Supabase
+
+---
+
+# TESTE AUTOMÁTICO OBRIGATÓRIO
+
+Ao concluir a Sprint executar automaticamente o seguinte fluxo:
+
+Novo usuário
+
+↓
+
+Cadastro
+
+↓
+
+Login
+
+↓
+
+Biblioteca
+
+↓
+
+Entrar no Laboratório
+
+↓
+
+Selecionar PD-001
+
+↓
+
+Criar sessão
+
+↓
+
+Executar toda simulação
+
+↓
+
+Salvar
+
+↓
+
+Logout
+
+↓
+
+Novo Login
+
+↓
+
+Continuar sessão
+
+↓
+
+Finalizar
+
+↓
+
+Dashboard atualizado
+
+Todo o fluxo deverá funcionar sem intervenção manual.
+
+---
+
+# AUDITORIA FINAL
+
+Gerar um relatório respondendo obrigatoriamente:
+
+O usuário consegue iniciar uma simulação?
+
+SIM ou NÃO
+
+O usuário consegue concluir uma simulação?
+
+SIM ou NÃO
+
+A Diagnosis Engine foi utilizada?
+
+SIM ou NÃO
+
+Todas as ações passam pelos Services?
+
+SIM ou NÃO
+
+Existe algum mock?
+
+SIM ou NÃO
+
+Existe algum botão sem função?
+
+SIM ou NÃO
+
+A sessão é salva automaticamente?
+
+SIM ou NÃO
+
+O F5 recupera corretamente a sessão?
+
+SIM ou NÃO
+
+O Dashboard é atualizado automaticamente?
+
+SIM ou NÃO
+
+O CEEX possui agora uma simulação funcional de ponta a ponta?
+
+SIM ou NÃO
+
+---
+
+# CRITÉRIOS DE ACEITE
+
+Esta Sprint somente será considerada concluída quando:
+
+✅ Um usuário recém-cadastrado conseguir acessar a Biblioteca.
+
+✅ Conseguir entrar no Laboratório "Partida Direta".
+
+✅ Selecionar o caso PD-001.
+
+✅ Criar automaticamente uma sessão de diagnóstico.
+
+✅ Executar toda a investigação utilizando a Diagnosis Engine.
+
+✅ Realizar inspeções e medições reais.
+
+✅ Descobrir a causa raiz do defeito.
+
+✅ Corrigir a falha.
+
+✅ Validar o funcionamento do circuito.
+
+✅ Receber um relatório técnico completo.
+
+✅ Ter sua sessão persistida integralmente no Supabase.
+
+✅ Atualizar automaticamente seu Dashboard e estatísticas.
+
+A partir desta Sprint, o CEEX deverá possuir sua primeira simulação industrial totalmente funcional. Ela servirá como **modelo oficial** para todos os demais casos de diagnóstico da plataforma.
             </Badge>
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
               Bom trabalho, <span className="text-primary">{userName.split(' ')[0]}</span>
