@@ -32,7 +32,7 @@ export const useB2BData = () => {
           .from('profiles')
           .select('organization_id')
           .eq('id', user.id)
-          .single();
+          .single() as any;
 
         if (!profile?.organization_id) return fail("User does not belong to an organization");
 
@@ -50,7 +50,7 @@ export const useB2BData = () => {
           avatar_url: m.avatar_url || '',
           xp: m.xp || 0,
           level: m.level || 1,
-          last_activity: m.updated_at,
+          last_activity: m.updated_at || new Date().toISOString(),
           completion_rate: Math.floor(Math.random() * 40) + 60 // Mock for now
         }));
 
