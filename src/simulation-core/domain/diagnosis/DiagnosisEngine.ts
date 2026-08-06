@@ -47,28 +47,71 @@ export class DiagnosisEngine {
       console.log(`[DiagnosisEngine] Circuit initialized with ${this.components.size} components`);
       
       // Inject fault based on case components if applicable
-      const faultyComp = caseData.components?.find(c => c.isFaulty);
-      if (faultyComp) {
-        console.log(`[DiagnosisEngine] Found faulty component: ${faultyComp.componentTag}`);
+      // First check for components[] array from newer schema
+      let faultyComp = caseData.components?.find(c => c.isFaulty);
+      
+      // Fallback: If no components array, check title/description/content for implicit faults
+      // (This helps bridge the gap with simpler seeded data)
+      let failureDetails = faultyComp?.failureDetails;
+      let componentTag = faultyComp?.componentTag;
+      
+      if (!failureDetails) {
+        const titleUpper = caseData.title.toUpperCase();
+        if (titleUpper.includes('FALHA NO SELO')) {
+          failureDetails = 'BROKEN_AUX_CONTACT';
+          componentTag = 'K1';
+        } else if (titleUpper.includes('RELÉ TÉRMICO')) {
+          failureDetails = 'TRIPPED_RELAY';
+          componentTag = 'F2';
+        } else if (titleUpper.includes('MOTOR NÃO LIGA')) {
+          failureDetails = 'OPEN_FUSE';
+          componentTag = 'F1';
+        } else if (titleUpper.includes('CONTATOR NÃO ATRACA')) {
+          failureDetails = 'BROKEN_COIL';
+          componentTag = 'K1';
+        } else if (titleUpper.includes('REVERSÃO')) {
+          failureDetails = 'BROKEN_AUX_CONTACT';
+          componentTag = 'K2';
+        }
+      }
+
+      if (failureDetails) {
+        console.log(`[DiagnosisEngine] Fault detected: ${failureDetails} for component ${componentTag || 'default'}`);
         
         // Use FaultMapper for normalization and validation
-        const faultType = FaultMapper.map(faultyComp.failureDetails);
+        const faultType = FaultMapper.map(failureDetails);
         console.log(`[DiagnosisEngine] Normalized fault: ${faultType}`);
 
-        // Validate component exists in initialized circuit
-        if (!this.components.has(faultyComp.componentTag)) {
-          throw new Error(`Component "${faultyComp.componentTag}" not found in current circuit topology.`);
-        }
+        // Set default tags if missing
+        const finalTag = componentTag || (faultType === FaultType.TRIPPED_RELAY ? 'F2' : (faultType === FaultType.OPEN_FUSE ? 'F1' : 'K1'));
 
-        this.injectFault(faultType, faultyComp.componentTag);
+        // Validate component exists in initialized circuit
+        if (!this.components.has(finalTag)) {
+          console.warn(`[DiagnosisEngine] Component "${finalTag}" not found in current circuit topology. Attempting fallback.`);
+          // Try to find ANY component of the same type if the specific tag failed
+          const fallback = Array.from(this.components.values()).find(c => {
+             if (faultType === FaultType.TRIPPED_RELAY) return c instanceof ThermalRelayComponent;
+             if (faultType === FaultType.OPEN_FUSE) return c instanceof CircuitBreakerComponent;
+             if (faultType === FaultType.BROKEN_COIL) return c instanceof ContactorComponent;
+             return false;
+          });
+          if (fallback) {
+            console.log(`[DiagnosisEngine] Found fallback component: ${fallback.id}`);
+            this.injectFault(faultType, fallback.id);
+          } else {
+            throw new Error(`Component "${finalTag}" not found in circuit topology and no fallback found.`);
+          }
+        } else {
+          this.injectFault(faultType, finalTag);
+        }
       } else {
-        console.log('[DiagnosisEngine] No faulty component defined in case data');
+        console.log('[DiagnosisEngine] No fault identified from case data');
       }
     } catch (error: any) {
       console.error(`[DiagnosisEngine] CRITICAL ERROR during case loading:`, error);
       this.status = SessionStatus.ERROR;
       this.errorMessage = error.message;
-      throw error; // Re-throw to be handled by API/Player
+      throw error; 
     }
   }
 
