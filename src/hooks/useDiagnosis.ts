@@ -1,27 +1,31 @@
-import { useState, useEffect, useCallback } from 'react';
-import { SimulationAPI } from '../simulation-core/api/SimulationAPI';
+import { useState, useCallback } from 'react';
+import { SimulationPlayer } from '../simulation-core/services/SimulationPlayer';
 import { SimulationState, SessionStatus } from '../simulation-core/domain/sessions/SimulationSession';
 import { useSession, useUpdateSession } from './useSession';
 import { DiagnosticCase } from '../types/diagnosis';
 
+/**
+ * useDiagnosis hook now consumes the SimulationPlayer service,
+ * which centralizes all diagnostic session logic.
+ */
 export const useDiagnosis = (caseId?: string) => {
-  const api = SimulationAPI.getInstance();
-  const [state, setState] = useState<SimulationState>(api.getSessionState());
+  const player = SimulationPlayer.getInstance();
+  const [state, setState] = useState<SimulationState>(player.getPlayerState());
   
   const { data: sessionResult, isLoading: sessionLoading } = useSession(caseId || '');
   const updateSessionMutation = useUpdateSession();
 
   const loadCase = useCallback((dbCase: DiagnosticCase) => {
-    api.createSession(dbCase);
-    setState(api.getSessionState());
-  }, []);
+    player.startSession(dbCase);
+    setState(player.getPlayerState());
+  }, [player]);
 
   const selectChoice = useCallback(async (choiceId: string, params: any = {}) => {
-    api.executeAction(choiceId, params);
-    const newState = api.getSessionState();
+    player.handleAction(choiceId, params);
+    const newState = player.getPlayerState();
     setState(newState);
 
-    // Persist session to database via repo (through hooks for now)
+    // Persist session to database
     if (caseId && sessionResult?.success && sessionResult.data) {
       await updateSessionMutation.mutateAsync({
         id: sessionResult.data.id,
@@ -36,19 +40,19 @@ export const useDiagnosis = (caseId?: string) => {
         }
       });
     }
-  }, [caseId, sessionResult, updateSessionMutation]);
+  }, [caseId, sessionResult, updateSessionMutation, player]);
 
   const answerQuiz = useCallback((optionIndex: number) => {
-    api.answerQuiz(optionIndex);
-    setState(api.getSessionState());
-  }, []);
+    player.submitQuizAnswer(optionIndex);
+    setState(player.getPlayerState());
+  }, [player]);
 
   return {
     state,
     loadCase,
     selectChoice,
     answerQuiz,
-    measure: api.measure.bind(api),
+    measure: player.performMeasurement.bind(player),
     isLoading: sessionLoading,
     isError: !!sessionResult && !sessionResult.success
   };
