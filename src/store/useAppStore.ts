@@ -200,15 +200,16 @@ export const useAppStore = create<AppState>((set, get) => ({
         estimatedTime: l.estimated_time || '',
         totalXp: l.total_xp || 0,
         defectCount: (casesData || []).filter(c => c.laboratory_id === l.id).length,
-        progress: 0, // Calculate later
+        progress: 0, 
         averageAccuracy: 0,
         bestStreak: 0,
         achievements: [],
-        baseCircuit: l.base_circuit_data || {},
-        panel: l.panel_data || {},
-        components: l.components || [],
-        measurementMap: l.measurements || []
+        baseCircuit: (l.base_circuit_data as any) || {},
+        panel: (l.panel_data as any) || {},
+        components: (l.components as any) || [],
+        measurementMap: (l.measurements as any) || []
       }));
+
 
       set({ 
         profile: profile as any, 
