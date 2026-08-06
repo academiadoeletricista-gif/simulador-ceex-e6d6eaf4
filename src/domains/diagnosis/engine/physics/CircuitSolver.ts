@@ -43,7 +43,7 @@ export class CircuitSolver {
             const t1 = comp.terminals[terminalNames[i]];
             const t2 = comp.terminals[terminalNames[j]];
             
-            if (comp.getContinuity(terminalNames[i], terminalNames[j])) {
+            if (t1 && t2 && comp.getContinuity(terminalNames[i], terminalNames[j])) {
               const n1 = this.nodes.get(t1.nodeId);
               const n2 = this.nodes.get(t2.nodeId);
 
