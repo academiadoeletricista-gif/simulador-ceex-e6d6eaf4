@@ -30,6 +30,11 @@ export class FaultMapper {
     'contato_auxiliar_quebrado': FaultType.BROKEN_AUX_CONTACT,
     'rele_tripado': FaultType.TRIPPED_RELAY,
     'falha_mecanica': FaultType.MECHANICAL_FAILURE,
+    'FALHA_NO_SELO': FaultType.BROKEN_AUX_CONTACT,
+    'RELÉ TÉRMICO DESARMA': FaultType.TRIPPED_RELAY,
+    'MOTOR NÃO LIGA': FaultType.OPEN_FUSE,
+    'CONTATOR NÃO ATRACA': FaultType.BROKEN_COIL,
+    'FALHA NO DESLIGAMENTO': FaultType.MECHANICAL_FAILURE,
   };
 
   /**
