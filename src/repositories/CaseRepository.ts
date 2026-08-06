@@ -6,7 +6,7 @@ export class CaseRepository {
   async findAll(): Promise<Result<DiagnosticCase[]>> {
     try {
       const { data, error } = await (supabase as any)
-        .from('diagnostic_cases')
+        .from('cases')
         .select(`
           *,
           occurrence:case_occurrences(*),
