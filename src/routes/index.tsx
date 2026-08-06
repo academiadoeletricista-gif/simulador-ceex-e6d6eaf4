@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { useAppStore, getLevelTitle } from "@/store/useAppStore";
-import { cases } from "./library";
+// cases removed from library.tsx
 import { 
   Zap, 
   Clock, 
@@ -41,10 +41,11 @@ function Index() {
   const xpProgress = (xp / nextLevelXp) * 100;
   
   const { cases: dbCases } = useAppStore();
-  const allCases = dbCases.length > 0 ? dbCases : cases;
+  const allCases = dbCases;
   
   // Encontrar um caso não concluído como recomendação
   const recommendedCase = allCases.find(c => !sessions[c.id] || sessions[c.id]?.status !== 'completed') || allCases[0];
+
 
   return (
     <div className="p-8 space-y-8 max-w-7xl mx-auto pb-20">
