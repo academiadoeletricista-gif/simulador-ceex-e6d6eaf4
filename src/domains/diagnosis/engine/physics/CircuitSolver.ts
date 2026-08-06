@@ -62,13 +62,15 @@ export class CircuitSolver {
           // Check coil voltage
           const a1 = (comp as any).terminals['A1'];
           const a2 = (comp as any).terminals['A2'];
-          const vA1 = this.nodes.get(a1.nodeId)?.voltage || 0;
-          const vA2 = this.nodes.get(a2.nodeId)?.voltage || 0;
-          
-          const diff = Math.abs(vA1 - vA2);
-          const wasEnergized = (comp as any).isEnergized;
-          (comp as any).isEnergized = diff >= 110; // Threshold
-          if (wasEnergized !== (comp as any).isEnergized) changed = true;
+          if (a1 && a2) {
+            const vA1 = this.nodes.get(a1.nodeId)?.voltage || 0;
+            const vA2 = this.nodes.get(a2.nodeId)?.voltage || 0;
+            
+            const diff = Math.abs(vA1 - vA2);
+            const wasEnergized = (comp as any).isEnergized;
+            (comp as any).isEnergized = diff >= 110; 
+            if (wasEnergized !== (comp as any).isEnergized) changed = true;
+          }
         }
       });
     }
