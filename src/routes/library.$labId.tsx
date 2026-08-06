@@ -182,7 +182,13 @@ function LabDetail() {
                           isCompleted ? "bg-primary/20 text-primary hover:bg-primary/30" : ""
                         )}
                         variant={isCompleted ? "secondary" : "default"}
-                        onClick={() => navigate({ to: '/simulations', search: { id: defect.id } })}
+                        loading={startSessionMutation.isPending}
+                        onClick={async () => {
+                          if (!isCompleted && !isStarted) {
+                            await startSessionMutation.mutateAsync(defect.id);
+                          }
+                          navigate({ to: '/simulations', search: { id: defect.id } });
+                        }}
                       >
                         {isCompleted ? "Revisar Diagnóstico" : isStarted ? "Continuar Simulação" : "Iniciar Simulação"}
                         <Play className={cn("h-3 w-3", !isCompleted && "fill-current")} />
