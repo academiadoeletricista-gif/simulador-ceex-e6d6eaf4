@@ -98,7 +98,14 @@ export class ReversingCircuit {
       'A1': { id: 'tA1', name: 'A1', voltage: 0, nodeId: 'k2_coil_in' },
       'A2': { id: 'tA2', name: 'A2', voltage: 0, nodeId: 'N' },
       '13': { id: 't13', name: '13', voltage: 0, nodeId: 'ctrl_stop' },
-      '14': { id: 't14', name: '14', voltage: 0, nodeId: 'ctrl_reverse' }
+      '14': { id: 't14', name: '14', voltage: 0, nodeId: 'ctrl_reverse' },
+      // Power contacts (phase reversal: L1->W, L2->V, L3->U)
+      '1': { id: 't1', name: '1', voltage: 0, nodeId: 'pow_q1_1' },
+      '2': { id: 't2', name: '2', nodeId: 'motor_w' },
+      '3': { id: 't3', name: '3', voltage: 0, nodeId: 'pow_q1_2' },
+      '4': { id: 't4', name: '4', nodeId: 'motor_v' },
+      '5': { id: 't5', name: '5', voltage: 0, nodeId: 'pow_q1_3' },
+      '6': { id: 't6', name: '6', nodeId: 'motor_u' }
     };
     solver.addComponent(k2);
 
