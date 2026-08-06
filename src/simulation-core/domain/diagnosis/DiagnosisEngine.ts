@@ -88,16 +88,18 @@ export class DiagnosisEngine {
     let observation = "Ação executada.";
 
     if (action === 'PRESS_START') {
-      const start = this.components.get('S2') as SwitchComponent;
+      const targetId = params.id || 'S2';
+      const start = this.components.get(targetId) as SwitchComponent;
       if (start) {
         start.isPressed = true;
-        observation = "Botão START pressionado.";
+        observation = `Botão ${targetId} pressionado.`;
       }
     } else if (action === 'RELEASE_START') {
-      const start = this.components.get('S2') as SwitchComponent;
+      const targetId = params.id || 'S2';
+      const start = this.components.get(targetId) as SwitchComponent;
       if (start) {
         start.isPressed = false;
-        observation = "Botão START solto.";
+        observation = `Botão ${targetId} solto.`;
       }
     } else if (action === 'TOGGLE_BREAKER') {
       const breaker = this.components.get(params.id) as CircuitBreakerComponent;

@@ -122,15 +122,18 @@ function SimulationsPage() {
                     </div>
                     <div className="text-xs font-medium truncate">
                       {comp.id === 'K1' ? 'Contator KM1' : 
+                       comp.id === 'K2' ? 'Contator KM2' :
+                       comp.id === 'K3' ? 'Contator KM3' :
                        comp.id === 'F1' ? 'Fusível Comando' : 
                        comp.id === 'S2' ? 'Botão START' : 
                        comp.id === 'S1' ? 'Botão STOP' :
-                       comp.id === 'Q2' ? 'Disjuntor Comando' :
+                       comp.id === 'S0' ? 'Botão DESLIGA' :
+                       comp.id === 'Q1' || comp.id === 'Q2' ? 'Disjuntor' :
                        comp.id === 'F2' ? 'Relé Térmico' : comp.id}
                     </div>
                     
                     <div className="flex flex-col gap-1 mt-auto">
-                      {comp.id === 'Q2' && (
+                      {(comp.id === 'Q1' || comp.id === 'Q2') && (
                         <Button 
                           size="sm" 
                           variant={comp.isClosed ? "default" : "outline"}
@@ -152,18 +155,18 @@ function SimulationsPage() {
                         </Button>
                       )}
 
-                      {comp.id === 'S2' && (
+                      {(comp.id === 'S1' || comp.id === 'S2') && (
                         <Button 
                           size="sm" 
                           className="w-full text-[10px] h-7"
-                          onMouseDown={() => selectChoice('PRESS_START')}
-                          onMouseUp={() => selectChoice('RELEASE_START')}
+                          onMouseDown={() => selectChoice('PRESS_START', { id: comp.id })}
+                          onMouseUp={() => selectChoice('RELEASE_START', { id: comp.id })}
                         >
                           Pressionar
                         </Button>
                       )}
 
-                      {comp.type !== 'POWER_SUPPLY' && comp.type !== 'MOTOR' && comp.id !== 'S2' && comp.id !== 'Q2' && (
+                      {comp.type !== 'POWER_SUPPLY' && comp.type !== 'MOTOR' && !comp.id.startsWith('S') && !comp.id.startsWith('Q') && (
                         <Button 
                           size="sm" 
                           variant="outline"
@@ -196,7 +199,7 @@ function SimulationsPage() {
                 <div className="space-y-2">
                   <p className="text-[10px] font-bold text-muted-foreground uppercase">Pontos de Medição (Comando)</p>
                   <div className="grid grid-cols-2 gap-2">
-                    {['L1-N', 'ctrl_in-N', 'ctrl_f1-N', 'ctrl_stop-N', 'ctrl_start-N', 'ctrl_relay-N', 'L1-ctrl_in', 'ctrl_in-ctrl_f1', 'ctrl_f1-ctrl_stop', 'ctrl_stop-ctrl_start'].map(pair => (
+                    {['L1-N', 'ctrl_in-N', 'ctrl_f1-N', 'ctrl_stop-N', 'ctrl_start-N', 'ctrl_relay-N', 'L1-ctrl_in', 'ctrl_in-ctrl_f1', 'ctrl_f1-ctrl_stop', 'ctrl_stop-ctrl_start', 'motor_u1-N', 'motor_v1-N', 'motor_w1-N'].map(pair => (
                       <Button 
                         key={pair}
                         size="sm" 
