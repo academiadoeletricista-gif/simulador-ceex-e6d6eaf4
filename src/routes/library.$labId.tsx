@@ -35,6 +35,7 @@ function LabDetail() {
   const { data: labResult, isLoading: labLoading } = useLaboratory(labId);
   const { data: casesResult, isLoading: casesLoading } = useCasesByLab(labId);
   const { data: sessionsResult, isLoading: sessionsLoading } = useSessions();
+  const startSessionMutation = useStartSession();
 
   const isLoading = labLoading || casesLoading || sessionsLoading;
 
@@ -182,7 +183,7 @@ function LabDetail() {
                           isCompleted ? "bg-primary/20 text-primary hover:bg-primary/30" : ""
                         )}
                         variant={isCompleted ? "secondary" : "default"}
-                        loading={startSessionMutation.isPending}
+                        disabled={startSessionMutation.isPending}
                         onClick={async () => {
                           if (!isCompleted && !isStarted) {
                             await startSessionMutation.mutateAsync(defect.id);
