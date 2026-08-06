@@ -120,31 +120,55 @@ function SimulationsPage() {
                       <span className="text-[10px] font-bold text-primary">{comp.id}</span>
                       <Badge variant="secondary" className="text-[8px] py-0">{comp.type}</Badge>
                     </div>
-                    <div className="text-xs font-medium truncate">{comp.id === 'K1' ? 'Contator de Potência' : comp.id === 'F1' ? 'Fusível' : comp.id === 'S2' ? 'Botão START' : comp.id}</div>
+                    <div className="text-xs font-medium truncate">
+                      {comp.id === 'K1' ? 'Contator KM1' : 
+                       comp.id === 'F1' ? 'Fusível Comando' : 
+                       comp.id === 'S2' ? 'Botão START' : 
+                       comp.id === 'S1' ? 'Botão STOP' :
+                       comp.id === 'Q2' ? 'Disjuntor Comando' :
+                       comp.id === 'F2' ? 'Relé Térmico' : comp.id}
+                    </div>
                     
-                    <div className="flex gap-1 mt-auto">
+                    <div className="flex flex-col gap-1 mt-auto">
+                      {comp.id === 'Q2' && (
+                        <Button 
+                          size="sm" 
+                          variant={comp.isClosed ? "default" : "outline"}
+                          className="w-full text-[10px] h-7"
+                          onClick={() => selectChoice('TOGGLE_BREAKER', { id: comp.id })}
+                        >
+                          {comp.isClosed ? 'Desligar' : 'Ligar'}
+                        </Button>
+                      )}
+                      
+                      {comp.id === 'F2' && comp.state === 'OPEN' && (
+                        <Button 
+                          size="sm" 
+                          variant="secondary"
+                          className="w-full text-[10px] h-7"
+                          onClick={() => selectChoice('RESET_RELAY')}
+                        >
+                          Resetar Relé
+                        </Button>
+                      )}
+
                       {comp.id === 'S2' && (
                         <Button 
                           size="sm" 
                           className="w-full text-[10px] h-7"
-                          onMouseDown={async () => {
-                            await selectChoice('PRESS_START');
-                          }}
-                          onMouseUp={async () => {
-                            await selectChoice('RELEASE_START');
-                          }}
+                          onMouseDown={() => selectChoice('PRESS_START')}
+                          onMouseUp={() => selectChoice('RELEASE_START')}
                         >
                           Pressionar
                         </Button>
                       )}
-                      {comp.type !== 'POWER_SUPPLY' && comp.type !== 'MOTOR' && comp.id !== 'S2' && (
+
+                      {comp.type !== 'POWER_SUPPLY' && comp.type !== 'MOTOR' && comp.id !== 'S2' && comp.id !== 'Q2' && (
                         <Button 
                           size="sm" 
                           variant="outline"
                           className="w-full text-[10px] h-7"
-                          onClick={async () => {
-                            await selectChoice('REPLACE_COMPONENT', { id: comp.id });
-                          }}
+                          onClick={() => selectChoice('REPLACE_COMPONENT', { id: comp.id })}
                         >
                           Substituir
                         </Button>
@@ -172,7 +196,7 @@ function SimulationsPage() {
                 <div className="space-y-2">
                   <p className="text-[10px] font-bold text-muted-foreground uppercase">Pontos de Medição (Comando)</p>
                   <div className="grid grid-cols-2 gap-2">
-                    {['L1-N', 'L1-n1', 'n1-n2', 'n2-n3', 'n3-n4', 'n4-N'].map(pair => (
+                    {['L1-N', 'ctrl_in-N', 'ctrl_f1-N', 'ctrl_stop-N', 'ctrl_start-N', 'ctrl_relay-N', 'L1-ctrl_in', 'ctrl_in-ctrl_f1', 'ctrl_f1-ctrl_stop', 'ctrl_stop-ctrl_start'].map(pair => (
                       <Button 
                         key={pair}
                         size="sm" 
