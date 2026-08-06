@@ -26,7 +26,8 @@ export const Route = createFileRoute("/marketplace")({
 });
 
 function MarketplacePage() {
-  const { xp, marketplace, cart, addToCart, removeFromCart } = useAppStore();
+  const { profile, marketplace, cart, addToCart, removeFromCart } = useAppStore();
+  const xp = profile?.xp || 0;
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<string>("Todos");
 
