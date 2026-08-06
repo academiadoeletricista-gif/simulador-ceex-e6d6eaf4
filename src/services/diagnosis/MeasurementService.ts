@@ -9,7 +9,22 @@ export const MeasurementService = {
       .eq('case_id', caseId);
 
     if (error) throw error;
-    return data as CaseMeasurement[];
+    
+    return (data as any[]).map(item => ({
+      id: item.id,
+      caseId: item.case_id,
+      measurementPointId: item.measurement_point_id,
+      pointCode: item.point_code,
+      expectedValue: item.expected_value,
+      realValue: item.real_value,
+      presentedValue: item.presented_value,
+      unit: item.unit,
+      precision: item.precision,
+      tolerance: item.tolerance,
+      displayMessage: item.display_message,
+      state: item.state,
+      condition: item.condition
+    }));
   },
 
   async getByPoint(caseId: string, pointCode: string): Promise<CaseMeasurement | null> {
@@ -24,6 +39,22 @@ export const MeasurementService = {
       if (error.code === 'PGRST116') return null;
       throw error;
     }
-    return data as CaseMeasurement;
+
+    const item = data as any;
+    return {
+      id: item.id,
+      caseId: item.case_id,
+      measurementPointId: item.measurement_point_id,
+      pointCode: item.point_code,
+      expectedValue: item.expected_value,
+      realValue: item.real_value,
+      presentedValue: item.presented_value,
+      unit: item.unit,
+      precision: item.precision,
+      tolerance: item.tolerance,
+      displayMessage: item.display_message,
+      state: item.state,
+      condition: item.condition
+    };
   }
 };
