@@ -144,7 +144,10 @@ function SimulationsPage() {
                           size="sm" 
                           variant="outline"
                           className="w-full text-[10px] h-7"
-                          onClick={() => (engine as any).performAction('REPLACE_COMPONENT', { id: comp.id })}
+                          onClick={async () => {
+                            (engine as any).performAction('REPLACE_COMPONENT', { id: comp.id });
+                            await selectChoice('REPLACE_COMPONENT');
+                          }}
                         >
                           Substituir
                         </Button>
