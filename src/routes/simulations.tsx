@@ -128,11 +128,9 @@ function SimulationsPage() {
                           size="sm" 
                           className="w-full text-[10px] h-7"
                           onMouseDown={async () => {
-                            (engine as any).performAction('PRESS_START');
                             await selectChoice('PRESS_START');
                           }}
                           onMouseUp={async () => {
-                            (engine as any).performAction('RELEASE_START');
                             await selectChoice('RELEASE_START');
                           }}
                         >
@@ -145,8 +143,7 @@ function SimulationsPage() {
                           variant="outline"
                           className="w-full text-[10px] h-7"
                           onClick={async () => {
-                            (engine as any).performAction('REPLACE_COMPONENT', { id: comp.id });
-                            await selectChoice('REPLACE_COMPONENT');
+                            await selectChoice('REPLACE_COMPONENT', { id: comp.id });
                           }}
                         >
                           Substituir
@@ -183,11 +180,9 @@ function SimulationsPage() {
                         className="text-[10px] h-8"
                         onClick={async () => {
                           const [n1, n2] = pair.split('-');
-                          const result = (engine as any).performAction('MEASURE_VOLTAGE', { node1: n1, node2: n2 });
-                          const vMatch = result.match(/\d+/);
-                          const v = vMatch ? parseInt(vMatch[0]) : 0;
+                          const v = measure(n1, n2);
                           setMultimeterValue(v);
-                          await selectChoice('MEASURE_VOLTAGE');
+                          await selectChoice('MEASURE_VOLTAGE', { node1: n1, node2: n2 });
                         }}
                       >
                         {pair}
