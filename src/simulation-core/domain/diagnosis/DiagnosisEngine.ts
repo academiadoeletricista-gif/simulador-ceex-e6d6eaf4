@@ -3,19 +3,21 @@ import { SimulationState, SessionStatus } from '../sessions/SimulationSession';
 import { ElectricalComponent, SwitchComponent, ContactorComponent } from '../components/ElectricalComponent';
 import { CircuitBreakerComponent, ThermalRelayComponent, MotorComponent } from '../components/IndustrialComponents';
 
-export type FaultType = 
-  | 'OPEN_FUSE' 
-  | 'BROKEN_COIL' 
-  | 'SHORTED_COIL' 
-  | 'OPEN_START_BUTTON' 
-  | 'OPEN_STOP_BUTTON' 
-  | 'BROKEN_AUX_CONTACT' 
-  | 'WELDED_AUX_CONTACT' 
-  | 'TRIPPED_RELAY' 
-  | 'BROKEN_WIRE' 
-  | 'LOOSE_TERMINAL' 
-  | 'MISSING_VOLTAGE' 
-  | 'MECHANICAL_FAILURE';
+export enum FaultType {
+  OPEN_FUSE = 'OPEN_FUSE',
+  BROKEN_COIL = 'BROKEN_COIL',
+  SHORTED_COIL = 'SHORTED_COIL',
+  OPEN_START_BUTTON = 'OPEN_START_BUTTON',
+  OPEN_STOP_BUTTON = 'OPEN_STOP_BUTTON',
+  BROKEN_AUX_CONTACT = 'BROKEN_AUX_CONTACT',
+  WELDED_AUX_CONTACT = 'WELDED_AUX_CONTACT',
+  TRIPPED_RELAY = 'TRIPPED_RELAY',
+  BROKEN_WIRE = 'BROKEN_WIRE',
+  LOOSE_TERMINAL = 'LOOSE_TERMINAL',
+  MISSING_VOLTAGE = 'MISSING_VOLTAGE',
+  MECHANICAL_FAILURE = 'MECHANICAL_FAILURE',
+  NONE = 'NONE'
+}
 
 export class DiagnosisEngine {
   private solver: CircuitSolver;
@@ -108,12 +110,29 @@ export class DiagnosisEngine {
       if (relay) {
         relay.reset();
         observation = "Relé térmico resetado.";
+        if (this.activeFault === FaultType.TRIPPED_RELAY) {
+          this.activeFault = FaultType.NONE;
+        }
       }
     } else if (action === 'REPLACE_COMPONENT') {
       const comp = this.components.get(params.id);
       if (comp) {
         comp.failureStatus = null;
         if (comp instanceof ThermalRelayComponent) comp.isTripped = false;
+        
+        // Clear active fault if this was the faulty component
+        if (this.activeFault) {
+          const faultComponentMap: Record<string, string> = {
+            'F1': FaultType.OPEN_FUSE,
+            'K1': FaultType.BROKEN_COIL, // Simple mapping, could be refined
+            'S2': FaultType.OPEN_START_BUTTON,
+            'S1': FaultType.OPEN_STOP_BUTTON,
+            'F2': FaultType.TRIPPED_RELAY
+          };
+          if (faultComponentMap[params.id] === this.activeFault) {
+            this.activeFault = FaultType.NONE;
+          }
+        }
         observation = `Componente ${params.id} substituído por um novo.`;
       }
     }
@@ -125,9 +144,14 @@ export class DiagnosisEngine {
     const k1 = this.components.get('K1') as ContactorComponent;
     const motor = this.components.get('M1') as MotorComponent;
     
+    // Contactor physical state depends on voltage across A1-A2
+    // Motor state depends on K1 being energized
     if (k1?.isEnergized) {
       if (motor) motor.isRunning = true;
-      this.status = SessionStatus.COMPLETED;
+      // Success condition: Contactor energized AND no active fault remaining
+      if (!this.activeFault || this.activeFault === FaultType.NONE) {
+        this.status = SessionStatus.COMPLETED;
+      }
     } else {
       if (motor) motor.isRunning = false;
     }
@@ -151,7 +175,7 @@ export class DiagnosisEngine {
       isMotorRunning: motor?.isRunning || false,
       startTime: this.startTime,
       status: this.status,
-      currentNodeId: 'sim',
+      currentNodeId: this.activeFault || 'sim',
       xp: 0,
       score: 100,
       components: Array.from(this.components.values()).map(c => ({
