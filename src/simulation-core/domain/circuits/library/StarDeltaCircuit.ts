@@ -38,14 +38,32 @@ export class StarDeltaCircuit {
 
     nodes.forEach(n => solver.addNode(n));
 
+    // Power Circuit (After Q1)
+    solver.addNode({ id: 'pow_q1_1', voltage: 0, connections: [] });
+    solver.addNode({ id: 'pow_q1_2', voltage: 0, connections: [] });
+    solver.addNode({ id: 'pow_q1_3', voltage: 0, connections: [] });
+
     // Q1 - Main Breaker
     const q1 = new CircuitBreakerComponent('Q1');
     q1.terminals = {
       '1': { id: 't1', name: '1', voltage: 0, nodeId: 'L1' },
-      '2': { id: 't2', name: '2', voltage: 0, nodeId: 'ctrl_in' }
+      '2': { id: 't2', name: '2', voltage: 0, nodeId: 'pow_q1_1' },
+      '3': { id: 't3', name: '3', voltage: 0, nodeId: 'L2' },
+      '4': { id: 't4', name: '4', voltage: 0, nodeId: 'pow_q1_2' },
+      '5': { id: 't5', name: '5', voltage: 0, nodeId: 'L3' },
+      '6': { id: 't6', name: '6', voltage: 0, nodeId: 'pow_q1_3' }
     };
     q1.isClosed = true;
     solver.addComponent(q1);
+
+    // Q2 - Control Breaker
+    const q2 = new CircuitBreakerComponent('Q2');
+    q2.terminals = {
+      '1': { id: 't1', name: '1', voltage: 0, nodeId: 'L1' },
+      '2': { id: 't2', name: '2', voltage: 0, nodeId: 'ctrl_in' }
+    };
+    q2.isClosed = true;
+    solver.addComponent(q2);
 
     // S1 - STOP Button (NC)
     const s1 = new SwitchComponent('S1', ComponentType.PUSHBUTTON_STOP, false);
