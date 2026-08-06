@@ -27,6 +27,8 @@ import {
   X,
   Briefcase,
   CreditCard,
+  ShieldCheck,
+  BarChart3,
 } from "lucide-react";
 
 import appCss from "../styles.css?url";
