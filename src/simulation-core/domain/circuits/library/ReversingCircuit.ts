@@ -24,14 +24,32 @@ export class ReversingCircuit {
 
     nodes.forEach(n => solver.addNode(n));
 
+    // Power Nodes
+    solver.addNode({ id: 'pow_q1_1', voltage: 0, connections: [] });
+    solver.addNode({ id: 'pow_q1_2', voltage: 0, connections: [] });
+    solver.addNode({ id: 'pow_q1_3', voltage: 0, connections: [] });
+
     // Q1 - Breaker
     const q1 = new CircuitBreakerComponent('Q1');
     q1.terminals = {
       '1': { id: 't1', name: '1', voltage: 0, nodeId: 'L1' },
-      '2': { id: 't2', name: '2', voltage: 0, nodeId: 'ctrl_in' }
+      '2': { id: 't2', name: '2', voltage: 0, nodeId: 'pow_q1_1' },
+      '3': { id: 't3', name: '3', voltage: 0, nodeId: 'L2' },
+      '4': { id: 't4', name: '4', voltage: 0, nodeId: 'pow_q1_2' },
+      '5': { id: 't5', name: '5', voltage: 0, nodeId: 'L3' },
+      '6': { id: 't6', name: '6', voltage: 0, nodeId: 'pow_q1_3' }
     };
     q1.isClosed = true;
     solver.addComponent(q1);
+
+    // Q2 - Control Breaker
+    const q2 = new CircuitBreakerComponent('Q2');
+    q2.terminals = {
+      '1': { id: 't1', name: '1', voltage: 0, nodeId: 'L1' },
+      '2': { id: 't2', name: '2', voltage: 0, nodeId: 'ctrl_in' }
+    };
+    q2.isClosed = true;
+    solver.addComponent(q2);
 
     // S0 - STOP (NC)
     const s0 = new SwitchComponent('S0', ComponentType.PUSHBUTTON_STOP, false);
@@ -63,7 +81,14 @@ export class ReversingCircuit {
       'A1': { id: 'tA1', name: 'A1', voltage: 0, nodeId: 'k1_coil_in' },
       'A2': { id: 'tA2', name: 'A2', voltage: 0, nodeId: 'N' },
       '13': { id: 't13', name: '13', voltage: 0, nodeId: 'ctrl_stop' },
-      '14': { id: 't14', name: '14', voltage: 0, nodeId: 'ctrl_forward' }
+      '14': { id: 't14', name: '14', voltage: 0, nodeId: 'ctrl_forward' },
+      // Power contacts
+      '1': { id: 't1', name: '1', voltage: 0, nodeId: 'pow_q1_1' },
+      '2': { id: 't2', name: '2', voltage: 0, nodeId: 'motor_u' },
+      '3': { id: 't3', name: '3', voltage: 0, nodeId: 'pow_q1_2' },
+      '4': { id: 't4', name: '4', voltage: 0, nodeId: 'motor_v' },
+      '5': { id: 't5', name: '5', voltage: 0, nodeId: 'pow_q1_3' },
+      '6': { id: 't6', name: '6', voltage: 0, nodeId: 'motor_w' }
     };
     solver.addComponent(k1);
 
@@ -73,7 +98,14 @@ export class ReversingCircuit {
       'A1': { id: 'tA1', name: 'A1', voltage: 0, nodeId: 'k2_coil_in' },
       'A2': { id: 'tA2', name: 'A2', voltage: 0, nodeId: 'N' },
       '13': { id: 't13', name: '13', voltage: 0, nodeId: 'ctrl_stop' },
-      '14': { id: 't14', name: '14', voltage: 0, nodeId: 'ctrl_reverse' }
+      '14': { id: 't14', name: '14', voltage: 0, nodeId: 'ctrl_reverse' },
+      // Power contacts (phase reversal: L1->W, L2->V, L3->U)
+      '1': { id: 't1', name: '1', voltage: 0, nodeId: 'pow_q1_1' },
+      '2': { id: 't2', name: '2', voltage: 0, nodeId: 'motor_w' },
+      '3': { id: 't3', name: '3', voltage: 0, nodeId: 'pow_q1_2' },
+      '4': { id: 't4', name: '4', voltage: 0, nodeId: 'motor_v' },
+      '5': { id: 't5', name: '5', voltage: 0, nodeId: 'pow_q1_3' },
+      '6': { id: 't6', name: '6', voltage: 0, nodeId: 'motor_u' }
     };
     solver.addComponent(k2);
 
