@@ -83,58 +83,128 @@ function SimulationsPage() {
         </div>
       </aside>
 
-      {/* Centro: Pergunta Atual */}
-      <main className="flex-1 flex flex-col p-8 bg-background/50 relative">
-        <div className="flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto w-full text-center space-y-8">
-          <Badge className={cn(
-            "py-1 px-4 text-sm font-bold uppercase tracking-wider",
-            isCompleted ? "bg-green-500/20 text-green-500 border-green-500/20" : "bg-primary/20 text-primary border-primary/20"
-          )}>
-            {isCompleted ? "Caso Concluído" : currentNode?.type === NodeType.START ? "Briefing Inicial" : "Fase de Diagnóstico"}
-          </Badge>
-          
-          <div className="space-y-4">
-            <h2 className="text-4xl font-bold tracking-tight">{currentNode?.title || activeCase.title}</h2>
-            <p className="text-xl text-muted-foreground italic">{currentNode?.description || activeCase.description}</p>
+      {/* Centro: Simulador Elétrico Real */}
+      <main className="flex-1 flex flex-col p-6 bg-background/50 relative overflow-hidden">
+        <div className="flex-1 flex flex-col space-y-6">
+          <div className="flex justify-between items-start">
+            <div className="space-y-1">
+              <Badge className={cn(
+                "py-0.5 px-3 text-[10px] font-bold uppercase tracking-wider",
+                isCompleted ? "bg-green-500/20 text-green-500 border-green-500/20" : "bg-primary/20 text-primary border-primary/20"
+              )}>
+                {isCompleted ? "Caso Concluído" : "Simulação de Física Elétrica"}
+              </Badge>
+              <h2 className="text-2xl font-bold tracking-tight">{activeCase.title}</h2>
+              <p className="text-sm text-muted-foreground italic">Identifique a falha elétrica através de medições e inspeções.</p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className={cn("gap-1.5", state.isMotorRunning ? "text-green-500 border-green-500/20" : "text-red-500 border-red-500/20")}>
+                <Activity size={12} className={cn(state.isMotorRunning && "animate-pulse")} />
+                Motor: {state.isMotorRunning ? "EM OPERAÇÃO" : "PARADO"}
+              </Badge>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 w-full gap-4 pt-8">
-            {!isCompleted ? (
-              choices.map((choice) => (
-                <Button 
-                  key={choice.id}
-                  variant="outline" 
-                  className="h-16 justify-between px-6 text-lg hover:border-primary/50 group" 
-                  onClick={() => selectChoice(choice.id)}
-                >
-                  <span className="flex items-center gap-3">
-                    <ArrowRight className="h-4 w-4 text-primary opacity-0 group-hover:opacity-100 -ml-6 group-hover:ml-0 transition-all" />
-                    {choice.label}
-                  </span>
-                  <Badge variant="secondary" className="bg-muted text-[10px]">Ação</Badge>
-                </Button>
-              ))
-            ) : (
-              <div className="space-y-6 w-full">
-                <Card className="bg-green-500/5 border-green-500/20">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-center gap-4 mb-4">
-                      <div className="h-12 w-12 rounded-full bg-green-500/20 flex items-center justify-center text-green-500">
-                        <CheckCircle2 size={24} />
-                      </div>
-                      <div className="text-left">
-                        <h3 className="font-bold text-green-700">Diagnóstico Certeiro</h3>
-                        <p className="text-xs text-green-600">Você ganhou {activeCase.xpReward} XP por esta conclusão.</p>
-                      </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Componentes do Painel */}
+            <Card className="col-span-1 lg:col-span-2">
+              <CardHeader className="p-4 border-b">
+                <CardTitle className="text-sm flex items-center gap-2"><Settings2 size={16} /> Componentes do Painel</CardTitle>
+              </CardHeader>
+              <CardContent className="p-4 grid grid-cols-2 sm:grid-cols-3 gap-4">
+                {state.components.map((comp: any) => (
+                  <div key={comp.id} className="p-3 border rounded-lg bg-card/30 flex flex-col gap-2">
+                    <div className="flex justify-between items-start">
+                      <span className="text-[10px] font-bold text-primary">{comp.id}</span>
+                      <Badge variant="secondary" className="text-[8px] py-0">{comp.type}</Badge>
                     </div>
-                  </CardContent>
-                </Card>
-                <Button size="lg" onClick={() => navigate({ to: "/library" })} className="h-16 text-lg w-full">
-                  Voltar para Biblioteca
-                </Button>
-              </div>
-            )}
+                    <div className="text-xs font-medium truncate">{comp.id === 'K1' ? 'Contator de Potência' : comp.id === 'F1' ? 'Fusível' : comp.id === 'S2' ? 'Botão START' : comp.id}</div>
+                    
+                    <div className="flex gap-1 mt-auto">
+                      {comp.id === 'S2' && (
+                        <Button 
+                          size="sm" 
+                          className="w-full text-[10px] h-7"
+                          onMouseDown={() => (engine as any).performAction('PRESS_START')}
+                          onMouseUp={() => (engine as any).performAction('RELEASE_START')}
+                        >
+                          Pressionar
+                        </Button>
+                      )}
+                      {comp.type !== 'POWER_SUPPLY' && comp.type !== 'MOTOR' && comp.id !== 'S2' && (
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          className="w-full text-[10px] h-7"
+                          onClick={() => (engine as any).performAction('REPLACE_COMPONENT', { id: comp.id })}
+                        >
+                          Substituir
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            {/* Multímetro / Medições */}
+            <Card>
+              <CardHeader className="p-4 border-b">
+                <CardTitle className="text-sm flex items-center gap-2"><Zap size={16} /> Multímetro Digital</CardTitle>
+              </CardHeader>
+              <CardContent className="p-4 space-y-4">
+                <div className="bg-black/90 p-4 rounded-lg border-2 border-primary/20 flex flex-col items-center justify-center min-h-[100px]">
+                  <span className="text-[10px] text-primary/50 font-mono mb-1">VAC - TRUE RMS</span>
+                  <div className="text-4xl font-mono text-primary animate-pulse">
+                    {multimeterValue !== null ? `${multimeterValue}.0` : "---.-"}
+                  </div>
+                  <span className="text-[10px] text-primary/50 font-mono mt-1">VOLTS</span>
+                </div>
+
+                <div className="space-y-2">
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase">Pontos de Medição (Comando)</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {['L1-N', 'L1-n1', 'n1-n2', 'n2-n3', 'n3-n4', 'n4-N'].map(pair => (
+                      <Button 
+                        key={pair}
+                        size="sm" 
+                        variant="outline" 
+                        className="text-[10px] h-8"
+                        onClick={() => {
+                          const [n1, n2] = pair.split('-');
+                          const result = (engine as any).performAction('MEASURE_VOLTAGE', { node1: n1, node2: n2 });
+                          const v = parseInt(result.match(/\d+/)[0]);
+                          setMultimeterValue(v);
+                        }}
+                      >
+                        {pair}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
+
+          {isCompleted && (
+            <Card className="bg-green-500/5 border-green-500/20 animate-in fade-in zoom-in duration-300">
+              <CardContent className="p-6 flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="h-12 w-12 rounded-full bg-green-500/20 flex items-center justify-center text-green-500">
+                    <CheckCircle2 size={24} />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-green-700">Circuito Restaurado com Sucesso</h3>
+                    <p className="text-sm text-green-600">A falha foi identificada e o motor está em operação normal.</p>
+                  </div>
+                </div>
+                <Button size="lg" onClick={() => navigate({ to: "/library" })} className="bg-green-600 hover:bg-green-700">
+                  Concluir Diagnóstico
+                </Button>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* Inferior: Ações Disponíveis */}
