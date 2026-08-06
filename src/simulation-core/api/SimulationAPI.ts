@@ -25,7 +25,7 @@ export class SimulationAPI {
     // circuitId determines which topology to load
     const circuitId = caseData?.circuitId || 'DOL';
     
-    this.engine.loadCircuit((solver) => {
+    this.engine.loadCase(caseData, (solver) => {
       if (circuitId === 'STAR_DELTA') {
         StarDeltaCircuit.setup(solver);
       } else if (circuitId === 'REVERSING') {
@@ -34,16 +34,6 @@ export class SimulationAPI {
         DOLCircuit.setup(solver);
       }
     });
-    
-    // Inject fault based on database case components
-    const faultyComp = caseData?.components?.find((c: any) => c.isFaulty);
-    const faultTypeStr = faultyComp?.failureDetails || 'OPEN_FUSE';
-    const componentTag = faultyComp?.componentTag || (faultTypeStr === 'OPEN_FUSE' ? 'F1' : 'K1');
-    
-    // Convert string to enum, fallback to OPEN_FUSE if invalid
-    const faultType = (FaultType as any)[faultTypeStr] || FaultType.OPEN_FUSE;
-    
-    this.engine.injectFault(faultType, componentTag);
   }
 
   public getSessionState(): SimulationState {
