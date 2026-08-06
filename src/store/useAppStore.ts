@@ -29,6 +29,7 @@ export const useAppStore = create<AppState>((set) => ({
   isSidebarOpen: true,
   isLoading: false,
   activeModals: {},
+  cart: [],
 
   setTheme: (theme) => {
     set({ theme });
