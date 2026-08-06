@@ -517,7 +517,8 @@ function SimulationsPage() {
                 </div>
               </CardContent>
             </Card>
-          </div>
+            </div>
+          )}
 
           {isCompleted && (
             <Card className="bg-green-500/5 border-green-500/20 animate-in fade-in zoom-in duration-300">
