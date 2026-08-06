@@ -522,7 +522,8 @@ function SimulationsPage() {
             </p>
           </div>
         </div>
-      </div>
+        </div>
+      </aside>
     </div>
   );
 }
