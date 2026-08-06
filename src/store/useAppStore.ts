@@ -135,7 +135,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
-      // Fetch public data first (Labs and Cases)
+      // Fetch public data (Labs and Cases) - accessible to all
       const { data: labsData } = await supabase
         .from('laboratories')
         .select('*')
@@ -145,54 +145,12 @@ export const useAppStore = create<AppState>((set, get) => ({
         .from('cases')
         .select('*')
         .eq('published', true);
-
-      if (!user) {
-        // ... format labs and cases still ...
-
-
-      // Fetch Profile
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-
-      // Fetch Laboratories
-      const { data: labsData } = await supabase
-        .from('laboratories')
-        .select('*')
-        .eq('published', true);
-
-      // Fetch Cases
-      const { data: casesData } = await supabase
-        .from('cases')
-        .select('*')
-        .eq('published', true);
-
-
-      // Fetch Sessions
-      const { data: sessionsData } = await supabase
-        .from('case_sessions')
-        .select('*')
-        .eq('user_id', user.id);
-
-      const sessionsMap: Record<string, CaseSession> = {};
-      sessionsData?.forEach(s => {
-        sessionsMap[s.case_id] = {
-          case_id: s.case_id,
-          status: s.status as any,
-          current_step: s.current_step || 0,
-          answers: (s.answers as any) || {},
-          start_time: s.start_time || new Date().toISOString()
-        };
-      });
 
       const formattedCases: Case[] = (casesData || []).map(c => ({
         id: c.id,
         laboratory_id: c.laboratory_id,
         code: c.code,
         slug: c.slug,
-
         title: c.title,
         category: c.category,
         level: c.level,
@@ -227,6 +185,40 @@ export const useAppStore = create<AppState>((set, get) => ({
         measurementMap: (l.measurements as any) || []
       }));
 
+      if (!user) {
+        set({ 
+          profile: null,
+          laboratories: formattedLabs,
+          cases: formattedCases,
+          sessions: {},
+          isLoading: false 
+        });
+        return;
+      }
+
+      // Fetch Profile for authenticated user
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      // Fetch Sessions for authenticated user
+      const { data: sessionsData } = await supabase
+        .from('case_sessions')
+        .select('*')
+        .eq('user_id', user.id);
+
+      const sessionsMap: Record<string, CaseSession> = {};
+      sessionsData?.forEach(s => {
+        sessionsMap[s.case_id] = {
+          case_id: s.case_id,
+          status: s.status as any,
+          current_step: s.current_step || 0,
+          answers: (s.answers as any) || {},
+          start_time: s.start_time || new Date().toISOString()
+        };
+      });
 
       set({ 
         profile: profile as any, 
@@ -241,6 +233,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       set({ isLoading: false });
     }
   },
+
 
   updateProfile: async (data) => {
     const { profile } = get();
