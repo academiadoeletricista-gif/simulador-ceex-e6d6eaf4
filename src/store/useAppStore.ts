@@ -134,10 +134,21 @@ export const useAppStore = create<AppState>((set, get) => ({
     set({ isLoading: true });
     try {
       const { data: { user } } = await supabase.auth.getUser();
+      
+      // Fetch public data first (Labs and Cases)
+      const { data: labsData } = await supabase
+        .from('laboratories')
+        .select('*')
+        .eq('published', true);
+
+      const { data: casesData } = await supabase
+        .from('cases')
+        .select('*')
+        .eq('published', true);
+
       if (!user) {
-        set({ profile: null, sessions: {}, isLoading: false });
-        return;
-      }
+        // ... format labs and cases still ...
+
 
       // Fetch Profile
       const { data: profile } = await supabase
