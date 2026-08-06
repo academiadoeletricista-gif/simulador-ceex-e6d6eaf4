@@ -6,6 +6,7 @@ import { QuizState, QuizQuestion } from '../quiz/QuizTypes';
 import { COMPONENT_QUIZ_POOL, FAULT_QUIZ_POOL } from '../quiz/QuizPool';
 import { ReportGenerator } from '../reports/ReportGenerator';
 import { TechnicalReport } from '../reports/ReportTypes';
+import { DiagnosticCase } from '@/types/diagnosis';
 
 
 export enum FaultType {
@@ -31,6 +32,8 @@ export class DiagnosisEngine {
   private startTime: number = Date.now();
   private status: SessionStatus = SessionStatus.IN_PROGRESS;
   private activeFault: FaultType | null = null;
+  private currentCase: DiagnosticCase | null = null;
+  private currentNodeId: string = 's0';
   private quizState: QuizState = {
     currentQuestion: null,
     answeredQuestions: [],
@@ -40,9 +43,21 @@ export class DiagnosisEngine {
   private totalXP: number = 0;
   private totalScore: number = 100;
 
-
   constructor() {
     this.solver = new CircuitSolver();
+  }
+
+  loadCase(caseData: DiagnosticCase, setupFn: (solver: CircuitSolver) => void) {
+    this.currentCase = caseData;
+    this.currentNodeId = 's0';
+    this.loadCircuit(setupFn);
+    
+    // Inject fault based on case components if applicable
+    const faultyComp = caseData.components?.find(c => c.isFaulty);
+    if (faultyComp) {
+      const faultType = (FaultType as any)[faultyComp.failureDetails || ''] || FaultType.OPEN_FUSE;
+      this.injectFault(faultType, faultyComp.componentTag);
+    }
   }
 
   loadCircuit(setupFn: (solver: CircuitSolver) => void) {
@@ -101,6 +116,12 @@ export class DiagnosisEngine {
 
     let observation = "Ação executada.";
 
+    // Handle narrative node transitions if the action matches a choice in the current node
+    if (this.currentCase?.occurrence) {
+      // For now, if the action is a choice label from the reference project style
+      // We map these to the narrative flow
+    }
+
     if (action === 'PRESS_START') {
       const targetId = params.id || 'S2';
       const start = this.components.get(targetId) as SwitchComponent;
@@ -140,7 +161,7 @@ export class DiagnosisEngine {
         if (this.activeFault) {
           const faultComponentMap: Record<string, string> = {
             'F1': FaultType.OPEN_FUSE,
-            'K1': FaultType.BROKEN_COIL, // Simple mapping, could be refined
+            'K1': FaultType.BROKEN_COIL,
             'S2': FaultType.OPEN_START_BUTTON,
             'S1': FaultType.OPEN_STOP_BUTTON,
             'F2': FaultType.TRIPPED_RELAY
@@ -151,6 +172,9 @@ export class DiagnosisEngine {
         }
         observation = `Componente ${params.id} substituído por um novo.`;
       }
+    } else if (action === 'NEXT_STEP') {
+        // Explicit narrative transition
+        this.currentNodeId = params.nextId || this.currentNodeId;
     }
     
     this.components.forEach(c => c.updateState());
