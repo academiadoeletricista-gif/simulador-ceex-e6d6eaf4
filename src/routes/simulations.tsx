@@ -40,9 +40,10 @@ function SimulationsPage() {
 
   const handleFinish = () => {
     if (activeCase) {
+      const caseXp = 'xp_reward' in activeCase ? activeCase.xp_reward : activeCase.xp;
       completeCase(activeCase.id, true, 300); // 5 min
-      addXp(activeCase.xp);
-      toast.success(`Caso concluído! +${activeCase.xp} XP ganhos.`);
+      addXp(caseXp);
+      toast.success(`Caso concluído! +${caseXp} XP ganhos.`);
       navigate({ to: "/library" });
     }
   };
