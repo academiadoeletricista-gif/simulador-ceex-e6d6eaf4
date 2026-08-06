@@ -1,5 +1,5 @@
-import { NodeType } from '../types/enums';
-import { NodeId, ChoiceId } from '../types/schema';
+import { NodeType } from '../../types/enums';
+import { NodeId, ChoiceId } from '../../types/schema';
 
 export class DiagnosisNode {
   constructor(
