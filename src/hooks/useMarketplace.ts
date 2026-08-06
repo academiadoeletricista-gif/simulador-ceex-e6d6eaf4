@@ -9,7 +9,7 @@ export interface Product {
   price: number;
   category: string;
   image: string;
-  requirements?: string;
+  requirements?: string | null;
 }
 
 export const useMarketplace = () => {
