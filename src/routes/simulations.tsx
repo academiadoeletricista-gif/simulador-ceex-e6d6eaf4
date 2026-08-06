@@ -27,8 +27,11 @@ function SimulationsPage() {
   
   const { data: caseResult, isLoading: caseLoading } = useCase(id || '');
   const startSessionMutation = useStartSession();
-  const { state, loadCase, selectChoice, measure, isLoading: diagnosisLoading } = useDiagnosis(id);
+  const { state, loadCase, selectChoice, measure, answerQuiz, isLoading: diagnosisLoading } = useDiagnosis(id);
   const [multimeterValue, setMultimeterValue] = useState<number | null>(null);
+  const [showDiagram, setShowDiagram] = useState(false);
+  const [showReport, setShowReport] = useState(false);
+
 
   useEffect(() => {
     if (caseResult?.success && caseResult.data) {
@@ -58,7 +61,146 @@ function SimulationsPage() {
   const isCompleted = state.status === 'COMPLETED';
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] overflow-hidden">
+    <div className="flex h-[calc(100vh-4rem)] overflow-hidden bg-background">
+      {/* Quiz Modal Overlay */}
+      {state.status === 'QUIZ_PENDING' && state.quiz?.currentQuestion && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <Card className="max-w-xl w-full border-primary/50 shadow-2xl animate-in zoom-in duration-300">
+            <CardHeader>
+              <div className="flex justify-between items-center mb-2">
+                <Badge variant="outline" className="text-primary border-primary/20 uppercase tracking-tighter">Desafio Técnico</Badge>
+                <span className="text-xs font-bold text-muted-foreground">+{state.quiz.currentQuestion.points} XP</span>
+              </div>
+              <CardTitle className="text-xl">{state.quiz.currentQuestion.question}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {state.quiz.currentQuestion.options.map((option: string, index: number) => (
+                <Button 
+                  key={index} 
+                  variant="outline" 
+                  className="w-full justify-start text-left h-auto py-4 px-6 hover:bg-primary/5 hover:border-primary/30 transition-all"
+                  onClick={() => answerQuiz(index)}
+                >
+                  <span className="h-6 w-6 rounded-full border border-primary/20 flex items-center justify-center mr-4 text-xs font-bold shrink-0">
+                    {String.fromCharCode(65 + index)}
+                  </span>
+                  {option}
+                </Button>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Diagram Modal Overlay */}
+      {showDiagram && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-8">
+          <Card className="w-full h-full max-w-6xl overflow-hidden flex flex-col">
+            <CardHeader className="flex flex-row items-center justify-between border-b py-4">
+              <CardTitle className="text-lg">Esquema Elétrico - Partida Direta (DOL)</CardTitle>
+              <Button variant="ghost" size="icon" onClick={() => setShowDiagram(false)}>X</Button>
+            </CardHeader>
+            <CardContent className="flex-1 bg-white p-0 overflow-auto flex items-center justify-center">
+              <div className="relative w-full h-full min-h-[600px] flex flex-col items-center justify-center p-12">
+                {/* Simplified Placeholder Diagram Rendering */}
+                <div className="grid grid-cols-2 gap-12 w-full max-w-4xl">
+                  <div className="border-2 border-slate-200 rounded p-8 text-center space-y-4">
+                    <h4 className="font-bold text-slate-800 uppercase text-xs">Circuito de Força</h4>
+                    <div className="h-64 border-l-2 border-r-2 border-slate-300 mx-auto w-32 relative flex flex-col items-center justify-between py-4">
+                      <div className="w-full h-4 bg-slate-200 text-[8px] flex items-center justify-center font-bold">L1 L2 L3</div>
+                      <div className="w-8 h-8 border-2 border-slate-400 rounded-sm flex items-center justify-center text-[10px] font-bold">Q1</div>
+                      <div className="w-12 h-12 border-2 border-slate-600 rounded flex items-center justify-center text-[10px] font-bold bg-slate-50">KM1</div>
+                      <div className="w-10 h-10 border-2 border-slate-400 rounded-full flex items-center justify-center text-[10px] font-bold">M1</div>
+                    </div>
+                  </div>
+                  <div className="border-2 border-slate-200 rounded p-8 text-center space-y-4">
+                    <h4 className="font-bold text-slate-800 uppercase text-xs">Circuito de Comando</h4>
+                    <div className="h-64 border-l-2 border-slate-300 mx-auto w-24 relative flex flex-col items-center justify-start gap-4 py-4">
+                      <div className="w-full h-4 bg-slate-100 text-[8px] flex items-center justify-center font-bold">220V</div>
+                      <div className="w-6 h-6 border border-slate-400 flex items-center justify-center text-[8px]">F1</div>
+                      <div className="w-8 h-4 border border-red-400 text-red-600 text-[8px] font-bold">STOP S1</div>
+                      <div className="w-8 h-4 border border-green-400 text-green-600 text-[8px] font-bold">START S2</div>
+                      <div className="w-10 h-8 border-2 border-slate-600 rounded flex items-center justify-center text-[8px] font-bold">K1(A1-A2)</div>
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-8 text-[10px] text-slate-400 font-mono text-center">
+                  DIAGRAMA REFERENCIAL CEEX-LAB V2.0 | TODOS OS DIREITOS RESERVADOS
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Report Modal Overlay */}
+      {state.status === 'COMPLETED' && state.report && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
+          <Card className="max-w-2xl w-full border-green-500/50 shadow-2xl animate-in slide-in-from-bottom-8 duration-500">
+            <CardHeader className="text-center border-b pb-6">
+              <div className="h-16 w-16 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle2 size={32} />
+              </div>
+              <CardTitle className="text-2xl">Relatório Técnico de Diagnóstico</CardTitle>
+              <CardDescription>Sessão Finalizada com Sucesso</CardDescription>
+            </CardHeader>
+            <CardContent className="p-8 space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <p className="text-[10px] text-muted-foreground uppercase font-bold">Laboratório</p>
+                  <p className="font-medium">{state.report.laboratoryName}</p>
+                </div>
+                <div className="space-y-1 text-right">
+                  <p className="text-[10px] text-muted-foreground uppercase font-bold">Nota Técnica</p>
+                  <span className="text-2xl font-black text-primary">{state.report.performanceGrade}</span>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[10px] text-muted-foreground uppercase font-bold">Duração</p>
+                  <p className="font-medium font-mono">{Math.floor(state.report.durationSeconds / 60)}min {state.report.durationSeconds % 60}s</p>
+                </div>
+                <div className="space-y-1 text-right">
+                  <p className="text-[10px] text-muted-foreground uppercase font-bold">Recompensa</p>
+                  <p className="font-bold text-green-500">+{state.report.totalXP} XP</p>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <h4 className="text-xs font-bold uppercase tracking-widest border-b pb-1">Desempenho</h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Medições Realizadas:</span>
+                    <span className="font-bold">{state.report.measurementsCount}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span>Componentes Inspecionados:</span>
+                    <span className="font-bold">{state.report.inspectedComponents.length}</span>
+                  </div>
+                  <div className="flex justify-between text-sm text-primary font-bold">
+                    <span>Pontuação Quiz:</span>
+                    <span>{state.report.quizScore}%</span>
+                  </div>
+                </div>
+              </div>
+
+              {state.report.recommendations.length > 0 && (
+                <div className="bg-primary/5 p-4 rounded-lg border border-primary/10">
+                  <h4 className="text-xs font-bold text-primary uppercase mb-2">Recomendações do Supervisor:</h4>
+                  <ul className="text-sm space-y-1 list-disc pl-4 text-muted-foreground">
+                    {state.report.recommendations.map((r: string, i: number) => (
+                      <li key={i}>{r}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <Button size="lg" className="w-full bg-green-600 hover:bg-green-700" onClick={() => navigate({ to: "/library" })}>
+                Finalizar e Voltar à Biblioteca
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       {/* Área Esquerda: Histórico */}
       <aside className="w-64 border-r bg-card/50 overflow-y-auto hidden lg:block">
         <div className="p-4 border-b">
@@ -246,8 +388,9 @@ function SimulationsPage() {
         {/* Inferior: Ações Disponíveis */}
         <footer className="mt-auto pt-8 border-t flex justify-between items-center bg-background/80 backdrop-blur-sm p-4 rounded-xl">
           <div className="flex gap-4">
-            <Button variant="ghost" className="gap-2"><BookOpen size={18} /> Ver Esquema</Button>
-            <Button variant="ghost" className="gap-2"><Info size={18} /> Dica (-50 XP)</Button>
+            <Button variant="ghost" className="gap-2" onClick={() => setShowDiagram(true)}><BookOpen size={18} /> Ver Esquema</Button>
+            <Button variant="ghost" className="gap-2 text-muted-foreground/50 cursor-not-allowed"><Info size={18} /> Dica (-50 XP)</Button>
+
           </div>
           <div className="flex items-center gap-6">
             <div className="text-right">
