@@ -8,6 +8,7 @@ import { ReportGenerator } from '../reports/ReportGenerator';
 import { TechnicalReport } from '../reports/ReportTypes';
 import { DiagnosticCase } from '@/types/diagnosis';
 import { FaultType } from './FaultType';
+import { FaultMapper } from './FaultMapper';
 
 export { FaultType };
 
@@ -20,6 +21,7 @@ export class DiagnosisEngine {
   private activeFault: FaultType | null = null;
   private currentCase: DiagnosticCase | null = null;
   private currentNodeId: string = 's0';
+  private errorMessage: string | null = null;
   private quizState: QuizState = {
     currentQuestion: null,
     answeredQuestions: [],
@@ -34,15 +36,39 @@ export class DiagnosisEngine {
   }
 
   loadCase(caseData: DiagnosticCase, setupFn: (solver: CircuitSolver) => void) {
-    this.currentCase = caseData;
-    this.currentNodeId = 's0';
-    this.loadCircuit(setupFn);
-    
-    // Inject fault based on case components if applicable
-    const faultyComp = caseData.components?.find(c => c.isFaulty);
-    if (faultyComp) {
-      const faultType = (FaultType as any)[faultyComp.failureDetails || ''] || FaultType.OPEN_FUSE;
-      this.injectFault(faultType, faultyComp.componentTag);
+    try {
+      console.log(`[DiagnosisEngine] Loading case: ${caseData.code} - ${caseData.title}`);
+      this.currentCase = caseData;
+      this.currentNodeId = 's0';
+      this.status = SessionStatus.IN_PROGRESS;
+      this.errorMessage = null;
+
+      this.loadCircuit(setupFn);
+      console.log(`[DiagnosisEngine] Circuit initialized with ${this.components.size} components`);
+      
+      // Inject fault based on case components if applicable
+      const faultyComp = caseData.components?.find(c => c.isFaulty);
+      if (faultyComp) {
+        console.log(`[DiagnosisEngine] Found faulty component: ${faultyComp.componentTag}`);
+        
+        // Use FaultMapper for normalization and validation
+        const faultType = FaultMapper.map(faultyComp.failureDetails);
+        console.log(`[DiagnosisEngine] Normalized fault: ${faultType}`);
+
+        // Validate component exists in initialized circuit
+        if (!this.components.has(faultyComp.componentTag)) {
+          throw new Error(`Component "${faultyComp.componentTag}" not found in current circuit topology.`);
+        }
+
+        this.injectFault(faultType, faultyComp.componentTag);
+      } else {
+        console.log('[DiagnosisEngine] No faulty component defined in case data');
+      }
+    } catch (error: any) {
+      console.error(`[DiagnosisEngine] CRITICAL ERROR during case loading:`, error);
+      this.status = SessionStatus.ERROR;
+      this.errorMessage = error.message;
+      throw error; // Re-throw to be handled by API/Player
     }
   }
 
@@ -56,45 +82,102 @@ export class DiagnosisEngine {
   }
 
   injectFault(type: FaultType, componentId?: string) {
+    console.log(`[DiagnosisEngine] Injecting fault ${type} into ${componentId || 'default component'}`);
     this.activeFault = type;
     
+    const targetId = componentId;
+    
     switch (type) {
-      case 'OPEN_FUSE':
-        const fuse = this.components.get(componentId || 'F1');
-        if (fuse) fuse.failureStatus = 'OPEN';
+      case FaultType.OPEN_FUSE: {
+        const fuse = this.components.get(targetId || 'F1');
+        if (fuse) {
+          fuse.failureStatus = 'OPEN';
+          console.log(`[DiagnosisEngine] FUSE ${fuse.id} set to OPEN`);
+        } else {
+          throw new Error(`Fault injection failed: FUSE component ${targetId || 'F1'} not found.`);
+        }
         break;
-      case 'BROKEN_COIL':
-        const k1 = this.components.get(componentId || 'K1');
-        if (k1) k1.failureStatus = 'BURNT_COIL';
+      }
+      case FaultType.BROKEN_COIL: {
+        const k1 = this.components.get(targetId || 'K1');
+        if (k1) {
+          k1.failureStatus = 'BURNT_COIL';
+          console.log(`[DiagnosisEngine] COIL ${k1.id} set to BURNT_COIL`);
+        } else {
+          throw new Error(`Fault injection failed: COIL component ${targetId || 'K1'} not found.`);
+        }
         break;
-      case 'SHORTED_COIL':
-        const k1_short = this.components.get(componentId || 'K1');
-        if (k1_short) k1_short.failureStatus = 'SHORTED_COIL';
+      }
+      case FaultType.SHORTED_COIL: {
+        const k1_short = this.components.get(targetId || 'K1');
+        if (k1_short) {
+          k1_short.failureStatus = 'SHORTED_COIL';
+          console.log(`[DiagnosisEngine] COIL ${k1_short.id} set to SHORTED_COIL`);
+        } else {
+          throw new Error(`Fault injection failed: COIL component ${targetId || 'K1'} not found.`);
+        }
         break;
-      case 'OPEN_START_BUTTON':
-        const s2 = this.components.get(componentId || 'S2');
-        if (s2) s2.failureStatus = 'STUCK_OPEN';
+      }
+      case FaultType.OPEN_START_BUTTON: {
+        const s2 = this.components.get(targetId || 'S2');
+        if (s2) {
+          s2.failureStatus = 'STUCK_OPEN';
+          console.log(`[DiagnosisEngine] START BUTTON ${s2.id} set to STUCK_OPEN`);
+        } else {
+          throw new Error(`Fault injection failed: START BUTTON ${targetId || 'S2'} not found.`);
+        }
         break;
-      case 'OPEN_STOP_BUTTON':
-        const s1 = this.components.get(componentId || 'S1');
-        if (s1) s1.failureStatus = 'STUCK_OPEN';
+      }
+      case FaultType.OPEN_STOP_BUTTON: {
+        const s1 = this.components.get(targetId || 'S1');
+        if (s1) {
+          s1.failureStatus = 'STUCK_OPEN';
+          console.log(`[DiagnosisEngine] STOP BUTTON ${s1.id} set to STUCK_OPEN`);
+        } else {
+          throw new Error(`Fault injection failed: STOP BUTTON ${targetId || 'S1'} not found.`);
+        }
         break;
-      case 'BROKEN_AUX_CONTACT':
-        const k1_aux = this.components.get(componentId || 'K1');
-        if (k1_aux) k1_aux.failureStatus = 'BROKEN_AUX';
+      }
+      case FaultType.BROKEN_AUX_CONTACT: {
+        const k1_aux = this.components.get(targetId || 'K1');
+        if (k1_aux) {
+          k1_aux.failureStatus = 'BROKEN_AUX';
+          console.log(`[DiagnosisEngine] AUX CONTACT ${k1_aux.id} set to BROKEN_AUX`);
+        } else {
+          throw new Error(`Fault injection failed: AUX CONTACT component ${targetId || 'K1'} not found.`);
+        }
         break;
-      case 'TRIPPED_RELAY':
-        const f2 = this.components.get(componentId || 'F2') as ThermalRelayComponent;
-        if (f2) f2.isTripped = true;
+      }
+      case FaultType.TRIPPED_RELAY: {
+        const f2 = this.components.get(targetId || 'F2') as ThermalRelayComponent;
+        if (f2) {
+          f2.isTripped = true;
+          console.log(`[DiagnosisEngine] THERMAL RELAY ${f2.id} set to TRIPPED`);
+        } else {
+          throw new Error(`Fault injection failed: THERMAL RELAY component ${targetId || 'F2'} not found.`);
+        }
         break;
-      case 'MECHANICAL_FAILURE':
-        const k1_mech = this.components.get(componentId || 'K1');
-        if (k1_mech) k1_mech.failureStatus = 'MECHANICAL_STUCK';
+      }
+      case FaultType.MECHANICAL_FAILURE: {
+        const k1_mech = this.components.get(targetId || 'K1');
+        if (k1_mech) {
+          k1_mech.failureStatus = 'MECHANICAL_STUCK';
+          console.log(`[DiagnosisEngine] CONTACTOR ${k1_mech.id} set to MECHANICAL_STUCK`);
+        } else {
+          throw new Error(`Fault injection failed: CONTACTOR component ${targetId || 'K1'} not found.`);
+        }
         break;
+      }
+      case FaultType.NONE:
+        console.log(`[DiagnosisEngine] No fault injected (NONE)`);
+        break;
+      default:
+        console.warn(`[DiagnosisEngine] Fault type ${type} mapping not implemented for physical engine.`);
     }
     
     this.components.forEach(c => c.updateState());
     this.solver.solve();
+    console.log(`[DiagnosisEngine] Initial physical state computed after fault injection.`);
   }
 
   performAction(action: string, params: any = {}) {
@@ -144,19 +227,26 @@ export class DiagnosisEngine {
         if (comp instanceof ThermalRelayComponent) comp.isTripped = false;
         
         // Clear active fault if this was the faulty component
-        if (this.activeFault) {
-          const faultComponentMap: Record<string, string> = {
-            'F1': FaultType.OPEN_FUSE,
-            'K1': FaultType.BROKEN_COIL,
-            'S2': FaultType.OPEN_START_BUTTON,
-            'S1': FaultType.OPEN_STOP_BUTTON,
-            'F2': FaultType.TRIPPED_RELAY
-          };
-          if (faultComponentMap[params.id] === this.activeFault) {
+        if (this.activeFault && this.activeFault !== FaultType.NONE) {
+          console.log(`[DiagnosisEngine] Component ${params.id} replaced. Checking if it clears active fault: ${this.activeFault}`);
+          
+          const faultyComp = this.currentCase?.components?.find(c => c.isFaulty);
+          if (faultyComp && faultyComp.componentTag === params.id) {
+            console.log(`[DiagnosisEngine] Success! Faulty component ${params.id} replaced. Clearing fault.`);
             this.activeFault = FaultType.NONE;
-          } else if (params.id === 'Q1' && this.activeFault === FaultType.OPEN_FUSE) {
-            // Q1 is often confused with a fuse in generic repair actions, allow it if it clears the fault logic
-            this.activeFault = FaultType.NONE;
+          } else {
+            // Fallback for generic cases or legacy data
+            const faultComponentMap: Record<string, FaultType> = {
+              'F1': FaultType.OPEN_FUSE,
+              'K1': FaultType.BROKEN_COIL,
+              'S2': FaultType.OPEN_START_BUTTON,
+              'S1': FaultType.OPEN_STOP_BUTTON,
+              'F2': FaultType.TRIPPED_RELAY
+            };
+            if (faultComponentMap[params.id] === this.activeFault) {
+              console.log(`[DiagnosisEngine] Generic match: Component ${params.id} clears fault ${this.activeFault}`);
+              this.activeFault = FaultType.NONE;
+            }
           }
         }
         observation = `Componente ${params.id} substituído por um novo.`;
@@ -276,6 +366,7 @@ export class DiagnosisEngine {
       currentNodeId: this.currentNodeId,
       xp: this.totalXP,
       score: this.totalScore,
+      error: this.errorMessage,
       quiz: {
         currentQuestion: this.quizState.currentQuestion,
         isCorrect: null

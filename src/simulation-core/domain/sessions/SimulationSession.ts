@@ -2,7 +2,8 @@ export enum SessionStatus {
   IN_PROGRESS = 'IN_PROGRESS',
   QUIZ_PENDING = 'QUIZ_PENDING',
   COMPLETED = 'COMPLETED',
-  FAILED = 'FAILED'
+  FAILED = 'FAILED',
+  ERROR = 'ERROR'
 }
 
 export interface SimulationState {
@@ -13,6 +14,7 @@ export interface SimulationState {
   currentNodeId: string;
   xp: number;
   score: number;
+  error?: string | null;
   components: any[];
   quiz?: {
     currentQuestion: any;
