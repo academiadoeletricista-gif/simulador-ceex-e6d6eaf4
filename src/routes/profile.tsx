@@ -214,7 +214,7 @@ function ProfilePage() {
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Calendar size={16} /> Sequência
                 </div>
-                <span className="font-bold">{streak.current} Dias</span>
+                <span className="font-bold">{streakCount} Dias</span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2 text-muted-foreground">
