@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Trophy, Award, Clock, Target, Calendar, Zap, Camera, Save } from "lucide-react";
-import { useAppStore } from "@/store/useAppStore";
+import { useAppStore, getLevelTitle } from "@/store/useAppStore";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -17,24 +17,22 @@ export const Route = createFileRoute("/profile")({
 });
 
 function ProfilePage() {
-  const { 
-    userName, 
-    userAvatar,
-    userPhone,
-    userBio,
-    userCity,
-    userState,
-    userCompany,
-    level, 
-    levelTitle, 
-    xp, 
-    nextLevelXp,
-    accuracy,
-    avgTime,
-    totalDiagnoses,
-    streak,
-    updateProfile 
-  } = useAppStore();
+  const { profile, updateProfile } = useAppStore();
+  const userName = profile?.full_name || "Comandante";
+  const userAvatar = profile?.avatar_url || "";
+  const userPhone = profile?.phone || "";
+  const userBio = profile?.bio || "";
+  const userCity = profile?.city || "";
+  const userState = profile?.state || "";
+  const userCompany = profile?.company || "";
+  const level = profile?.level || 1;
+  const levelTitle = getLevelTitle(level);
+  const xp = profile?.xp || 0;
+  const nextLevelXp = 1000;
+  const accuracy = profile?.accuracy || 0;
+  const avgTime = profile?.avg_time || 0;
+  const totalDiagnoses = profile?.total_diagnoses || 0;
+  const streakCount = profile?.streak_current || 0;
 
   const [formData, setFormData] = useState({
     userName,
@@ -216,7 +214,7 @@ function ProfilePage() {
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Calendar size={16} /> Sequência
                 </div>
-                <span className="font-bold">{streak.current} Dias</span>
+                <span className="font-bold">{streakCount} Dias</span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2 text-muted-foreground">

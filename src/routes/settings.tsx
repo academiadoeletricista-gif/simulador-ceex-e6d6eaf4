@@ -12,7 +12,10 @@ export const Route = createFileRoute("/settings")({
 });
 
 function SettingsPage() {
-  const { theme, setTheme, language, setLanguage, notifications, toggleNotifications } = useAppStore();
+  const { profile, setTheme, setLanguage, toggleNotifications } = useAppStore();
+  const theme = profile?.theme || 'dark';
+  const language = profile?.language || 'pt';
+  const notifications = profile?.notifications || false;
 
   const handleSave = () => {
     toast.success("Configurações salvas com sucesso!");

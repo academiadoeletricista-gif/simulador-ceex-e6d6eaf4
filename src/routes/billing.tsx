@@ -47,8 +47,8 @@ const PLANS = [
 ];
 
 function BillingPage() {
-  const { organization } = useAppStore();
-  const currentPlan = organization?.subscription.plan || "Free";
+  const organization = { subscription: { plan: "Professional" } };
+  const currentPlan = organization.subscription.plan;
 
   return (
     <div className="p-8 space-y-12 max-w-7xl mx-auto pb-20">

@@ -21,12 +21,14 @@ export const Route = createFileRoute("/simulations")({
 function SimulationsPage() {
   const { id } = Route.useSearch();
   const navigate = useNavigate();
-  const { sessions, startCase, completeCase, addXp } = useAppStore();
-  const [activeCase, setActiveCase] = useState<typeof cases[0] | null>(null);
+  const { sessions, startCase, completeCase, addXp, profile } = useAppStore();
+  const [activeCase, setActiveCase] = useState<any>(null);
+
+  const { cases: dbCases } = useAppStore();
 
   useEffect(() => {
     if (id) {
-      const foundCase = cases.find(c => c.id === id);
+      const foundCase = dbCases.find(c => c.id === id) || cases.find(c => c.id === id);
       if (foundCase) {
         setActiveCase(foundCase);
         if (!sessions[id]) {
@@ -34,13 +36,14 @@ function SimulationsPage() {
         }
       }
     }
-  }, [id, sessions, startCase]);
+  }, [id, sessions, startCase, dbCases]);
 
   const handleFinish = () => {
     if (activeCase) {
+      const caseXp = 'xp_reward' in activeCase ? activeCase.xp_reward : activeCase.xp;
       completeCase(activeCase.id, true, 300); // 5 min
-      addXp(activeCase.xp);
-      toast.success(`Caso concluído! +${activeCase.xp} XP ganhos.`);
+      addXp(caseXp);
+      toast.success(`Caso concluído! +${caseXp} XP ganhos.`);
       navigate({ to: "/library" });
     }
   };
@@ -143,7 +146,7 @@ function SimulationsPage() {
             </div>
             <div className="flex justify-between text-xs">
               <span className="text-muted-foreground">XP em jogo:</span>
-              <span className="font-medium text-secondary">{activeCase.xp}</span>
+              <span className="font-medium text-secondary">{'xp_reward' in activeCase ? activeCase.xp_reward : activeCase.xp}</span>
             </div>
           </CardContent>
         </Card>
@@ -151,7 +154,7 @@ function SimulationsPage() {
         <div className="space-y-2">
           <h4 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Sintomas</h4>
           <ul className="text-xs space-y-2">
-            {activeCase.symptoms.map((s, i) => (
+            {activeCase.symptoms.map((s: string, i: number) => (
               <li key={i} className="flex gap-2 text-red-500"><AlertTriangle size={12} /> {s}</li>
             ))}
           </ul>
@@ -160,7 +163,7 @@ function SimulationsPage() {
         <div className="space-y-2">
           <h4 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Checklist Recomendado</h4>
           <ul className="text-xs space-y-2">
-            {activeCase.checklist.map((c, i) => (
+            {activeCase.checklist.map((c: string, i: number) => (
               <li key={i} className="flex gap-2 text-muted-foreground"><CheckCircle2 size={12} /> {c}</li>
             ))}
           </ul>

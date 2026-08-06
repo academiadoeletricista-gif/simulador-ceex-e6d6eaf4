@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { useAppStore } from "@/store/useAppStore";
+import { useAppStore, getLevelTitle } from "@/store/useAppStore";
 import { cases } from "./library";
 import { 
   Zap, 
@@ -24,24 +24,27 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const { 
-    userName,
-    xp, 
-    level, 
-    streak, 
-    levelTitle, 
-    nextLevelXp, 
-    dailyChallenges, 
-    achievements,
-    accuracy,
-    avgTime,
-    sessions
-  } = useAppStore();
+  const { profile, sessions, achievements } = useAppStore();
+  const userName = profile?.full_name || "Comandante";
+  const xp = profile?.xp || 0;
+  const level = profile?.level || 1;
+  const streakCount = profile?.streak_current || 0;
+  const levelTitle = getLevelTitle(level);
+  const nextLevelXp = 1000;
+  const dailyChallenges = [
+    { id: 'd1', title: 'Completar 2 diagnósticos', description: 'Realize dois diagnósticos completos hoje', xpReward: 200, completed: false },
+    { id: 'd2', title: 'Precisão > 90% em caso Prata', description: 'Mantenha alta precisão em um caso de nível Prata', xpReward: 500, completed: false },
+  ];
+  const accuracy = profile?.accuracy || 0;
+  const avgTime = profile?.avg_time || 0;
 
   const xpProgress = (xp / nextLevelXp) * 100;
   
+  const { cases: dbCases } = useAppStore();
+  const allCases = dbCases.length > 0 ? dbCases : cases;
+  
   // Encontrar um caso não concluído como recomendação
-  const recommendedCase = cases.find(c => !sessions[c.id] || sessions[c.id]?.status !== 'completed') || cases[0];
+  const recommendedCase = allCases.find(c => !sessions[c.id] || sessions[c.id]?.status !== 'completed') || allCases[0];
 
   return (
     <div className="p-8 space-y-8 max-w-7xl mx-auto pb-20">
@@ -92,7 +95,7 @@ function Index() {
                 <CardDescription className="flex items-center gap-2">
                   <Zap className="h-4 w-4 text-primary" /> Sequência
                 </CardDescription>
-                <CardTitle className="text-3xl">{streak.current} dias</CardTitle>
+                <CardTitle className="text-3xl">{streakCount} dias</CardTitle>
               </CardHeader>
             </Card>
             <Card className="bg-card/40 border-none shadow-none">
@@ -125,7 +128,7 @@ function Index() {
               <Card className="group relative overflow-hidden border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
                 <CardContent className="p-0 flex flex-col md:flex-row">
                   <div className="w-full md:w-48 bg-muted/20 flex items-center justify-center p-8 overflow-hidden">
-                    <img src={recommendedCase.image} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                    <img src={'image_url' in recommendedCase ? recommendedCase.image_url : recommendedCase.image} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                   </div>
                   <div className="p-6 flex-1 space-y-4">
                     <div>
@@ -136,8 +139,8 @@ function Index() {
                       </p>
                     </div>
                     <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                      <span className="flex items-center gap-1.5"><Zap className="h-4 w-4 text-primary" /> +{recommendedCase.xp} XP</span>
-                      <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" /> {recommendedCase.time}</span>
+                      <span className="flex items-center gap-1.5"><Zap className="h-4 w-4 text-primary" /> +{'xp_reward' in recommendedCase ? recommendedCase.xp_reward : recommendedCase.xp} XP</span>
+                      <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" /> {'time_estimate' in recommendedCase ? recommendedCase.time_estimate : recommendedCase.time}</span>
                     </div>
                     <Button asChild className="w-full md:w-auto gap-2 group-hover:gap-3 transition-all">
                       <Link to="/simulations" search={{ id: recommendedCase.id }}>
