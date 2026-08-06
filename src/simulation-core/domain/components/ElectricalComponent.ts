@@ -92,14 +92,27 @@ export class ContactorComponent extends ElectricalComponent {
   getContinuity(t1: string, t2: string): boolean {
     if (this.failureStatus === 'BROKEN_AUX') return false;
     
-    // Main contacts or auxiliary contacts logic
-    if ((t1 === '13' && t2 === '14') || (t1 === '14' && t2 === '13')) {
-      return this.isEnergized;
+    // Physical state for contacts
+    const active = this.isEnergized;
+
+    // Power contacts (1-2, 3-4, 5-6)
+    const isPower1 = (t1 === '1' && t2 === '2') || (t1 === '2' && t2 === '1');
+    const isPower2 = (t1 === '3' && t2 === '4') || (t1 === '4' && t2 === '3');
+    const isPower3 = (t1 === '5' && t2 === '6') || (t1 === '6' && t2 === '5');
+    
+    if (isPower1 || isPower2 || isPower3) {
+      return active;
     }
     
-    // Power contacts (1-2, 3-4, 5-6)
-    const isPower = (t1 === '1' && t2 === '2') || (t1 === '3' && t2 === '4') || (t1 === '5' && t2 === '6');
-    if (isPower) return this.isEnergized;
+    // Main auxiliary contact (NO 13-14)
+    if ((t1 === '13' && t2 === '14') || (t1 === '14' && t2 === '13')) {
+      return active;
+    }
+
+    // NC contact (21-22) if exists
+    if ((t1 === '21' && t2 === '22') || (t1 === '22' && t2 === '21')) {
+      return !active;
+    }
     
     return false; 
   }
