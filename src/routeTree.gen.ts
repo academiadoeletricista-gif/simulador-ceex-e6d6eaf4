@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AchievementsRouteImport } from './routes/achievements'
+import { Route as CertificationsRouteImport } from './routes/certifications'
 import { Route as LibraryRouteImport } from './routes/library'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as RankingRouteImport } from './routes/ranking'
@@ -23,6 +24,11 @@ const IndexRoute = IndexRouteImport.update({
 const AchievementsRoute = AchievementsRouteImport.update({
   id: '/achievements',
   path: '/achievements',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CertificationsRoute = CertificationsRouteImport.update({
+  id: '/certifications',
+  path: '/certifications',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LibraryRoute = LibraryRouteImport.update({
@@ -44,6 +50,7 @@ const RankingRoute = RankingRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/achievements': typeof AchievementsRoute
+  '/certifications': typeof CertificationsRoute
   '/library': typeof LibraryRoute
   '/profile': typeof ProfileRoute
   '/ranking': typeof RankingRoute
@@ -51,6 +58,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/achievements': typeof AchievementsRoute
+  '/certifications': typeof CertificationsRoute
   '/library': typeof LibraryRoute
   '/profile': typeof ProfileRoute
   '/ranking': typeof RankingRoute
@@ -59,21 +67,42 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/achievements': typeof AchievementsRoute
+  '/certifications': typeof CertificationsRoute
   '/library': typeof LibraryRoute
   '/profile': typeof ProfileRoute
   '/ranking': typeof RankingRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/achievements' | '/library' | '/profile' | '/ranking'
+  fullPaths:
+    | '/'
+    | '/achievements'
+    | '/certifications'
+    | '/library'
+    | '/profile'
+    | '/ranking'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/achievements' | '/library' | '/profile' | '/ranking'
-  id: '__root__' | '/' | '/achievements' | '/library' | '/profile' | '/ranking'
+  to:
+    | '/'
+    | '/achievements'
+    | '/certifications'
+    | '/library'
+    | '/profile'
+    | '/ranking'
+  id:
+    | '__root__'
+    | '/'
+    | '/achievements'
+    | '/certifications'
+    | '/library'
+    | '/profile'
+    | '/ranking'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AchievementsRoute: typeof AchievementsRoute
+  CertificationsRoute: typeof CertificationsRoute
   LibraryRoute: typeof LibraryRoute
   ProfileRoute: typeof ProfileRoute
   RankingRoute: typeof RankingRoute
@@ -93,6 +122,13 @@ declare module '@tanstack/react-router' {
       path: '/achievements'
       fullPath: '/achievements'
       preLoaderRoute: typeof AchievementsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/certifications': {
+      id: '/certifications'
+      path: '/certifications'
+      fullPath: '/certifications'
+      preLoaderRoute: typeof CertificationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/library': {
@@ -122,6 +158,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AchievementsRoute: AchievementsRoute,
+  CertificationsRoute: CertificationsRoute,
   LibraryRoute: LibraryRoute,
   ProfileRoute: ProfileRoute,
   RankingRoute: RankingRoute,
