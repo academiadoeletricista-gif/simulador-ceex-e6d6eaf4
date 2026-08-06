@@ -83,7 +83,7 @@ function SimulationsPage() {
         </div>
       </aside>
 
-      {/* Centro: Pergunta Atual (Diagnosis Engine Node) */}
+      {/* Centro: Pergunta Atual */}
       <main className="flex-1 flex flex-col p-8 bg-background/50 relative">
         <div className="flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto w-full text-center space-y-8">
           <Badge className={cn(
