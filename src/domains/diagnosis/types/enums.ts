@@ -1,0 +1,59 @@
+export enum NodeType {
+  START = 'START',
+  INFORMATION = 'INFORMATION',
+  QUESTION = 'QUESTION',
+  DECISION = 'DECISION',
+  MEASUREMENT = 'MEASUREMENT',
+  INSPECTION = 'INSPECTION',
+  EVIDENCE = 'EVIDENCE',
+  HINT = 'HINT',
+  ERROR = 'ERROR',
+  SUCCESS = 'SUCCESS',
+  FAILURE = 'FAILURE',
+  END = 'END',
+}
+
+export enum CaseDifficulty {
+  BEGINNER = 'BEGINNER',
+  INTERMEDIATE = 'INTERMEDIATE',
+  ADVANCED = 'ADVANCED',
+  EXPERT = 'EXPERT',
+}
+
+export enum EquipmentType {
+  MOTOR = 'MOTOR',
+  CONTACTOR = 'CONTACTOR',
+  RELAY = 'RELAY',
+  PLC = 'PLC',
+  MULTIMETER = 'MULTIMETER',
+  OTHER = 'OTHER',
+}
+
+export enum ChoiceResult {
+  NEUTRAL = 'NEUTRAL',
+  CORRECT = 'CORRECT',
+  INCORRECT = 'INCORRECT',
+  CRITICAL_ERROR = 'CRITICAL_ERROR',
+}
+
+export enum MeasurementType {
+  VOLTAGE = 'VOLTAGE',
+  CURRENT = 'CURRENT',
+  RESISTANCE = 'RESISTANCE',
+  CONTINUITY = 'CONTINUITY',
+  VISUAL = 'VISUAL',
+}
+
+export enum SessionStatus {
+  IDLE = 'IDLE',
+  IN_PROGRESS = 'IN_PROGRESS',
+  PAUSED = 'PAUSED',
+  COMPLETED = 'COMPLETED',
+  FAILED = 'FAILED',
+}
+
+export enum CaseStatus {
+  DRAFT = 'DRAFT',
+  PUBLISHED = 'PUBLISHED',
+  ARCHIVED = 'ARCHIVED',
+}
