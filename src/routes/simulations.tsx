@@ -127,8 +127,14 @@ function SimulationsPage() {
                         <Button 
                           size="sm" 
                           className="w-full text-[10px] h-7"
-                          onMouseDown={() => (engine as any).performAction('PRESS_START')}
-                          onMouseUp={() => (engine as any).performAction('RELEASE_START')}
+                          onMouseDown={async () => {
+                            (engine as any).performAction('PRESS_START');
+                            await selectChoice('PRESS_START');
+                          }}
+                          onMouseUp={async () => {
+                            (engine as any).performAction('RELEASE_START');
+                            await selectChoice('RELEASE_START');
+                          }}
                         >
                           Pressionar
                         </Button>
