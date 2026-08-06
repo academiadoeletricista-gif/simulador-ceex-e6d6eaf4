@@ -316,13 +316,100 @@ function SimulationsPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Componentes do Painel */}
-            <Card className="col-span-1 lg:col-span-2">
-              <CardHeader className="p-4 border-b">
-                <CardTitle className="text-sm flex items-center gap-2"><Settings2 size={16} /> Componentes do Painel</CardTitle>
-              </CardHeader>
-              <CardContent className="p-4 grid grid-cols-2 sm:grid-cols-3 gap-4">
+          {activeTab === 'problem' && (
+            <div className="flex-1 overflow-y-auto pr-2 space-y-6">
+              <Card className="border-2 border-primary/20 bg-primary/5">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-primary"><Info size={20} /> Chamado de Ocorrência</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4 text-xs">
+                    <div className="p-3 bg-background rounded-lg border">
+                      <p className="text-muted-foreground font-bold uppercase mb-1">Equipamento</p>
+                      <p className="font-mono">{(activeCase as any).occurrence?.equipment || 'Painel de Partida'}</p>
+                    </div>
+                    <div className="p-3 bg-background rounded-lg border">
+                      <p className="text-muted-foreground font-bold uppercase mb-1">Prioridade</p>
+                      <p className="font-bold text-red-500">{(activeCase as any).occurrence?.urgency || 'Alta'}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="p-4 bg-background rounded-lg border space-y-2">
+                    <h4 className="font-bold text-sm">Sintoma Relatado:</h4>
+                    <p className="text-sm italic text-muted-foreground">"{(activeCase as any).occurrence?.operatorMessage || activeCase.description}"</p>
+                  </div>
+
+                  <div className="p-4 bg-background rounded-lg border space-y-2">
+                    <h4 className="font-bold text-sm">Próximos Passos:</h4>
+                    <ul className="text-sm space-y-2">
+                       <li className="flex items-start gap-2"><div className="h-4 w-4 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[10px] shrink-0 mt-0.5">1</div> Inspecione visualmente os componentes do painel.</li>
+                       <li className="flex items-start gap-2"><div className="h-4 w-4 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[10px] shrink-0 mt-0.5">2</div> Utilize o multímetro para medir tensões no circuito de comando.</li>
+                       <li className="flex items-start gap-2"><div className="h-4 w-4 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[10px] shrink-0 mt-0.5">3</div> Isole o trecho defeituoso e realize o reparo.</li>
+                    </ul>
+                  </div>
+
+                  <Button className="w-full gap-2" size="lg" onClick={() => setActiveTab('inspect')}>
+                    Iniciar Diagnóstico <ArrowRight size={18} />
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {currentStep && (
+                <Card className="border-primary shadow-lg animate-in slide-in-from-right duration-500">
+                  <CardHeader className="bg-primary/5 border-b">
+                    <CardTitle className="text-sm flex items-center gap-2"><Activity size={16} className="text-primary" /> Situação Atual</CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6 space-y-4">
+                    <p className="text-lg font-medium">{currentStep.situation}</p>
+                    {currentStep.reading && (
+                        <div className="p-4 bg-black rounded border-2 border-primary/30 flex flex-col items-center">
+                            <span className="text-[10px] text-primary/50 font-mono">Última Leitura</span>
+                            <span className="text-2xl font-mono text-primary">{currentStep.reading}</span>
+                        </div>
+                    )}
+                    
+                    <div className="space-y-3 pt-4 border-t">
+                        <p className="text-xs font-bold text-muted-foreground uppercase">Escolha sua ação técnica:</p>
+                        <div className="grid gap-2">
+                            <Button variant="outline" className="justify-start text-left h-auto py-3 px-4 hover:border-primary/50" onClick={() => selectChoice('NEXT_STEP', { nextId: `s${currentStepIndex + 1}` })}>
+                                <span className="h-5 w-5 rounded-full border flex items-center justify-center mr-3 text-[10px] font-bold shrink-0">A</span>
+                                {currentStep.correct}
+                            </Button>
+                            {currentStep.wrong?.map((w: [string, string], i: number) => (
+                                <Button key={i} variant="outline" className="justify-start text-left h-auto py-3 px-4 hover:border-red-200" onClick={() => { setLastMessage(w[1]); }}>
+                                    <span className="h-5 w-5 rounded-full border flex items-center justify-center mr-3 text-[10px] font-bold shrink-0">{String.fromCharCode(66 + i)}</span>
+                                    {w[0]}
+                                </Button>
+                            ))}
+                        </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+              
+              {lastMessage && (
+                <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-600 text-sm animate-in fade-in duration-300">
+                    <p className="font-bold mb-1 flex items-center gap-2"><AlertTriangle size={14} /> Consequência Técnica:</p>
+                    {lastMessage}
+                    <Button variant="link" className="p-0 h-auto text-red-600 font-bold ml-2" onClick={() => setLastMessage(null)}>Ocultar</Button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {(activeTab === 'inspect' || activeTab === 'measure') && (
+            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-y-auto pr-2">
+              <Card className="col-span-1 lg:col-span-2">
+                <CardHeader className="p-4 border-b bg-card">
+                  <div className="flex justify-between items-center">
+                    <CardTitle className="text-sm flex items-center gap-2"><Settings2 size={16} /> Componentes do Painel</CardTitle>
+                    <div className="flex gap-2">
+                        <Button variant={activeTab === 'inspect' ? "default" : "outline"} size="sm" onClick={() => setActiveTab('inspect')} className="h-8">Inspeção Visual</Button>
+                        <Button variant={activeTab === 'measure' ? "default" : "outline"} size="sm" onClick={() => setActiveTab('measure')} className="h-8">Multímetro</Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-4 grid grid-cols-2 sm:grid-cols-3 gap-4">
                 {state.components.map((comp: any) => (
                   <div key={comp.id} className="p-3 border rounded-lg bg-card/30 flex flex-col gap-2">
                     <div className="flex justify-between items-start">
