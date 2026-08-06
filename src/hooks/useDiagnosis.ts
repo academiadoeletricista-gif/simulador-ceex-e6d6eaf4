@@ -49,6 +49,7 @@ export const useDiagnosis = (caseId?: string) => {
     selectChoice,
     answerQuiz,
     measure: api.measure.bind(api),
-    isLoading: sessionLoading
+    isLoading: sessionLoading,
+    isError: !!sessionResult && !sessionResult.success
   };
 };

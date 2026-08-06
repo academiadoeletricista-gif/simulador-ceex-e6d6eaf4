@@ -21,7 +21,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useLaboratory } from "@/hooks/useLaboratory";
 import { useCasesByLab } from "@/hooks/useCase";
-import { useSessions } from "@/hooks/useSession";
+import { useSessions, useStartSession } from "@/hooks/useSession";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/library/$labId")({
@@ -35,6 +35,7 @@ function LabDetail() {
   const { data: labResult, isLoading: labLoading } = useLaboratory(labId);
   const { data: casesResult, isLoading: casesLoading } = useCasesByLab(labId);
   const { data: sessionsResult, isLoading: sessionsLoading } = useSessions();
+  const startSessionMutation = useStartSession();
 
   const isLoading = labLoading || casesLoading || sessionsLoading;
 
@@ -182,7 +183,13 @@ function LabDetail() {
                           isCompleted ? "bg-primary/20 text-primary hover:bg-primary/30" : ""
                         )}
                         variant={isCompleted ? "secondary" : "default"}
-                        onClick={() => navigate({ to: '/simulations', search: { id: defect.id } })}
+                        disabled={startSessionMutation.isPending}
+                        onClick={async () => {
+                          if (!isCompleted && !isStarted) {
+                            await startSessionMutation.mutateAsync(defect.id);
+                          }
+                          navigate({ to: '/simulations', search: { id: defect.id } });
+                        }}
                       >
                         {isCompleted ? "Revisar Diagnóstico" : isStarted ? "Continuar Simulação" : "Iniciar Simulação"}
                         <Play className={cn("h-3 w-3", !isCompleted && "fill-current")} />

@@ -47,7 +47,7 @@ function SimulationsPage() {
   
   const { data: caseResult, isLoading: caseLoading } = useCase(id || '');
   const startSessionMutation = useStartSession();
-  const { state, loadCase, selectChoice, measure, answerQuiz, isLoading: diagnosisLoading } = useDiagnosis(id);
+  const { state, loadCase, selectChoice, measure, answerQuiz, isLoading: diagnosisLoading, isError } = useDiagnosis(id);
   const [multimeterValue, setMultimeterValue] = useState<number | null>(null);
   const [showDiagram, setShowDiagram] = useState(false);
   const [showReport, setShowReport] = useState(false);
@@ -79,19 +79,23 @@ function SimulationsPage() {
     }
   }, [caseResult, loadCase]);
 
-  if (caseLoading || diagnosisLoading) {
+  if (caseLoading || (diagnosisLoading && !isError)) {
     return <div className="p-8"><Skeleton className="w-full h-[600px]" /></div>;
   }
 
   const activeCase = caseResult?.success ? caseResult.data : null;
 
-  if (!activeCase || !id) {
+  if (!activeCase || !id || isError) {
     return (
       <div className="flex flex-col items-center justify-center h-[calc(100vh-4rem)] space-y-4">
         <div className="p-8 text-center max-w-md space-y-4">
           <BookOpen size={48} className="mx-auto text-muted-foreground opacity-20" />
-          <h2 className="text-2xl font-bold">Nenhuma simulação ativa</h2>
-          <p className="text-muted-foreground">Selecione um caso na biblioteca para iniciar seu diagnóstico.</p>
+          <h2 className="text-2xl font-bold">{isError ? "Erro ao carregar sessão" : "Nenhuma simulação ativa"}</h2>
+          <p className="text-muted-foreground">
+            {isError 
+              ? "Houve um problema ao carregar os dados do seu diagnóstico. Tente iniciar novamente pela biblioteca." 
+              : "Selecione um caso na biblioteca para iniciar seu diagnóstico."}
+          </p>
           <Button onClick={() => navigate({ to: "/library" })}>Ir para Biblioteca</Button>
         </div>
       </div>
