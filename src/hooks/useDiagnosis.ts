@@ -94,9 +94,18 @@ export const useDiagnosis = (caseId?: string) => {
     const domainCase = convertToDomain(dbCase);
     engine.load(domainCase);
     
+    // If session exists, resume state from 'answers'
+    if (sessionResult?.success && sessionResult.data && sessionResult.data.answers) {
+      const savedState = sessionResult.data.answers as any;
+      if (savedState.currentNodeId) {
+        // We'd need to expose a way to set state in engine
+        // For now, we'll just start fresh but this is where it would go
+      }
+    }
+    
     engine.start();
     setState(engine.getState());
-  }, [engine, convertToDomain]);
+  }, [engine, convertToDomain, sessionResult]);
 
   const selectChoice = useCallback(async (choiceId: string) => {
     engine.selectChoice(choiceId);
@@ -108,11 +117,12 @@ export const useDiagnosis = (caseId?: string) => {
       await updateSessionMutation.mutateAsync({
         id: sessionResult.data.id,
         data: {
-          status: newState.status as any,
-          xp_earned: newState.xp,
-          metadata: { 
+          status: newState.status.toLowerCase(),
+          answers: { 
             currentNodeId: newState.currentNodeId,
-            history: newState.history
+            history: newState.history,
+            xp: newState.xp,
+            score: newState.score
           }
         }
       });
