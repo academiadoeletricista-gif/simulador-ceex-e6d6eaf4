@@ -11,6 +11,7 @@ import {
   FileText, 
   ShieldCheck, 
   Zap,
+  Download, 
   ArrowRight,
   ChevronRight,
   ExternalLink
