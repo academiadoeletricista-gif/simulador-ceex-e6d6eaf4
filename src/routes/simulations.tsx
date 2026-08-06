@@ -182,6 +182,7 @@ function SimulationsPage() {
                         variant="outline" 
                         className="text-[10px] h-8"
                         onClick={async () => {
+                          const [n1, n2] = pair.split('-');
                           const result = (engine as any).performAction('MEASURE_VOLTAGE', { node1: n1, node2: n2 });
                           const vMatch = result.match(/\d+/);
                           const v = vMatch ? parseInt(vMatch[0]) : 0;
