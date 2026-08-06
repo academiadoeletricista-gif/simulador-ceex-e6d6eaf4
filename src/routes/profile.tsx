@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Trophy, Award, Clock, Target, Calendar, Zap, Camera, Save } from "lucide-react";
-import { useAppStore } from "@/store/useAppStore";
+import { useAppStore, getLevelTitle } from "@/store/useAppStore";
 import { useState } from "react";
 import { toast } from "sonner";
 
