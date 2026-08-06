@@ -83,421 +83,281 @@ function Index() {
       <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/10 via-background to-secondary/5 border p-8 md:p-12">
         <div className="relative z-10 flex flex-col md:flex-row gap-8 items-center justify-between">
           <div className="space-y-4 text-center md:text-left">
-            <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 px-3 py-1 text-[10px] whitespace-pre-wrap text-left max-w-full">
-              Execute esta instrucao no projeto: # SPRINT P0.1
-# CRITICAL FIX
-# END-TO-END DIAGNOSTIC SIMULATION
-# PRODUCTION BLOCKER
+            <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 px-3 py-1">
+              Painel de Controle do Especialista
+            </Badge>
+            <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
+              Bem-vindo, <span className="text-primary">{userName}</span>
+            </h1>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto md:mx-0">
+              Sua jornada para se tornar uma lenda industrial continua. Analise casos, realize medições e resolva defeitos complexos.
+            </p>
+            
+            <div className="flex flex-wrap gap-4 pt-4 justify-center md:justify-start">
+              <Button size="lg" className="rounded-full px-8 gap-2 group" onClick={() => navigate({ to: '/library' })}>
+                Iniciar Novo Diagnóstico
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </Button>
+              <Button size="lg" variant="outline" className="rounded-full px-8 gap-2" onClick={() => navigate({ to: '/ranking' })}>
+                Ver Ranking Global
+                <Trophy className="w-4 h-4 text-yellow-500" />
+              </Button>
+            </div>
+          </div>
+
+          <div className="w-full max-w-md space-y-6">
+            <Card className="bg-background/40 backdrop-blur-sm border-primary/10">
+              <CardContent className="pt-6 space-y-6">
+                <div className="flex justify-between items-end">
+                  <div className="space-y-1">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{levelTitle}</p>
+                    <p className="text-2xl font-bold">Nível {level}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">XP Total</p>
+                    <p className="text-2xl font-bold text-primary">{xp.toLocaleString()}</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Progresso para Nível {level + 1}</span>
+                    <span className="font-medium">{Math.round(xpProgress)}%</span>
+                  </div>
+                  <Progress value={xpProgress} className="h-2" />
+                  <p className="text-[10px] text-center text-muted-foreground">Faltam {nextLevelXp - (xp % nextLevelXp)} XP para o próximo nível</p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1 p-3 rounded-2xl bg-primary/5 border border-primary/10">
+                    <div className="flex items-center gap-2 text-primary">
+                      <TrendingUp className="w-4 h-4" />
+                      <span className="text-xs font-bold">Precisão</span>
+                    </div>
+                    <p className="text-xl font-bold">{accuracy}%</p>
+                  </div>
+                  <div className="space-y-1 p-3 rounded-2xl bg-secondary/5 border border-secondary/10">
+                    <div className="flex items-center gap-2 text-secondary-foreground">
+                      <Clock className="w-4 h-4" />
+                      <span className="text-xs font-bold">Tempo Médio</span>
+                    </div>
+                    <p className="text-xl font-bold">{avgTime}m</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Main Column */}
+        <div className="lg:col-span-2 space-y-8">
+          {/* Quick Actions / Featured */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card className="group hover:border-primary/50 transition-all cursor-pointer overflow-hidden relative" onClick={() => navigate({ to: '/library' })}>
+              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                <BookOpen className="w-24 h-24" />
+              </div>
+              <CardHeader>
+                <Badge className="w-fit mb-2">Recomendado</Badge>
+                <CardTitle>Continuar Aprendizado</CardTitle>
+                <CardDescription>Explore os laboratórios virtuais e domine novos comandos.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {recommendedLab ? (
+                  <div className="space-y-4">
+                    <div className="p-4 rounded-xl bg-muted/50 border flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                          <Zap className="w-5 h-5 text-primary" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold">{recommendedLab.name}</p>
+                          <p className="text-xs text-muted-foreground">{recommendedLab.cases_count} Casos disponíveis</p>
+                        </div>
+                      </div>
+                      <ArrowUpRight className="w-4 h-4 text-muted-foreground" />
+                    </div>
+                    <Button variant="ghost" className="w-full justify-between hover:bg-primary/5 group">
+                      Acessar Laboratório
+                      <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="h-[100px] flex items-center justify-center text-muted-foreground italic text-sm">
+                    Nenhum laboratório disponível no momento.
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card className="group hover:border-secondary/50 transition-all cursor-pointer overflow-hidden relative" onClick={() => navigate({ to: '/achievements' })}>
+              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                <Trophy className="w-24 h-24" />
+              </div>
+              <CardHeader>
+                <Badge variant="secondary" className="w-fit mb-2">Conquistas</Badge>
+                <CardTitle>Suas Medalhas</CardTitle>
+                <CardDescription>Você já desbloqueou {achievements.filter(a => a.unlocked_at).length} de {achievements.length} conquistas.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex gap-2">
+                  {achievements.slice(0, 4).map((achievement, i) => (
+                    <div 
+                      key={achievement.id} 
+                      className={cn(
+                        "w-10 h-10 rounded-full border flex items-center justify-center transition-all",
+                        achievement.unlocked_at ? "bg-yellow-500/10 border-yellow-500/50 text-yellow-600 scale-110 shadow-lg shadow-yellow-500/10" : "bg-muted text-muted-foreground opacity-40"
+                      )}
+                    >
+                      <Award className="w-5 h-5" />
+                    </div>
+                  ))}
+                  <div className="w-10 h-10 rounded-full border bg-muted flex items-center justify-center text-xs font-bold text-muted-foreground">
+                    +{Math.max(0, achievements.length - 4)}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Activity Feed / Recent Sessions */}
+          <section className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-bold flex items-center gap-2">
+                <Clock className="w-5 h-5 text-primary" />
+                Atividade Recente
+              </h2>
+              <Button variant="ghost" size="sm" className="text-primary" onClick={() => navigate({ to: '/simulations' })}>
+                Ver Histórico Completo
+              </Button>
+            </div>
+
+            <div className="space-y-3">
+              {sessions.length > 0 ? (
+                sessions.slice(0, 5).map((session) => {
+                  const sessionCase = allCases.find(c => c.id === session.case_id);
+                  return (
+                    <div key={session.id} className="p-4 rounded-2xl border bg-card hover:bg-muted/30 transition-colors flex items-center justify-between group">
+                      <div className="flex items-center gap-4">
+                        <div className={cn(
+                          "w-12 h-12 rounded-xl flex items-center justify-center",
+                          session.status === 'completed' ? "bg-green-500/10 text-green-600" : "bg-blue-500/10 text-blue-600"
+                        )}>
+                          {session.status === 'completed' ? <CheckCircle2 className="w-6 h-6" /> : <TrendingUp className="w-6 h-6" />}
+                        </div>
+                        <div>
+                          <p className="font-bold">{sessionCase?.title || "Caso Industrial"}</p>
+                          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <Calendar className="w-3 h-3" />
+                              {new Date(session.updated_at).toLocaleDateString()}
+                            </span>
+                            <span className="w-1 h-1 rounded-full bg-muted-foreground/30" />
+                            <span className="flex items-center gap-1">
+                              <Star className="w-3 h-3 text-yellow-500" />
+                              {session.xp_earned || 0} XP
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <Button variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => navigate({ to: `/simulation/${session.id}` })}>
+                        <ArrowRight className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="text-center py-12 border rounded-2xl border-dashed bg-muted/20">
+                  <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+                    <Zap className="w-8 h-8 text-muted-foreground" />
+                  </div>
+                  <h3 className="font-bold text-lg">Inicie sua jornada</h3>
+                  <p className="text-muted-foreground text-sm max-w-xs mx-auto mt-2">
+                    Você ainda não realizou nenhuma simulação. Vá até a biblioteca para começar.
+                  </p>
+                  <Button className="mt-6 rounded-full" onClick={() => navigate({ to: '/library' })}>
+                    Ir para Biblioteca
+                  </Button>
+                </div>
+              )}
+            </div>
+          </section>
+        </div>
+
+        {/* Sidebar Column */}
+        <div className="space-y-8">
+          {/* Daily Missions */}
+          <Card className="border-primary/20 bg-primary/5 overflow-hidden">
+            <div className="h-1 bg-primary w-full" />
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Target className="w-5 h-5 text-primary" />
+                Missões Diárias
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {dailyChallenges.map((challenge) => (
+                <div key={challenge.id} className="space-y-2">
+                  <div className="flex justify-between items-start gap-2">
+                    <div>
+                      <p className="text-sm font-bold">{challenge.title}</p>
+                      <p className="text-[10px] text-muted-foreground leading-tight">{challenge.description}</p>
+                    </div>
+                    <Badge variant="outline" className="bg-background text-primary text-[10px] shrink-0">
+                      +{challenge.xpReward} XP
+                    </Badge>
+                  </div>
+                  <Progress value={challenge.completed ? 100 : 0} className="h-1.5" />
+                </div>
+              ))}
+              <p className="text-[10px] text-center text-muted-foreground pt-2">Atualiza em 14h 22m</p>
+            </CardContent>
+          </Card>
+
+          {/* Ranking Preview */}
+          <Card>
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Trophy className="w-5 h-5 text-yellow-500" />
+                Top Ranking
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                {[
+                  { name: "Carlos Silva", xp: 15420, pos: 1, avatar: "CS" },
+                  { name: "Ana Oliveira", xp: 12850, pos: 2, avatar: "AO" },
+                  { name: "Marcos Paulo", xp: 11200, pos: 3, avatar: "MP" }
+                ].map((user) => (
+                  <div key={user.pos} className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className={cn(
+                        "w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold",
+                        user.pos === 1 ? "bg-yellow-500/20 text-yellow-700 border border-yellow-500/30" : 
+                        user.pos === 2 ? "bg-slate-300/20 text-slate-600 border border-slate-300/30" : 
+                        "bg-amber-600/20 text-amber-700 border border-amber-600/30"
+                      )}>
+                        {user.avatar}
+                      </div>
+                      <span className="text-sm font-medium">{user.name}</span>
+                    </div>
+                    <span className="text-xs font-bold">{user.xp} XP</span>
+                  </div>
+                ))}
+              </div>
+              <Button variant="outline" size="sm" className="w-full text-xs" onClick={() => navigate({ to: '/ranking' })}>
+                Ver Ranking Completo
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-## CONTEXT
-
-The CEEX platform already contains:
-
-- Authentication
-- Dashboard
-- Library
-- Laboratories
-- Diagnostic Cases
-- Universal Case Schema
-- Diagnosis Engine
-- Supabase Database
-- Services Layer
-
-However, the core product is currently non-functional.
-
-Users are unable to perform a real diagnostic simulation.
-
-This is a production blocker.
-
-No new features must be developed.
-
-This Sprint exists only to make the diagnostic workflow fully operational.
-
----
-
-# PRIMARY GOAL
-
-Implement ONE complete diagnostic workflow from beginning to end.
-
-The user MUST be able to:
-
-Login
-
-↓
-
-Open Library
-
-↓
-
-Open Laboratory
-
-↓
-
-Select Diagnostic Case
-
-↓
-
-Start Diagnostic Session
-
-↓
-
-Interact with the Diagnosis Engine
-
-↓
-
-Perform inspections
-
-↓
-
-Perform electrical measurements
-
-↓
-
-Receive dynamic responses
-
-↓
-
-Find the root cause
-
-↓
-
-Repair the fault
-
-↓
-
-Validate operation
-
-↓
-
-Finish the case
-
-↓
-
-Persist all progress
-
-↓
-
-Update Dashboard
-
-Everything must work.
-
-Nothing may be simulated.
-
----
-
-# STRICT REQUIREMENTS
-
-The implementation MUST NOT contain:
-
-Mock data
-
-Static JSON
-
-Fake responses
-
-Instant success buttons
-
-Placeholder components
-
-Temporary arrays
-
-Hardcoded diagnostic results
-
-Automatic completion
-
-Local-only persistence
-
-Legacy data structures
-
-Fallback diagnostic cases
-
-Everything MUST come from the new architecture.
-
----
-
-# STEP 1
-
-## DIAGNOSTIC ENTRY
-
-When the user clicks
-
-"Start Diagnosis"
-
-the system MUST:
-
-Create a new Case Session
-
-Persist it in Supabase
-
-Generate Session ID
-
-Initialize Diagnosis Engine
-
-Load the selected Diagnostic Case
-
-Load all Case Components
-
-Load Measurements
-
-Load Symptoms
-
-Load Initial State
-
-Redirect to
-
-/simulation/:sessionId
-
-Failure is not acceptable.
-
----
-
-# STEP 2
-
-## SESSION INITIALIZATION
-
-The Simulation page MUST:
-
-Load the session
-
-Recover previous progress
-
-Recover current step
-
-Recover measurements
-
-Recover discovered evidence
-
-Recover hypotheses
-
-Recover action history
-
-Recover elapsed time
-
-If the session already exists, it MUST continue exactly where the user stopped.
-
-Refreshing the page MUST NEVER restart the simulation.
-
----
-
-# STEP 3
-
-## INITIAL INCIDENT
-
-Every simulation MUST begin with an industrial incident report.
-
-Display:
-
-Incident title
-
-Operator report
-
-Machine
-
-Equipment
-
-Location
-
-Symptoms
-
-Priority
-
-Production impact
-
-Estimated downtime
-
-Initial observations
-
-This data MUST come from the database.
-
----
-
-# STEP 4
-
-## DIAGNOSIS ENGINE
-
-The Diagnosis Engine MUST become the single source of truth.
-
-Every user action MUST pass through it.
-
-Flow:
-
-User Action
-
-↓
-
-Diagnosis Engine
-
-↓
-
-Validate Action
-
-↓
-
-Update Case State
-
-↓
-
-Generate Consequences
-
-↓
-
-Persist Session
-
-↓
-
-Return Updated UI
-
-No component may bypass the engine.
-
----
-
-# STEP 5
-
-## AVAILABLE ACTIONS
-
-The user MUST be able to perform real diagnostic actions.
-
-Examples:
-
-Inspect panel
-
-Inspect contactor
-
-Inspect overload relay
-
-Inspect fuse
-
-Measure voltage
-
-Measure continuity
-
-Measure resistance
-
-Inspect auxiliary contact
-
-Inspect START pushbutton
-
-Inspect STOP pushbutton
-
-Inspect emergency button
-
-Inspect timer
-
-Inspect limit switch
-
-Replace component
-
-Reset overload relay
-
-Each action MUST generate a different result according to the current fault.
-
----
-
-# STEP 6
-
-## ELECTRICAL MEASUREMENTS
-
-Measurements MUST be dynamic.
-
-Examples:
-
-Measure A1-A2
-
-Measure L1-L2
-
-Measure L2-L3
-
-Measure coil voltage
-
-Measure output voltage
-
-Measure continuity
-
-Measure NO contact
-
-Measure NC contact
-
-Measure overload relay
-
-Returned values MUST be calculated from the current circuit state.
-
-Never return random values.
-
-Never return fixed values.
-
----
-
-# STEP 7
-
-## STATE MACHINE
-
-Every action MUST change the simulation state.
-
-Example:
-
-Inspect Fuse
-
-↓
-
-Fuse OK
-
-↓
-
-Hypothesis removed
-
-↓
-
-New action becomes available
-
-Another example:
-
-Measure Coil Voltage
-
-↓
-
-0 V
-
-↓
-
-New symptom unlocked
-
-↓
-
-Next investigation path
-
-The simulation MUST behave like a finite state machine.
-
----
-
-# STEP 8
-
-## ACTION HISTORY
-
-Every executed action MUST be recorded.
-
-Persist:
-
-Timestamp
-
-Action
-
-Result
-
-Evidence
-
-XP
-
-Elapsed time
-
-Operator notes
-
-Everything must survive page refresh.
-
----
-
-# STEP 9
-
-## DYNAMIC HYPOTHESES
 
 The engine MUST continuously update possible hypotheses.
 
