@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { useAppStore, getLevelTitle } from "@/store/useAppStore";
-import { cases } from "./library";
+// cases removed from library.tsx
 import { 
   Zap, 
   Clock, 
@@ -41,10 +41,11 @@ function Index() {
   const xpProgress = (xp / nextLevelXp) * 100;
   
   const { cases: dbCases } = useAppStore();
-  const allCases = dbCases.length > 0 ? dbCases : cases;
+  const allCases = dbCases;
   
   // Encontrar um caso não concluído como recomendação
   const recommendedCase = allCases.find(c => !sessions[c.id] || sessions[c.id]?.status !== 'completed') || allCases[0];
+
 
   return (
     <div className="p-8 space-y-8 max-w-7xl mx-auto pb-20">
@@ -128,7 +129,7 @@ function Index() {
               <Card className="group relative overflow-hidden border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
                 <CardContent className="p-0 flex flex-col md:flex-row">
                   <div className="w-full md:w-48 bg-muted/20 flex items-center justify-center p-8 overflow-hidden">
-                    <img src={'image_url' in recommendedCase ? recommendedCase.image_url : recommendedCase.image} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                    <img src={recommendedCase.image_url} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                   </div>
                   <div className="p-6 flex-1 space-y-4">
                     <div>
@@ -139,8 +140,8 @@ function Index() {
                       </p>
                     </div>
                     <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                      <span className="flex items-center gap-1.5"><Zap className="h-4 w-4 text-primary" /> +{'xp_reward' in recommendedCase ? recommendedCase.xp_reward : recommendedCase.xp} XP</span>
-                      <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" /> {'time_estimate' in recommendedCase ? recommendedCase.time_estimate : recommendedCase.time}</span>
+                      <span className="flex items-center gap-1.5"><Zap className="h-4 w-4 text-primary" /> +{recommendedCase.xp_reward} XP</span>
+                      <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" /> {recommendedCase.time_estimate}</span>
                     </div>
                     <Button asChild className="w-full md:w-auto gap-2 group-hover:gap-3 transition-all">
                       <Link to="/simulations" search={{ id: recommendedCase.id }}>
@@ -152,6 +153,7 @@ function Index() {
               </Card>
             </section>
           )}
+
 
           {/* Daily Challenges */}
           <section>

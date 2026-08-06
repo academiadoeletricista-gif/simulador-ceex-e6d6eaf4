@@ -139,6 +139,12 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const location = useLocation();
+  const fetchInitialData = useAppStore(state => state.fetchInitialData);
+
+  useEffect(() => {
+    fetchInitialData();
+  }, [fetchInitialData]);
+
 
   const menuItems = [
     { icon: LayoutDashboard, label: "Dashboard", path: "/" },

@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Clock, Zap, BookOpen, AlertTriangle, ArrowRight, History, Info, CheckCircle2 } from "lucide-react";
 import { useAppStore } from "@/store/useAppStore";
-import { cases } from "./library";
+// cases import removed
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -28,7 +28,7 @@ function SimulationsPage() {
 
   useEffect(() => {
     if (id) {
-      const foundCase = dbCases.find(c => c.id === id) || cases.find(c => c.id === id);
+      const foundCase = dbCases.find(c => c.id === id);
       if (foundCase) {
         setActiveCase(foundCase);
         if (!sessions[id]) {

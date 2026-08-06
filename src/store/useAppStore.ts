@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from '@/integrations/supabase/client';
+import { Laboratory } from '@/types/laboratory';
+
 
 export type UserLevel = 
   | 'Aprendiz' 
@@ -47,6 +49,8 @@ export interface Achievement {
 
 export interface Case {
   id: string;
+  laboratory_id: string | null;
+  code: string | null;
   slug: string;
   title: string;
   category: string;
@@ -60,6 +64,7 @@ export interface Case {
   diagram_url: string | null;
   content?: any;
 }
+
 
 export interface CaseSession {
   case_id: string;
@@ -82,7 +87,9 @@ export interface Product {
 interface AppState {
   profile: Profile | null;
   cases: Case[];
+  laboratories: Laboratory[];
   sessions: Record<string, CaseSession>;
+
   achievements: Achievement[];
   marketplace: Product[];
   cart: string[];
@@ -115,7 +122,9 @@ export const getLevelTitle = (level: number): UserLevel => {
 export const useAppStore = create<AppState>((set, get) => ({
   profile: null,
   cases: [],
+  laboratories: [],
   sessions: {},
+
   achievements: [],
   marketplace: [],
   cart: [],
@@ -125,25 +134,78 @@ export const useAppStore = create<AppState>((set, get) => ({
     set({ isLoading: true });
     try {
       const { data: { user } } = await supabase.auth.getUser();
+      
+      // Fetch public data (Labs and Cases) - accessible to all
+      const { data: labsData } = await supabase
+        .from('laboratories')
+        .select('*')
+        .eq('published', true);
+
+      const { data: casesData } = await supabase
+        .from('cases')
+        .select('*')
+        .eq('published', true);
+
+
+      const formattedCases: Case[] = (casesData || []).map(c => ({
+
+        id: c.id,
+        laboratory_id: c.laboratory_id,
+        code: c.code,
+        slug: c.slug,
+        title: c.title,
+        category: c.category,
+        level: c.level,
+        xp_reward: c.xp_reward,
+        time_estimate: c.time_estimate,
+        description: c.description || '',
+        symptoms: c.symptoms || [],
+        checklist: c.checklist || [],
+        image_url: c.image_url || '',
+        diagram_url: c.diagram_url as string | null,
+        content: c.content
+      }));
+
+      const formattedLabs: Laboratory[] = (labsData || []).map(l => ({
+        id: l.id,
+        code: l.code,
+        name: l.name,
+        description: l.description || '',
+        learningObjectives: l.learning_objectives || [],
+        prerequisites: l.prerequisites || [],
+        level: l.level as any,
+        estimatedTime: l.estimated_time || '',
+        totalXp: l.total_xp || 0,
+        defectCount: (casesData || []).filter(c => c.laboratory_id === l.id).length,
+        progress: 0, 
+        averageAccuracy: 0,
+        bestStreak: 0,
+        achievements: [],
+        baseCircuit: (l.base_circuit_data as any) || {},
+        panel: (l.panel_data as any) || {},
+        components: (l.components as any) || [],
+        measurementMap: (l.measurements as any) || []
+      }));
+
       if (!user) {
-        set({ profile: null, sessions: {}, isLoading: false });
+        set({ 
+          profile: null,
+          laboratories: formattedLabs,
+          cases: formattedCases,
+          sessions: {},
+          isLoading: false 
+        });
         return;
       }
 
-      // Fetch Profile
+      // Fetch Profile for authenticated user
       const { data: profile } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', user.id)
         .single();
 
-      // Fetch Cases
-      const { data: casesData } = await supabase
-        .from('cases')
-        .select('*')
-        .eq('published', true);
-
-      // Fetch Sessions
+      // Fetch Sessions for authenticated user
       const { data: sessionsData } = await supabase
         .from('case_sessions')
         .select('*')
@@ -160,33 +222,20 @@ export const useAppStore = create<AppState>((set, get) => ({
         };
       });
 
-      const formattedCases: Case[] = (casesData || []).map(c => ({
-        id: c.id,
-        slug: c.slug,
-        title: c.title,
-        category: c.category,
-        level: c.level,
-        xp_reward: c.xp_reward,
-        time_estimate: c.time_estimate,
-        description: c.description || '',
-        symptoms: c.symptoms || [],
-        checklist: c.checklist || [],
-        image_url: c.image_url || '',
-        diagram_url: c.diagram_url as string | null,
-        content: c.content
-      }));
-
       set({ 
         profile: profile as any, 
+        laboratories: formattedLabs,
         cases: formattedCases, 
         sessions: sessionsMap,
         isLoading: false 
       });
+
     } catch (error) {
       console.error('Error fetching initial data:', error);
       set({ isLoading: false });
     }
   },
+
 
   updateProfile: async (data) => {
     const { profile } = get();
