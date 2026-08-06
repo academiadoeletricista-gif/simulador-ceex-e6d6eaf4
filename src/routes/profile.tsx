@@ -17,7 +17,7 @@ export const Route = createFileRoute("/profile")({
 });
 
 function ProfilePage() {
-  const { profile, getLevelTitle, updateProfile } = useAppStore();
+  const { profile, updateProfile } = useAppStore();
   const userName = profile?.full_name || "Comandante";
   const userAvatar = profile?.avatar_url || "";
   const userPhone = profile?.phone || "";
