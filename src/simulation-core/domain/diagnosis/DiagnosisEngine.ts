@@ -129,7 +129,10 @@ export class DiagnosisEngine {
     
     if (k1?.isEnergized) {
       if (motor) motor.isRunning = true;
-      this.status = SessionStatus.COMPLETED;
+      // Success condition: No active fault remaining
+      if (!this.activeFault || this.activeFault === FaultType.NONE) {
+        this.status = SessionStatus.COMPLETED;
+      }
     } else {
       if (motor) motor.isRunning = false;
     }
