@@ -227,19 +227,26 @@ export class DiagnosisEngine {
         if (comp instanceof ThermalRelayComponent) comp.isTripped = false;
         
         // Clear active fault if this was the faulty component
-        if (this.activeFault) {
-          const faultComponentMap: Record<string, string> = {
-            'F1': FaultType.OPEN_FUSE,
-            'K1': FaultType.BROKEN_COIL,
-            'S2': FaultType.OPEN_START_BUTTON,
-            'S1': FaultType.OPEN_STOP_BUTTON,
-            'F2': FaultType.TRIPPED_RELAY
-          };
-          if (faultComponentMap[params.id] === this.activeFault) {
+        if (this.activeFault && this.activeFault !== FaultType.NONE) {
+          console.log(`[DiagnosisEngine] Component ${params.id} replaced. Checking if it clears active fault: ${this.activeFault}`);
+          
+          const faultyComp = this.currentCase?.components?.find(c => c.isFaulty);
+          if (faultyComp && faultyComp.componentTag === params.id) {
+            console.log(`[DiagnosisEngine] Success! Faulty component ${params.id} replaced. Clearing fault.`);
             this.activeFault = FaultType.NONE;
-          } else if (params.id === 'Q1' && this.activeFault === FaultType.OPEN_FUSE) {
-            // Q1 is often confused with a fuse in generic repair actions, allow it if it clears the fault logic
-            this.activeFault = FaultType.NONE;
+          } else {
+            // Fallback for generic cases or legacy data
+            const faultComponentMap: Record<string, FaultType> = {
+              'F1': FaultType.OPEN_FUSE,
+              'K1': FaultType.BROKEN_COIL,
+              'S2': FaultType.OPEN_START_BUTTON,
+              'S1': FaultType.OPEN_STOP_BUTTON,
+              'F2': FaultType.TRIPPED_RELAY
+            };
+            if (faultComponentMap[params.id] === this.activeFault) {
+              console.log(`[DiagnosisEngine] Generic match: Component ${params.id} clears fault ${this.activeFault}`);
+              this.activeFault = FaultType.NONE;
+            }
           }
         }
         observation = `Componente ${params.id} substituído por um novo.`;
