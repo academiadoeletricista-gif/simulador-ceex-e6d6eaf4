@@ -19,7 +19,8 @@ import {
   FileText,
   Search,
   Hammer,
-  HelpCircle
+  HelpCircle,
+  RefreshCcw
 } from "lucide-react";
 import { useDiagnosis } from "@/hooks/useDiagnosis";
 import { useCase } from "@/hooks/useCase";
@@ -122,6 +123,9 @@ function SimulationsPage() {
 
         <div className="flex items-center gap-4">
            <Badge variant="outline" className="font-mono text-[10px]">{state.xp} XP</Badge>
+           <Button variant="outline" size="sm" className="h-8 gap-2" onClick={() => window.location.reload()}>
+             <RefreshCcw size={14} /> Reiniciar
+           </Button>
            <Button variant="outline" size="sm" className="h-8 gap-2" onClick={() => setShowDiagram(true)}>
              <BookOpen size={14} /> Esquema
            </Button>
