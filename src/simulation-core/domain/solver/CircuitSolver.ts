@@ -37,8 +37,12 @@ export class CircuitSolver {
         const terminalNames = Object.keys(comp.terminals);
         for (let i = 0; i < terminalNames.length; i++) {
           const t1Name = terminalNames[i];
+          if (!t1Name) continue;
+          
           for (let j = i + 1; j < terminalNames.length; j++) {
             const t2Name = terminalNames[j];
+            if (!t2Name) continue;
+
             const t1 = comp.terminals[t1Name];
             const t2 = comp.terminals[t2Name];
             
