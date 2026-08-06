@@ -166,7 +166,10 @@ export class DiagnosisEngine {
       if (motor) motor.isRunning = true;
       // Success condition: Contactor energized AND no active fault remaining
       if (!this.activeFault || this.activeFault === FaultType.NONE) {
-        this.status = SessionStatus.COMPLETED;
+        this.generateQuiz(); // Success triggers a final quiz check or report
+        if (!this.quizState.currentQuestion) {
+          this.completeSession();
+        }
       }
     } else {
       if (motor) motor.isRunning = false;
@@ -180,8 +183,57 @@ export class DiagnosisEngine {
     });
   }
 
-  measureVoltage(nodeId1: string, nodeId2: string): number {
-    return this.solver.getVoltageBetween(nodeId1, nodeId2);
+  private generateQuiz(componentId?: string) {
+    if (this.quizState.currentQuestion) return;
+
+    let possibleQuestions: QuizQuestion[] = [];
+    
+    if (componentId && COMPONENT_QUIZ_POOL[componentId]) {
+      possibleQuestions = COMPONENT_QUIZ_POOL[componentId];
+    } else if (this.activeFault && FAULT_QUIZ_POOL[this.activeFault]) {
+      possibleQuestions = FAULT_QUIZ_POOL[this.activeFault]!;
+    }
+
+    // Filter out already answered
+    const filtered = possibleQuestions.filter(q => 
+      !this.quizState.answeredQuestions.some(aq => aq.questionId === q.id)
+    );
+
+    if (filtered.length > 0) {
+      this.quizState.currentQuestion = filtered[0];
+      this.status = SessionStatus.QUIZ_PENDING;
+    }
+  }
+
+  public answerQuiz(optionIndex: number) {
+    if (!this.quizState.currentQuestion) return;
+
+    const isCorrect = this.quizState.currentQuestion.correctOptionIndex === optionIndex;
+    const points = isCorrect ? this.quizState.currentQuestion.points : 0;
+
+    this.quizState.answeredQuestions.push({
+      questionId: this.quizState.currentQuestion.id,
+      isCorrect,
+      pointsEarned: points
+    });
+
+    this.totalXP += points;
+    if (!isCorrect) this.totalScore -= 10;
+
+    this.quizState.currentQuestion = null;
+    this.status = SessionStatus.IN_PROGRESS;
+
+    // Re-check completion
+    const k1 = this.components.get('K1') as ContactorComponent;
+    if (k1?.isEnergized && (!this.activeFault || this.activeFault === FaultType.NONE)) {
+      this.completeSession();
+    }
+  }
+
+  private completeSession() {
+    this.status = SessionStatus.COMPLETED;
+    this.report = ReportGenerator.generate(this.getState(), "Laboratório Industrial");
+    this.totalXP += 500; // Bonus for completion
   }
 
   getState(): SimulationState {
@@ -192,8 +244,14 @@ export class DiagnosisEngine {
       startTime: this.startTime,
       status: this.status,
       currentNodeId: this.activeFault || 'sim',
-      xp: 0,
-      score: 100,
+      xp: this.totalXP,
+      score: this.totalScore,
+      quiz: {
+        currentQuestion: this.quizState.currentQuestion,
+        isCorrect: null
+      },
+      report: this.report,
+
       components: Array.from(this.components.values()).map(c => ({
         id: c.id,
         type: c.type,

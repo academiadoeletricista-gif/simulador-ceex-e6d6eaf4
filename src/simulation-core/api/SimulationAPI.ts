@@ -58,6 +58,11 @@ export class SimulationAPI {
     return this.engine.measureVoltage(nodeId1, nodeId2);
   }
 
+  public answerQuiz(optionIndex: number) {
+    this.engine.answerQuiz(optionIndex);
+  }
+
+
   public async saveSession(sessionId: string, userId: string) {
     console.log(`Saving session ${sessionId} for user ${userId}`);
   }

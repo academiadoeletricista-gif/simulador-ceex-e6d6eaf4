@@ -38,10 +38,16 @@ export const useDiagnosis = (caseId?: string) => {
     }
   }, [caseId, sessionResult, updateSessionMutation]);
 
+  const answerQuiz = useCallback((optionIndex: number) => {
+    api.answerQuiz(optionIndex);
+    setState(api.getSessionState());
+  }, []);
+
   return {
     state,
     loadCase,
     selectChoice,
+    answerQuiz,
     measure: api.measure.bind(api),
     isLoading: sessionLoading
   };
