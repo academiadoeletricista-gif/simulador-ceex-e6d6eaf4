@@ -12,6 +12,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { cn } from "@/lib/utils";
+import { useAppStore } from "@/store/useAppStore";
 import {
   LayoutDashboard,
   Library,
@@ -29,6 +30,7 @@ import {
   CreditCard,
   ShieldCheck,
   BarChart3,
+  LogOut,
 } from "lucide-react";
 
 import appCss from "../styles.css?url";
