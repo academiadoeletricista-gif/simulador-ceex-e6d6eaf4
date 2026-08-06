@@ -1,6 +1,6 @@
-import { CircuitSolver } from '../solver/CircuitSolver';
-import { ComponentType, SwitchComponent, ContactorComponent } from '../components/ElectricalComponent';
-import { CircuitBreakerComponent, ThermalRelayComponent, MotorComponent } from '../components/IndustrialComponents';
+import { CircuitSolver } from '../../solver/CircuitSolver';
+import { ComponentType, SwitchComponent, ContactorComponent } from '../../components/ElectricalComponent';
+import { CircuitBreakerComponent, ThermalRelayComponent, MotorComponent } from '../../components/IndustrialComponents';
 
 export class DOLCircuit {
   static setup(solver: CircuitSolver) {
