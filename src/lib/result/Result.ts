@@ -5,7 +5,7 @@ export type Result<T> = {
   success: false;
   error: {
     message: string;
-    code?: string;
+    code?: string | undefined;
     details?: any;
   };
 };
@@ -19,4 +19,3 @@ export const fail = (message: string, code?: string, details?: any): Result<any>
     details: details ?? undefined 
   },
 });
-
