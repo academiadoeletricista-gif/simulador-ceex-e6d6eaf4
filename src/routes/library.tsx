@@ -75,7 +75,10 @@ function LibraryPage() {
   const { sessions } = useAppStore();
   const navigate = useNavigate();
 
-  const filteredCases = cases.filter(c => {
+  const { profile, cases: dbCases, sessions } = useAppStore();
+  const displayCases = dbCases.length > 0 ? dbCases : cases;
+
+  const filteredCases = displayCases.filter(c => {
     const matchesCategory = selectedCategory ? c.category === selectedCategory : true;
     const matchesSearch = c.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           c.category.toLowerCase().includes(searchQuery.toLowerCase());
