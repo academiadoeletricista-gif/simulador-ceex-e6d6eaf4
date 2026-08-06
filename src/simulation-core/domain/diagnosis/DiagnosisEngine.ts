@@ -82,45 +82,102 @@ export class DiagnosisEngine {
   }
 
   injectFault(type: FaultType, componentId?: string) {
+    console.log(`[DiagnosisEngine] Injecting fault ${type} into ${componentId || 'default component'}`);
     this.activeFault = type;
     
+    const targetId = componentId;
+    
     switch (type) {
-      case 'OPEN_FUSE':
-        const fuse = this.components.get(componentId || 'F1');
-        if (fuse) fuse.failureStatus = 'OPEN';
+      case FaultType.OPEN_FUSE: {
+        const fuse = this.components.get(targetId || 'F1');
+        if (fuse) {
+          fuse.failureStatus = 'OPEN';
+          console.log(`[DiagnosisEngine] FUSE ${fuse.id} set to OPEN`);
+        } else {
+          throw new Error(`Fault injection failed: FUSE component ${targetId || 'F1'} not found.`);
+        }
         break;
-      case 'BROKEN_COIL':
-        const k1 = this.components.get(componentId || 'K1');
-        if (k1) k1.failureStatus = 'BURNT_COIL';
+      }
+      case FaultType.BROKEN_COIL: {
+        const k1 = this.components.get(targetId || 'K1');
+        if (k1) {
+          k1.failureStatus = 'BURNT_COIL';
+          console.log(`[DiagnosisEngine] COIL ${k1.id} set to BURNT_COIL`);
+        } else {
+          throw new Error(`Fault injection failed: COIL component ${targetId || 'K1'} not found.`);
+        }
         break;
-      case 'SHORTED_COIL':
-        const k1_short = this.components.get(componentId || 'K1');
-        if (k1_short) k1_short.failureStatus = 'SHORTED_COIL';
+      }
+      case FaultType.SHORTED_COIL: {
+        const k1_short = this.components.get(targetId || 'K1');
+        if (k1_short) {
+          k1_short.failureStatus = 'SHORTED_COIL';
+          console.log(`[DiagnosisEngine] COIL ${k1_short.id} set to SHORTED_COIL`);
+        } else {
+          throw new Error(`Fault injection failed: COIL component ${targetId || 'K1'} not found.`);
+        }
         break;
-      case 'OPEN_START_BUTTON':
-        const s2 = this.components.get(componentId || 'S2');
-        if (s2) s2.failureStatus = 'STUCK_OPEN';
+      }
+      case FaultType.OPEN_START_BUTTON: {
+        const s2 = this.components.get(targetId || 'S2');
+        if (s2) {
+          s2.failureStatus = 'STUCK_OPEN';
+          console.log(`[DiagnosisEngine] START BUTTON ${s2.id} set to STUCK_OPEN`);
+        } else {
+          throw new Error(`Fault injection failed: START BUTTON ${targetId || 'S2'} not found.`);
+        }
         break;
-      case 'OPEN_STOP_BUTTON':
-        const s1 = this.components.get(componentId || 'S1');
-        if (s1) s1.failureStatus = 'STUCK_OPEN';
+      }
+      case FaultType.OPEN_STOP_BUTTON: {
+        const s1 = this.components.get(targetId || 'S1');
+        if (s1) {
+          s1.failureStatus = 'STUCK_OPEN';
+          console.log(`[DiagnosisEngine] STOP BUTTON ${s1.id} set to STUCK_OPEN`);
+        } else {
+          throw new Error(`Fault injection failed: STOP BUTTON ${targetId || 'S1'} not found.`);
+        }
         break;
-      case 'BROKEN_AUX_CONTACT':
-        const k1_aux = this.components.get(componentId || 'K1');
-        if (k1_aux) k1_aux.failureStatus = 'BROKEN_AUX';
+      }
+      case FaultType.BROKEN_AUX_CONTACT: {
+        const k1_aux = this.components.get(targetId || 'K1');
+        if (k1_aux) {
+          k1_aux.failureStatus = 'BROKEN_AUX';
+          console.log(`[DiagnosisEngine] AUX CONTACT ${k1_aux.id} set to BROKEN_AUX`);
+        } else {
+          throw new Error(`Fault injection failed: AUX CONTACT component ${targetId || 'K1'} not found.`);
+        }
         break;
-      case 'TRIPPED_RELAY':
-        const f2 = this.components.get(componentId || 'F2') as ThermalRelayComponent;
-        if (f2) f2.isTripped = true;
+      }
+      case FaultType.TRIPPED_RELAY: {
+        const f2 = this.components.get(targetId || 'F2') as ThermalRelayComponent;
+        if (f2) {
+          f2.isTripped = true;
+          console.log(`[DiagnosisEngine] THERMAL RELAY ${f2.id} set to TRIPPED`);
+        } else {
+          throw new Error(`Fault injection failed: THERMAL RELAY component ${targetId || 'F2'} not found.`);
+        }
         break;
-      case 'MECHANICAL_FAILURE':
-        const k1_mech = this.components.get(componentId || 'K1');
-        if (k1_mech) k1_mech.failureStatus = 'MECHANICAL_STUCK';
+      }
+      case FaultType.MECHANICAL_FAILURE: {
+        const k1_mech = this.components.get(targetId || 'K1');
+        if (k1_mech) {
+          k1_mech.failureStatus = 'MECHANICAL_STUCK';
+          console.log(`[DiagnosisEngine] CONTACTOR ${k1_mech.id} set to MECHANICAL_STUCK`);
+        } else {
+          throw new Error(`Fault injection failed: CONTACTOR component ${targetId || 'K1'} not found.`);
+        }
         break;
+      }
+      case FaultType.NONE:
+        console.log(`[DiagnosisEngine] No fault injected (NONE)`);
+        break;
+      default:
+        console.warn(`[DiagnosisEngine] Fault type ${type} mapping not implemented for physical engine.`);
     }
     
     this.components.forEach(c => c.updateState());
     this.solver.solve();
+    console.log(`[DiagnosisEngine] Initial physical state computed after fault injection.`);
   }
 
   performAction(action: string, params: any = {}) {
