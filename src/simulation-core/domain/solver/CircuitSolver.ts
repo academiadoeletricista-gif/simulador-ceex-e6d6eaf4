@@ -68,8 +68,17 @@ export class CircuitSolver {
             const vA1 = this.nodes.get(a1.nodeId)?.voltage || 0;
             const vA2 = this.nodes.get(a2.nodeId)?.voltage || 0;
             const diff = Math.abs(vA1 - vA2);
+            
             const wasEnergized = c.isEnergized;
-            c.isEnergized = diff >= 110; 
+            // Logical condition for DOL: if voltage diff is enough, coil tries to pull
+            const hasControlVoltage = diff >= 110;
+            
+            if (c.failureStatus === 'BURNT_COIL' || c.failureStatus === 'MECHANICAL_STUCK') {
+               c.isEnergized = false;
+            } else {
+               c.isEnergized = hasControlVoltage;
+            }
+
             if (wasEnergized !== c.isEnergized) changed = true;
           }
         }

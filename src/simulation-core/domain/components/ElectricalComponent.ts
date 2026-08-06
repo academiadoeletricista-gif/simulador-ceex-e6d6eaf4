@@ -90,8 +90,17 @@ export class ContactorComponent extends ElectricalComponent {
   }
 
   getContinuity(t1: string, t2: string): boolean {
-    // Basic implementation for now
-    if ((t1 === '13' && t2 === '14') || (t1 === '14' && t2 === '13')) return this.isEnergized;
+    if (this.failureStatus === 'BROKEN_AUX') return false;
+    
+    // Main contacts or auxiliary contacts logic
+    if ((t1 === '13' && t2 === '14') || (t1 === '14' && t2 === '13')) {
+      return this.isEnergized;
+    }
+    
+    // Power contacts (1-2, 3-4, 5-6)
+    const isPower = (t1 === '1' && t2 === '2') || (t1 === '3' && t2 === '4') || (t1 === '5' && t2 === '6');
+    if (isPower) return this.isEnergized;
+    
     return false; 
   }
 }
