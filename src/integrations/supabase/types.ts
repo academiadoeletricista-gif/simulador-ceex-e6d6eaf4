@@ -350,6 +350,47 @@ export type Database = {
           },
         ]
       }
+      case_feedback: {
+        Row: {
+          case_id: string | null
+          created_at: string | null
+          feedback_text: string | null
+          id: string
+          metadata: Json | null
+          score: number | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          case_id?: string | null
+          created_at?: string | null
+          feedback_text?: string | null
+          id?: string
+          metadata?: Json | null
+          score?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          case_id?: string | null
+          created_at?: string | null
+          feedback_text?: string | null
+          id?: string
+          metadata?: Json | null
+          score?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_feedback_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "diagnostic_cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       case_hints: {
         Row: {
           case_id: string | null
@@ -602,6 +643,53 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "case_occurrences_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "diagnostic_cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      case_results: {
+        Row: {
+          accuracy: number | null
+          actions_taken: Json | null
+          case_id: string | null
+          created_at: string | null
+          errors_count: number | null
+          id: string
+          status: string | null
+          time_spent: number | null
+          total_xp: number | null
+          user_id: string | null
+        }
+        Insert: {
+          accuracy?: number | null
+          actions_taken?: Json | null
+          case_id?: string | null
+          created_at?: string | null
+          errors_count?: number | null
+          id?: string
+          status?: string | null
+          time_spent?: number | null
+          total_xp?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          accuracy?: number | null
+          actions_taken?: Json | null
+          case_id?: string | null
+          created_at?: string | null
+          errors_count?: number | null
+          id?: string
+          status?: string | null
+          time_spent?: number | null
+          total_xp?: number | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_results_case_id_fkey"
             columns: ["case_id"]
             isOneToOne: false
             referencedRelation: "diagnostic_cases"
