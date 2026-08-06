@@ -151,7 +151,7 @@ function B2BPage() {
                   )}>
                     <div className="flex items-center gap-4">
                       <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground font-bold">
-                        {invite.email[0].toUpperCase()}
+                        {invite.email[0]?.toUpperCase() || "?"}
                       </div>
                       <div>
                         <p className="text-sm font-medium">{invite.email}</p>
@@ -196,7 +196,7 @@ function B2BPage() {
             <CardContent className="space-y-4 pt-0">
               <div className="flex justify-between items-center text-sm">
                 <span className="text-muted-foreground">Plano Atual</span>
-                <span className="font-bold text-primary">{organization?.subscription.plan}</span>
+                <span className="font-bold text-primary">{organization.subscription.plan}</span>
               </div>
               <div className="flex justify-between items-center text-sm">
                 <span className="text-muted-foreground">Próxima Fatura</span>
