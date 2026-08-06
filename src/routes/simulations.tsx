@@ -69,9 +69,9 @@ function SimulationsPage() {
             <p className="text-sm font-medium">Início: Recebimento do chamado</p>
             <p className="text-[10px] text-muted-foreground italic">{activeCase.description}</p>
           </div>
-          {state.history.map((actionId, index) => (
+          {state.history.map((action: any, index: number) => (
             <div key={index} className="p-4 hover:bg-muted/30 transition-colors border-l-2 border-primary/20">
-              <p className="text-sm font-medium">Ação #{index + 1}</p>
+              <p className="text-sm font-medium">{action.action}</p>
               <p className="text-[10px] text-muted-foreground">{(actionId as any).result || 'Ação executada.'}</p>
             </div>
           ))}
