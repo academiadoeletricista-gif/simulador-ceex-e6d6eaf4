@@ -10,33 +10,141 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AchievementsRouteImport } from './routes/achievements'
+import { Route as CertificationsRouteImport } from './routes/certifications'
+import { Route as LibraryRouteImport } from './routes/library'
+import { Route as MarketplaceRouteImport } from './routes/marketplace'
+import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as RankingRouteImport } from './routes/ranking'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as SimulationsRouteImport } from './routes/simulations'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AchievementsRoute = AchievementsRouteImport.update({
+  id: '/achievements',
+  path: '/achievements',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CertificationsRoute = CertificationsRouteImport.update({
+  id: '/certifications',
+  path: '/certifications',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LibraryRoute = LibraryRouteImport.update({
+  id: '/library',
+  path: '/library',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MarketplaceRoute = MarketplaceRouteImport.update({
+  id: '/marketplace',
+  path: '/marketplace',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RankingRoute = RankingRouteImport.update({
+  id: '/ranking',
+  path: '/ranking',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SimulationsRoute = SimulationsRouteImport.update({
+  id: '/simulations',
+  path: '/simulations',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/achievements': typeof AchievementsRoute
+  '/certifications': typeof CertificationsRoute
+  '/library': typeof LibraryRoute
+  '/marketplace': typeof MarketplaceRoute
+  '/profile': typeof ProfileRoute
+  '/ranking': typeof RankingRoute
+  '/settings': typeof SettingsRoute
+  '/simulations': typeof SimulationsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/achievements': typeof AchievementsRoute
+  '/certifications': typeof CertificationsRoute
+  '/library': typeof LibraryRoute
+  '/marketplace': typeof MarketplaceRoute
+  '/profile': typeof ProfileRoute
+  '/ranking': typeof RankingRoute
+  '/settings': typeof SettingsRoute
+  '/simulations': typeof SimulationsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/achievements': typeof AchievementsRoute
+  '/certifications': typeof CertificationsRoute
+  '/library': typeof LibraryRoute
+  '/marketplace': typeof MarketplaceRoute
+  '/profile': typeof ProfileRoute
+  '/ranking': typeof RankingRoute
+  '/settings': typeof SettingsRoute
+  '/simulations': typeof SimulationsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/achievements'
+    | '/certifications'
+    | '/library'
+    | '/marketplace'
+    | '/profile'
+    | '/ranking'
+    | '/settings'
+    | '/simulations'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/achievements'
+    | '/certifications'
+    | '/library'
+    | '/marketplace'
+    | '/profile'
+    | '/ranking'
+    | '/settings'
+    | '/simulations'
+  id:
+    | '__root__'
+    | '/'
+    | '/achievements'
+    | '/certifications'
+    | '/library'
+    | '/marketplace'
+    | '/profile'
+    | '/ranking'
+    | '/settings'
+    | '/simulations'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AchievementsRoute: typeof AchievementsRoute
+  CertificationsRoute: typeof CertificationsRoute
+  LibraryRoute: typeof LibraryRoute
+  MarketplaceRoute: typeof MarketplaceRoute
+  ProfileRoute: typeof ProfileRoute
+  RankingRoute: typeof RankingRoute
+  SettingsRoute: typeof SettingsRoute
+  SimulationsRoute: typeof SimulationsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,22 +156,76 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/achievements': {
+      id: '/achievements'
+      path: '/achievements'
+      fullPath: '/achievements'
+      preLoaderRoute: typeof AchievementsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/certifications': {
+      id: '/certifications'
+      path: '/certifications'
+      fullPath: '/certifications'
+      preLoaderRoute: typeof CertificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/library': {
+      id: '/library'
+      path: '/library'
+      fullPath: '/library'
+      preLoaderRoute: typeof LibraryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/marketplace': {
+      id: '/marketplace'
+      path: '/marketplace'
+      fullPath: '/marketplace'
+      preLoaderRoute: typeof MarketplaceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ranking': {
+      id: '/ranking'
+      path: '/ranking'
+      fullPath: '/ranking'
+      preLoaderRoute: typeof RankingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/simulations': {
+      id: '/simulations'
+      path: '/simulations'
+      fullPath: '/simulations'
+      preLoaderRoute: typeof SimulationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AchievementsRoute: AchievementsRoute,
+  CertificationsRoute: CertificationsRoute,
+  LibraryRoute: LibraryRoute,
+  MarketplaceRoute: MarketplaceRoute,
+  ProfileRoute: ProfileRoute,
+  RankingRoute: RankingRoute,
+  SettingsRoute: SettingsRoute,
+  SimulationsRoute: SimulationsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
