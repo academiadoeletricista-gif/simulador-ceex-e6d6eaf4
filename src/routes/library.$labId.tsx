@@ -199,6 +199,15 @@ function LabDetail() {
                 );
               })}
             </div>
+            {cases.length === 0 && (
+              <div className="text-center py-20 border-2 border-dashed rounded-xl">
+                <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-20" />
+                <h3 className="text-lg font-bold">Nenhum diagnóstico disponível</h3>
+                <p className="text-muted-foreground max-w-xs mx-auto text-sm">
+                  Ainda não foram cadastrados defeitos para este laboratório no banco de dados.
+                </p>
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="circuit">
