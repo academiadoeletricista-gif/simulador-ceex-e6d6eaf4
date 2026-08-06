@@ -28,11 +28,24 @@ export class SimulationPlayer {
    * Initializes a new simulation session
    */
   public startSession(caseData: DiagnosticCase, userId?: string) {
-    this.activeCaseId = caseData.id;
-    this.userId = userId || null;
-    this.api.createSession(caseData);
-    
-    console.log(`[SimulationPlayer] Started session for case ${caseData.id}`);
+    try {
+      console.log(`[SimulationPlayer] Initializing session for case ${caseData.id} (${caseData.code})`);
+      this.activeCaseId = caseData.id;
+      this.userId = userId || null;
+      
+      this.api.createSession(caseData);
+      
+      const state = this.getPlayerState();
+      if (state.status === SessionStatus.ERROR) {
+        throw new Error(state.error || 'Unknown error during simulation initialization');
+      }
+      
+      console.log(`[SimulationPlayer] Session successfully started and in state: ${state.status}`);
+    } catch (error: any) {
+      console.error(`[SimulationPlayer] FAILED to start simulation:`, error);
+      // Ensure we are in ERROR state if not already set by engine
+      // The API call to createSession should have already handled this through the engine
+    }
   }
 
   /**
