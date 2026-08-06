@@ -79,7 +79,7 @@ function SimulationsPage() {
     }
   }, [caseResult, loadCase]);
 
-  if (caseLoading || diagnosisLoading) {
+  if (caseLoading || (diagnosisLoading && !isError)) {
     return <div className="p-8"><Skeleton className="w-full h-[600px]" /></div>;
   }
 
