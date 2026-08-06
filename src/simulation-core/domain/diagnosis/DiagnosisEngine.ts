@@ -200,7 +200,7 @@ export class DiagnosisEngine {
     );
 
     if (filtered.length > 0) {
-      this.quizState.currentQuestion = filtered[0];
+      this.quizState.currentQuestion = filtered[0] || null;
       this.status = SessionStatus.QUIZ_PENDING;
     }
   }
@@ -234,6 +234,10 @@ export class DiagnosisEngine {
     this.status = SessionStatus.COMPLETED;
     this.report = ReportGenerator.generate(this.getState(), "Laboratório Industrial");
     this.totalXP += 500; // Bonus for completion
+  }
+
+  public measureVoltage(nodeId1: string, nodeId2: string): number {
+    return this.solver.getVoltageBetween(nodeId1, nodeId2);
   }
 
   getState(): SimulationState {
