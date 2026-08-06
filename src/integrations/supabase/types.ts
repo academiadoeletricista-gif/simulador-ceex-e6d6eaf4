@@ -14,7 +14,232 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      achievements: {
+        Row: {
+          category: string | null
+          description: string
+          id: string
+          max_progress: number
+          title: string
+          xp_reward: number
+        }
+        Insert: {
+          category?: string | null
+          description: string
+          id?: string
+          max_progress: number
+          title: string
+          xp_reward: number
+        }
+        Update: {
+          category?: string | null
+          description?: string
+          id?: string
+          max_progress?: number
+          title?: string
+          xp_reward?: number
+        }
+        Relationships: []
+      }
+      case_sessions: {
+        Row: {
+          answers: Json | null
+          case_id: string
+          completed_at: string | null
+          current_step: number | null
+          id: string
+          start_time: string | null
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          answers?: Json | null
+          case_id: string
+          completed_at?: string | null
+          current_step?: number | null
+          id?: string
+          start_time?: string | null
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          answers?: Json | null
+          case_id?: string
+          completed_at?: string | null
+          current_step?: number | null
+          id?: string
+          start_time?: string | null
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_sessions_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cases: {
+        Row: {
+          category: string
+          checklist: string[] | null
+          content: Json | null
+          created_at: string | null
+          description: string | null
+          diagram_url: string | null
+          id: string
+          image_url: string | null
+          level: string
+          published: boolean | null
+          slug: string
+          symptoms: string[] | null
+          time_estimate: string
+          title: string
+          xp_reward: number
+        }
+        Insert: {
+          category: string
+          checklist?: string[] | null
+          content?: Json | null
+          created_at?: string | null
+          description?: string | null
+          diagram_url?: string | null
+          id?: string
+          image_url?: string | null
+          level: string
+          published?: boolean | null
+          slug: string
+          symptoms?: string[] | null
+          time_estimate: string
+          title: string
+          xp_reward: number
+        }
+        Update: {
+          category?: string
+          checklist?: string[] | null
+          content?: Json | null
+          created_at?: string | null
+          description?: string | null
+          diagram_url?: string | null
+          id?: string
+          image_url?: string | null
+          level?: string
+          published?: boolean | null
+          slug?: string
+          symptoms?: string[] | null
+          time_estimate?: string
+          title?: string
+          xp_reward?: number
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          accuracy: number | null
+          avatar_url: string | null
+          avg_time: number | null
+          bio: string | null
+          city: string | null
+          company: string | null
+          created_at: string | null
+          full_name: string | null
+          id: string
+          language: string | null
+          last_activity: string | null
+          level: number | null
+          phone: string | null
+          role: string | null
+          state: string | null
+          streak_best: number | null
+          streak_current: number | null
+          theme: string | null
+          total_diagnoses: number | null
+          updated_at: string | null
+          xp: number | null
+        }
+        Insert: {
+          accuracy?: number | null
+          avatar_url?: string | null
+          avg_time?: number | null
+          bio?: string | null
+          city?: string | null
+          company?: string | null
+          created_at?: string | null
+          full_name?: string | null
+          id: string
+          language?: string | null
+          last_activity?: string | null
+          level?: number | null
+          phone?: string | null
+          role?: string | null
+          state?: string | null
+          streak_best?: number | null
+          streak_current?: number | null
+          theme?: string | null
+          total_diagnoses?: number | null
+          updated_at?: string | null
+          xp?: number | null
+        }
+        Update: {
+          accuracy?: number | null
+          avatar_url?: string | null
+          avg_time?: number | null
+          bio?: string | null
+          city?: string | null
+          company?: string | null
+          created_at?: string | null
+          full_name?: string | null
+          id?: string
+          language?: string | null
+          last_activity?: string | null
+          level?: number | null
+          phone?: string | null
+          role?: string | null
+          state?: string | null
+          streak_best?: number | null
+          streak_current?: number | null
+          theme?: string | null
+          total_diagnoses?: number | null
+          updated_at?: string | null
+          xp?: number | null
+        }
+        Relationships: []
+      }
+      user_achievements: {
+        Row: {
+          achievement_id: string
+          completed: boolean | null
+          completed_at: string | null
+          progress: number | null
+          user_id: string
+        }
+        Insert: {
+          achievement_id: string
+          completed?: boolean | null
+          completed_at?: string | null
+          progress?: number | null
+          user_id: string
+        }
+        Update: {
+          achievement_id?: string
+          completed?: boolean | null
+          completed_at?: string | null
+          progress?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_achievements_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "achievements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
