@@ -32,6 +32,17 @@ export interface Profile {
   streak_current: number;
   streak_best: number;
   last_activity: string | null;
+  notifications?: boolean;
+}
+
+export interface Achievement {
+  id: string;
+  title: string;
+  description: string;
+  progress: number;
+  maxProgress: number;
+  completed: boolean;
+  xpReward: number;
 }
 
 export interface Case {
@@ -58,18 +69,36 @@ export interface CaseSession {
   start_time: string;
 }
 
+export interface Product {
+  id: string;
+  title: string;
+  price: number;
+  type: 'Curso' | 'Biblioteca' | 'Simulador' | 'Mentoria' | 'Plano' | 'Certificação';
+  rating: number;
+  image?: string;
+  description?: string;
+}
+
 interface AppState {
   profile: Profile | null;
   cases: Case[];
   sessions: Record<string, CaseSession>;
+  achievements: Achievement[];
+  marketplace: Product[];
+  cart: string[];
   isLoading: boolean;
   
   // Actions
   fetchInitialData: () => Promise<void>;
-  updateProfile: (data: Partial<Profile>) => Promise<void>;
+  updateProfile: (data: any) => Promise<void>;
   startCase: (caseId: string) => Promise<void>;
   completeCase: (caseId: string, success: boolean, timeTaken: number) => Promise<void>;
   signOut: () => Promise<void>;
+  addToCart: (id: string) => void;
+  removeFromCart: (id: string) => void;
+  setTheme: (theme: 'light' | 'dark') => Promise<void>;
+  setLanguage: (lang: string) => Promise<void>;
+  toggleNotifications: () => Promise<void>;
 }
 
 const LEVEL_TITLES: UserLevel[] = [
@@ -79,13 +108,16 @@ const LEVEL_TITLES: UserLevel[] = [
 
 export const getLevelTitle = (level: number): UserLevel => {
   const titleIndex = Math.min(Math.floor(level / 5), LEVEL_TITLES.length - 1);
-  return LEVEL_TITLES[titleIndex];
+  return LEVEL_TITLES[titleIndex] || 'Aprendiz';
 };
 
 export const useAppStore = create<AppState>((set, get) => ({
   profile: null,
   cases: [],
   sessions: {},
+  achievements: [],
+  marketplace: [],
+  cart: [],
   isLoading: false,
 
   fetchInitialData: async () => {
@@ -105,7 +137,7 @@ export const useAppStore = create<AppState>((set, get) => ({
         .single();
 
       // Fetch Cases
-      const { data: cases } = await supabase
+      const { data: casesData } = await supabase
         .from('cases')
         .select('*')
         .eq('published', true);
@@ -121,15 +153,31 @@ export const useAppStore = create<AppState>((set, get) => ({
         sessionsMap[s.case_id] = {
           case_id: s.case_id,
           status: s.status as any,
-          current_step: s.current_step,
-          answers: s.answers as any,
-          start_time: s.start_time
+          current_step: s.current_step || 0,
+          answers: (s.answers as any) || {},
+          start_time: s.start_time || new Date().toISOString()
         };
       });
 
+      const formattedCases: Case[] = (casesData || []).map(c => ({
+        id: c.id,
+        slug: c.slug,
+        title: c.title,
+        category: c.category,
+        level: c.level,
+        xp_reward: c.xp_reward,
+        time_estimate: c.time_estimate,
+        description: c.description || '',
+        symptoms: c.symptoms || [],
+        checklist: c.checklist || [],
+        image_url: c.image_url || '',
+        diagram_url: c.diagram_url || undefined,
+        content: c.content
+      }));
+
       set({ 
         profile: profile as any, 
-        cases: cases || [], 
+        cases: formattedCases, 
         sessions: sessionsMap,
         isLoading: false 
       });
@@ -157,7 +205,6 @@ export const useAppStore = create<AppState>((set, get) => ({
     const { profile, sessions } = get();
     if (!profile) return;
 
-    // Check if session already exists
     if (sessions[caseId]) return;
 
     const newSession = {
@@ -193,20 +240,17 @@ export const useAppStore = create<AppState>((set, get) => ({
     const { profile, sessions } = get();
     if (!profile || !sessions[caseId]) return;
 
-    const newTotalDiagnoses = profile.total_diagnoses + 1;
+    const newTotalDiagnoses = (profile.total_diagnoses || 0) + 1;
     const currentAccuracy = Number(profile.accuracy) || 0;
     const newAccuracy = success 
-      ? (currentAccuracy * profile.total_diagnoses + 100) / newTotalDiagnoses 
-      : (currentAccuracy * profile.total_diagnoses) / newTotalDiagnoses;
+      ? (currentAccuracy * (profile.total_diagnoses || 0) + 100) / newTotalDiagnoses 
+      : (currentAccuracy * (profile.total_diagnoses || 0)) / newTotalDiagnoses;
     
-    const newAvgTime = (profile.avg_time * profile.total_diagnoses + timeTaken) / newTotalDiagnoses;
+    const newAvgTime = ((profile.avg_time || 0) * (profile.total_diagnoses || 0) + timeTaken) / newTotalDiagnoses;
     
-    // XP Logic
     const caseObj = get().cases.find(c => c.id === caseId);
     const xpReward = caseObj?.xp_reward || 0;
-    const newXp = profile.xp + xpReward;
-    
-    // Simple level logic: every 1000 XP is a level
+    const newXp = (profile.xp || 0) + xpReward;
     const newLevel = Math.floor(newXp / 1000) + 1;
 
     const profileUpdate = {
@@ -218,7 +262,6 @@ export const useAppStore = create<AppState>((set, get) => ({
       last_activity: new Date().toISOString()
     };
 
-    // Update Session
     const { error: sessionError } = await supabase
       .from('case_sessions')
       .update({ status: 'completed', completed_at: new Date().toISOString() })
@@ -227,7 +270,6 @@ export const useAppStore = create<AppState>((set, get) => ({
 
     if (sessionError) return;
 
-    // Update Profile
     const { error: profileError } = await supabase
       .from('profiles')
       .update(profileUpdate)
@@ -250,5 +292,38 @@ export const useAppStore = create<AppState>((set, get) => ({
   signOut: async () => {
     await supabase.auth.signOut();
     set({ profile: null, sessions: {}, cases: [] });
+  },
+
+  addToCart: (id) => set((state) => ({
+    cart: state.cart.includes(id) ? state.cart : [...state.cart, id]
+  })),
+
+  removeFromCart: (id) => set((state) => ({
+    cart: state.cart.filter(itemId => itemId !== id)
+  })),
+
+  setTheme: async (theme) => {
+    const { profile } = get();
+    if (profile) {
+      await supabase.from('profiles').update({ theme }).eq('id', profile.id);
+      set({ profile: { ...profile, theme } });
+    }
+  },
+
+  setLanguage: async (language) => {
+    const { profile } = get();
+    if (profile) {
+      await supabase.from('profiles').update({ language }).eq('id', profile.id);
+      set({ profile: { ...profile, language } });
+    }
+  },
+
+  toggleNotifications: async () => {
+    const { profile } = get();
+    if (profile) {
+      const notifications = !profile.notifications;
+      await supabase.from('profiles').update({ notifications }).eq('id', profile.id);
+      set({ profile: { ...profile, notifications } });
+    }
   }
 }));
