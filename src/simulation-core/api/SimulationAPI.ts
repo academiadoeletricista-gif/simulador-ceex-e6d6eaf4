@@ -20,25 +20,30 @@ export class SimulationAPI {
   }
 
   public createSession(caseData: any) {
-    this.engine = new DiagnosisEngine(); // Fresh engine for new session
-    const circuitType = caseData?.type || 'DOL';
+    this.engine = new DiagnosisEngine();
+    
+    // circuitId determines which topology to load
+    const circuitId = caseData?.circuitId || 'DOL';
     
     this.engine.loadCircuit((solver) => {
-      if (circuitType === 'STAR_DELTA') {
+      if (circuitId === 'STAR_DELTA') {
         StarDeltaCircuit.setup(solver);
-      } else if (circuitType === 'REVERSING') {
+      } else if (circuitId === 'REVERSING') {
         ReversingCircuit.setup(solver);
       } else {
         DOLCircuit.setup(solver);
       }
     });
     
-    // Inject fault based on caseData or random if not specified
-    const faults = [FaultType.OPEN_FUSE, FaultType.BROKEN_COIL, FaultType.OPEN_START_BUTTON, FaultType.TRIPPED_RELAY];
-    const randomFault = caseData?.faultType || faults[Math.floor(Math.random() * faults.length)];
-    const targetComp = caseData?.faultComponent || (randomFault === FaultType.OPEN_FUSE ? 'F1' : 'K1');
+    // Inject fault based on database case components
+    const faultyComp = caseData?.components?.find((c: any) => c.isFaulty);
+    const faultTypeStr = faultyComp?.failureDetails || 'OPEN_FUSE';
+    const componentTag = faultyComp?.componentTag || (faultTypeStr === 'OPEN_FUSE' ? 'F1' : 'K1');
     
-    this.engine.injectFault(randomFault as FaultType, targetComp);
+    // Convert string to enum, fallback to OPEN_FUSE if invalid
+    const faultType = (FaultType as any)[faultTypeStr] || FaultType.OPEN_FUSE;
+    
+    this.engine.injectFault(faultType, componentTag);
   }
 
   public getSessionState(): SimulationState {
