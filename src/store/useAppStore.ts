@@ -59,6 +59,16 @@ export const useAppStore = create<AppState>((set) => ({
       [modalId]: !state.activeModals[modalId] 
     }
   })),
+
+  addToCart: (productId) => set((state) => ({
+    cart: [...state.cart, productId]
+  })),
+
+  removeFromCart: (productId) => set((state) => ({
+    cart: state.cart.filter((id) => id !== productId)
+  })),
+
+  clearCart: () => set({ cart: [] }),
 }));
 
 // Export legacy types if needed by components during transition, 
