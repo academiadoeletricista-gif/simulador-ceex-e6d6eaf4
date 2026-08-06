@@ -10,6 +10,7 @@ export interface Achievement {
   maxProgress: number;
   completed: boolean;
   xpReward: number;
+  icon: string;
 }
 
 export const useAchievements = () => {
