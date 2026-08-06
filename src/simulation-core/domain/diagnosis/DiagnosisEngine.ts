@@ -153,7 +153,7 @@ export class DiagnosisEngine {
       isMotorRunning: motor?.isRunning || false,
       startTime: this.startTime,
       status: this.status,
-      currentNodeId: 'sim',
+      currentNodeId: this.activeFault || 'sim',
       xp: 0,
       score: 100,
       components: Array.from(this.components.values()).map(c => ({
