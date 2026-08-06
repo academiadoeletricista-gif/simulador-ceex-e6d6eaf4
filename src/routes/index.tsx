@@ -92,7 +92,7 @@ function Index() {
                 <CardDescription className="flex items-center gap-2">
                   <Zap className="h-4 w-4 text-primary" /> Sequência
                 </CardDescription>
-                <CardTitle className="text-3xl">{streak.current} dias</CardTitle>
+                <CardTitle className="text-3xl">{streakCount} dias</CardTitle>
               </CardHeader>
             </Card>
             <Card className="bg-card/40 border-none shadow-none">
