@@ -93,6 +93,7 @@ interface AppState {
   updateProfile: (data: any) => Promise<void>;
   startCase: (caseId: string) => Promise<void>;
   completeCase: (caseId: string, success: boolean, timeTaken: number) => Promise<void>;
+  addXp: (amount: number) => Promise<void>;
   signOut: () => Promise<void>;
   addToCart: (id: string) => void;
   removeFromCart: (id: string) => void;
