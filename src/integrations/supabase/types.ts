@@ -1058,6 +1058,30 @@ export type Database = {
         }
         Relationships: []
       }
+      organizations: {
+        Row: {
+          created_at: string | null
+          id: string
+          logo_url: string | null
+          name: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          logo_url?: string | null
+          name: string
+          slug: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          logo_url?: string | null
+          name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
       panel_hotspots: {
         Row: {
           asset_id: string | null
@@ -1119,6 +1143,7 @@ export type Database = {
           language: string | null
           last_activity: string | null
           level: number | null
+          organization_id: string | null
           phone: string | null
           role: string | null
           state: string | null
@@ -1142,6 +1167,7 @@ export type Database = {
           language?: string | null
           last_activity?: string | null
           level?: number | null
+          organization_id?: string | null
           phone?: string | null
           role?: string | null
           state?: string | null
@@ -1165,6 +1191,7 @@ export type Database = {
           language?: string | null
           last_activity?: string | null
           level?: number | null
+          organization_id?: string | null
           phone?: string | null
           role?: string | null
           state?: string | null
@@ -1175,7 +1202,15 @@ export type Database = {
           updated_at?: string | null
           xp?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_achievements: {
         Row: {
