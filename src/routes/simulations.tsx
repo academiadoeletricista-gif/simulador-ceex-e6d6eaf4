@@ -522,7 +522,6 @@ function SimulationsPage() {
             </p>
           </div>
         </div>
-        </div>
       </aside>
     </div>
   );
