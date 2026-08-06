@@ -6,6 +6,7 @@ export interface UIState {
   isSidebarOpen: boolean;
   isLoading: boolean;
   activeModals: Record<string, boolean>;
+  cart: string[]; // Product IDs
 }
 
 interface AppState extends UIState {
@@ -17,6 +18,9 @@ interface AppState extends UIState {
   openModal: (modalId: string) => void;
   closeModal: (modalId: string) => void;
   toggleModal: (modalId: string) => void;
+  addToCart: (productId: string) => void;
+  removeFromCart: (productId: string) => void;
+  clearCart: () => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
