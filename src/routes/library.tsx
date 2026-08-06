@@ -18,7 +18,7 @@ function LibraryPage() {
   const navigate = useNavigate();
   const { laboratories, isLoading } = useAppStore();
 
-  console.log('LibraryPage render:', { labsCount: laboratories.length, isLoading });
+  
 
 
   const filteredLabs = laboratories.filter(lab => 

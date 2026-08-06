@@ -146,8 +146,6 @@ export const useAppStore = create<AppState>((set, get) => ({
         .select('*')
         .eq('published', true);
 
-      console.log('Fetched labs:', labsData?.length);
-      console.log('Fetched cases:', casesData?.length);
 
       const formattedCases: Case[] = (casesData || []).map(c => ({
 
