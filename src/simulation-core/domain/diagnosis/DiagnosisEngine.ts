@@ -132,7 +132,7 @@ export class DiagnosisEngine {
     
     switch (type) {
       case FaultType.OPEN_FUSE: {
-        const fuse = this.components.get(targetId || 'F1');
+        const fuse = this.components.get(targetId || 'F1') || this.components.get('Q1');
         if (fuse) {
           fuse.failureStatus = 'OPEN';
           console.log(`[DiagnosisEngine] FUSE ${fuse.id} set to OPEN`);
