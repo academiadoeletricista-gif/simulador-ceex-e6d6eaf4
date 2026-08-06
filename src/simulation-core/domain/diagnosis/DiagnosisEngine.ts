@@ -116,6 +116,20 @@ export class DiagnosisEngine {
       if (comp) {
         comp.failureStatus = null;
         if (comp instanceof ThermalRelayComponent) comp.isTripped = false;
+        
+        // Clear active fault if this was the faulty component
+        if (this.activeFault) {
+          const faultComponentMap: Record<string, string> = {
+            'F1': FaultType.OPEN_FUSE,
+            'K1': FaultType.BROKEN_COIL, // Simple mapping, could be refined
+            'S2': FaultType.OPEN_START_BUTTON,
+            'S1': FaultType.OPEN_STOP_BUTTON,
+            'F2': FaultType.TRIPPED_RELAY
+          };
+          if (faultComponentMap[params.id] === this.activeFault) {
+            this.activeFault = FaultType.NONE;
+          }
+        }
         observation = `Componente ${params.id} substituído por um novo.`;
       }
     }
