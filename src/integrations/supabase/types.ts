@@ -200,6 +200,415 @@ export type Database = {
         }
         Relationships: []
       }
+      case_actions: {
+        Row: {
+          case_id: string | null
+          category: string | null
+          created_at: string | null
+          description: string | null
+          expected_result: string | null
+          id: string
+          impact: string | null
+          name: string
+          real_result: string | null
+          required_tool: string | null
+          time_cost: number | null
+          xp_reward: number | null
+        }
+        Insert: {
+          case_id?: string | null
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          expected_result?: string | null
+          id?: string
+          impact?: string | null
+          name: string
+          real_result?: string | null
+          required_tool?: string | null
+          time_cost?: number | null
+          xp_reward?: number | null
+        }
+        Update: {
+          case_id?: string | null
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          expected_result?: string | null
+          id?: string
+          impact?: string | null
+          name?: string
+          real_result?: string | null
+          required_tool?: string | null
+          time_cost?: number | null
+          xp_reward?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_actions_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "diagnostic_cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      case_components: {
+        Row: {
+          can_inspect: boolean | null
+          can_measure: boolean | null
+          can_replace: boolean | null
+          case_id: string | null
+          component_id: string | null
+          component_tag: string | null
+          created_at: string | null
+          expected_state: string
+          failure_details: string | null
+          id: string
+          initial_state: string
+          is_faulty: boolean | null
+          state_after_intervention: string | null
+        }
+        Insert: {
+          can_inspect?: boolean | null
+          can_measure?: boolean | null
+          can_replace?: boolean | null
+          case_id?: string | null
+          component_id?: string | null
+          component_tag?: string | null
+          created_at?: string | null
+          expected_state: string
+          failure_details?: string | null
+          id?: string
+          initial_state: string
+          is_faulty?: boolean | null
+          state_after_intervention?: string | null
+        }
+        Update: {
+          can_inspect?: boolean | null
+          can_measure?: boolean | null
+          can_replace?: boolean | null
+          case_id?: string | null
+          component_id?: string | null
+          component_tag?: string | null
+          created_at?: string | null
+          expected_state?: string
+          failure_details?: string | null
+          id?: string
+          initial_state?: string
+          is_faulty?: boolean | null
+          state_after_intervention?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_components_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "diagnostic_cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      case_errors: {
+        Row: {
+          case_id: string | null
+          created_at: string | null
+          description: string
+          error_type: string
+          feedback: string
+          id: string
+          penalty_explanation: string | null
+          xp_penalty: number | null
+        }
+        Insert: {
+          case_id?: string | null
+          created_at?: string | null
+          description: string
+          error_type: string
+          feedback: string
+          id?: string
+          penalty_explanation?: string | null
+          xp_penalty?: number | null
+        }
+        Update: {
+          case_id?: string | null
+          created_at?: string | null
+          description?: string
+          error_type?: string
+          feedback?: string
+          id?: string
+          penalty_explanation?: string | null
+          xp_penalty?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_errors_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "diagnostic_cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      case_hints: {
+        Row: {
+          case_id: string | null
+          content: string
+          created_at: string | null
+          explanation: string | null
+          fundamental_basis: string | null
+          id: string
+          level: number
+          xp_penalty: number | null
+        }
+        Insert: {
+          case_id?: string | null
+          content: string
+          created_at?: string | null
+          explanation?: string | null
+          fundamental_basis?: string | null
+          id?: string
+          level: number
+          xp_penalty?: number | null
+        }
+        Update: {
+          case_id?: string | null
+          content?: string
+          created_at?: string | null
+          explanation?: string | null
+          fundamental_basis?: string | null
+          id?: string
+          level?: number
+          xp_penalty?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_hints_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "diagnostic_cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      case_hypotheses: {
+        Row: {
+          case_id: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          is_correct: boolean | null
+          root_cause: boolean | null
+          title: string
+          validation_logic: Json | null
+        }
+        Insert: {
+          case_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_correct?: boolean | null
+          root_cause?: boolean | null
+          title: string
+          validation_logic?: Json | null
+        }
+        Update: {
+          case_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_correct?: boolean | null
+          root_cause?: boolean | null
+          title?: string
+          validation_logic?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_hypotheses_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "diagnostic_cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      case_lessons: {
+        Row: {
+          best_practices: string | null
+          case_id: string | null
+          circuit_theory: string | null
+          common_mistakes: string | null
+          created_at: string | null
+          failure_explanation: string | null
+          fundamental_basis: string | null
+          id: string
+          norms_related: string | null
+          safety_warnings: string | null
+          technical_summary: string | null
+        }
+        Insert: {
+          best_practices?: string | null
+          case_id?: string | null
+          circuit_theory?: string | null
+          common_mistakes?: string | null
+          created_at?: string | null
+          failure_explanation?: string | null
+          fundamental_basis?: string | null
+          id?: string
+          norms_related?: string | null
+          safety_warnings?: string | null
+          technical_summary?: string | null
+        }
+        Update: {
+          best_practices?: string | null
+          case_id?: string | null
+          circuit_theory?: string | null
+          common_mistakes?: string | null
+          created_at?: string | null
+          failure_explanation?: string | null
+          fundamental_basis?: string | null
+          id?: string
+          norms_related?: string | null
+          safety_warnings?: string | null
+          technical_summary?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_lessons_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "diagnostic_cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      case_measurements: {
+        Row: {
+          case_id: string | null
+          condition: string | null
+          created_at: string | null
+          display_message: string | null
+          expected_value: string | null
+          id: string
+          measurement_point_id: string | null
+          point_code: string
+          precision: number | null
+          presented_value: string | null
+          real_value: string
+          state: string | null
+          tolerance: number | null
+          unit: string | null
+        }
+        Insert: {
+          case_id?: string | null
+          condition?: string | null
+          created_at?: string | null
+          display_message?: string | null
+          expected_value?: string | null
+          id?: string
+          measurement_point_id?: string | null
+          point_code: string
+          precision?: number | null
+          presented_value?: string | null
+          real_value: string
+          state?: string | null
+          tolerance?: number | null
+          unit?: string | null
+        }
+        Update: {
+          case_id?: string | null
+          condition?: string | null
+          created_at?: string | null
+          display_message?: string | null
+          expected_value?: string | null
+          id?: string
+          measurement_point_id?: string | null
+          point_code?: string
+          precision?: number | null
+          presented_value?: string | null
+          real_value?: string
+          state?: string | null
+          tolerance?: number | null
+          unit?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_measurements_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "diagnostic_cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      case_occurrences: {
+        Row: {
+          case_id: string | null
+          created_at: string | null
+          criticality: string | null
+          description: string
+          equipment: string | null
+          history: string | null
+          id: string
+          initial_condition: string | null
+          location: string | null
+          occurrence_date: string | null
+          operational_context: string | null
+          operational_risk: string | null
+          operator_message: string | null
+          responsible: string | null
+          shift: string | null
+          title: string
+          urgency: string | null
+        }
+        Insert: {
+          case_id?: string | null
+          created_at?: string | null
+          criticality?: string | null
+          description: string
+          equipment?: string | null
+          history?: string | null
+          id?: string
+          initial_condition?: string | null
+          location?: string | null
+          occurrence_date?: string | null
+          operational_context?: string | null
+          operational_risk?: string | null
+          operator_message?: string | null
+          responsible?: string | null
+          shift?: string | null
+          title: string
+          urgency?: string | null
+        }
+        Update: {
+          case_id?: string | null
+          created_at?: string | null
+          criticality?: string | null
+          description?: string
+          equipment?: string | null
+          history?: string | null
+          id?: string
+          initial_condition?: string | null
+          location?: string | null
+          occurrence_date?: string | null
+          operational_context?: string | null
+          operational_risk?: string | null
+          operator_message?: string | null
+          responsible?: string | null
+          shift?: string | null
+          title?: string
+          urgency?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_occurrences_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "diagnostic_cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       case_sessions: {
         Row: {
           answers: Json | null
@@ -237,6 +646,53 @@ export type Database = {
             columns: ["case_id"]
             isOneToOne: false
             referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      case_symptoms: {
+        Row: {
+          appearance_trigger: string | null
+          case_id: string | null
+          category: string | null
+          code: string
+          condition_logic: Json | null
+          created_at: string | null
+          description: string
+          id: string
+          priority: number | null
+          visibility: string | null
+        }
+        Insert: {
+          appearance_trigger?: string | null
+          case_id?: string | null
+          category?: string | null
+          code: string
+          condition_logic?: Json | null
+          created_at?: string | null
+          description: string
+          id?: string
+          priority?: number | null
+          visibility?: string | null
+        }
+        Update: {
+          appearance_trigger?: string | null
+          case_id?: string | null
+          category?: string | null
+          code?: string
+          condition_logic?: Json | null
+          created_at?: string | null
+          description?: string
+          id?: string
+          priority?: number | null
+          visibility?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_symptoms_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "diagnostic_cases"
             referencedColumns: ["id"]
           },
         ]
@@ -302,6 +758,71 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "cases_laboratory_id_fkey"
+            columns: ["laboratory_id"]
+            isOneToOne: false
+            referencedRelation: "laboratories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      diagnostic_cases: {
+        Row: {
+          author: string | null
+          category: string | null
+          circuit_id: string | null
+          code: string
+          complexity: number | null
+          created_at: string | null
+          description: string | null
+          id: string
+          laboratory_id: string | null
+          level: Database["public"]["Enums"]["case_difficulty"] | null
+          status: string | null
+          time_estimate: string | null
+          title: string
+          updated_at: string | null
+          version: string | null
+          xp_reward: number | null
+        }
+        Insert: {
+          author?: string | null
+          category?: string | null
+          circuit_id?: string | null
+          code: string
+          complexity?: number | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          laboratory_id?: string | null
+          level?: Database["public"]["Enums"]["case_difficulty"] | null
+          status?: string | null
+          time_estimate?: string | null
+          title: string
+          updated_at?: string | null
+          version?: string | null
+          xp_reward?: number | null
+        }
+        Update: {
+          author?: string | null
+          category?: string | null
+          circuit_id?: string | null
+          code?: string
+          complexity?: number | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          laboratory_id?: string | null
+          level?: Database["public"]["Enums"]["case_difficulty"] | null
+          status?: string | null
+          time_estimate?: string | null
+          title?: string
+          updated_at?: string | null
+          version?: string | null
+          xp_reward?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diagnostic_cases_laboratory_id_fkey"
             columns: ["laboratory_id"]
             isOneToOne: false
             referencedRelation: "laboratories"
@@ -598,6 +1119,11 @@ export type Database = {
         | "Símbolo Elétrico"
         | "Documento Técnico"
       asset_status: "active" | "inactive" | "archived" | "draft"
+      case_difficulty:
+        | "Iniciante"
+        | "Intermediário"
+        | "Avançado"
+        | "Especialista"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -749,6 +1275,12 @@ export const Constants = {
         "Documento Técnico",
       ],
       asset_status: ["active", "inactive", "archived", "draft"],
+      case_difficulty: [
+        "Iniciante",
+        "Intermediário",
+        "Avançado",
+        "Especialista",
+      ],
     },
   },
 } as const
