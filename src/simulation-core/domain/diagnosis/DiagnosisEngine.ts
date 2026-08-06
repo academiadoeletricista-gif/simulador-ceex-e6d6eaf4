@@ -32,6 +32,8 @@ export class DiagnosisEngine {
   private startTime: number = Date.now();
   private status: SessionStatus = SessionStatus.IN_PROGRESS;
   private activeFault: FaultType | null = null;
+  private currentCase: DiagnosticCase | null = null;
+  private currentNodeId: string = 's0';
   private quizState: QuizState = {
     currentQuestion: null,
     answeredQuestions: [],
@@ -41,9 +43,21 @@ export class DiagnosisEngine {
   private totalXP: number = 0;
   private totalScore: number = 100;
 
-
   constructor() {
     this.solver = new CircuitSolver();
+  }
+
+  loadCase(caseData: DiagnosticCase, setupFn: (solver: CircuitSolver) => void) {
+    this.currentCase = caseData;
+    this.currentNodeId = 's0';
+    this.loadCircuit(setupFn);
+    
+    // Inject fault based on case components if applicable
+    const faultyComp = caseData.components?.find(c => c.isFaulty);
+    if (faultyComp) {
+      const faultType = (FaultType as any)[faultyComp.failureDetails || ''] || FaultType.OPEN_FUSE;
+      this.injectFault(faultType, faultyComp.componentTag);
+    }
   }
 
   loadCircuit(setupFn: (solver: CircuitSolver) => void) {
