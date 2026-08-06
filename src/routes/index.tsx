@@ -24,19 +24,19 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const { 
-    userName,
-    xp, 
-    level, 
-    streak, 
-    levelTitle, 
-    nextLevelXp, 
-    dailyChallenges, 
-    achievements,
-    accuracy,
-    avgTime,
-    sessions
-  } = useAppStore();
+  const { profile, sessions, achievements, getLevelTitle } = useAppStore();
+  const userName = profile?.full_name || "Comandante";
+  const xp = profile?.xp || 0;
+  const level = profile?.level || 1;
+  const streak = profile?.streak_current || 0;
+  const levelTitle = getLevelTitle ? getLevelTitle(level) : "Aprendiz";
+  const nextLevelXp = 1000;
+  const dailyChallenges = [
+    { id: 'd1', title: 'Completar 2 diagnósticos', description: 'Realize dois diagnósticos completos hoje', xpReward: 200, completed: false },
+    { id: 'd2', title: 'Precisão > 90% em caso Prata', description: 'Mantenha alta precisão em um caso de nível Prata', xpReward: 500, completed: false },
+  ];
+  const accuracy = profile?.accuracy || 0;
+  const avgTime = profile?.avg_time || 0;
 
   const xpProgress = (xp / nextLevelXp) * 100;
   
