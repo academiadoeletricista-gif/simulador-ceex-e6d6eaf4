@@ -26,7 +26,7 @@ function Library() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState<string>("all");
-  const params = Route.useParams() as { labId?: string };
+  const params = useParams({ from: '/library/$labId', strict: false }) as { labId?: string };
   const labId = params.labId;
 
   const { data: laboratoriesResult, isLoading } = useLaboratories();
