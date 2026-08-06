@@ -263,7 +263,7 @@ function LabDetail() {
                     </div>
                     <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-primary/10">
                       <Info className="h-3 w-3" />
-                    </p>
+                    </Button>
                   </CardContent>
                 </Card>
               ))}
