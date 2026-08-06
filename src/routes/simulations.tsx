@@ -50,6 +50,26 @@ function SimulationsPage() {
   const [multimeterValue, setMultimeterValue] = useState<number | null>(null);
   const [showDiagram, setShowDiagram] = useState(false);
   const [showReport, setShowReport] = useState(false);
+  const [activeTab, setActiveTab] = useState<'problem' | 'inspect' | 'measure' | 'report'>('problem');
+  const [selectedComponent, setSelectedComponent] = useState<string | null>(null);
+  const [lastMessage, setLastMessage] = useState<string | null>(null);
+  
+  // Extract narrative steps if available
+  const narrativeSteps = useMemo(() => {
+    if (!caseResult?.success || !caseResult.data) return [];
+    // If the case format from DB follows our new schema
+    return (caseResult.data as any).occurrence?.steps || [];
+  }, [caseResult]);
+
+  const currentStepIndex = useMemo(() => {
+    const id = state.currentNodeId || 's0';
+    if (id.startsWith('s')) {
+        return parseInt(id.substring(1)) || 0;
+    }
+    return 0;
+  }, [state.currentNodeId]);
+
+  const currentStep = narrativeSteps[currentStepIndex] || null;
 
 
   useEffect(() => {
