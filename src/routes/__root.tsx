@@ -178,43 +178,19 @@ function RootComponent() {
               <span className="whitespace-nowrap">Comandos LAB</span>
             </div>
             <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
+              onClick={toggleSidebar}
               className="md:hidden"
             >
               <X size={20} />
             </button>
-          </div>
-
-          <nav className="p-4 space-y-1 overflow-y-auto h-[calc(100vh-4rem)]">
-            {menuItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={cn(
-                  "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors group",
-                  location.pathname === item.path
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-                )}
-              >
-                <item.icon size={20} className="shrink-0" />
-                <span className={cn("transition-all duration-300", !sidebarOpen && "md:hidden md:opacity-0 whitespace-nowrap overflow-hidden")}>
-                  {item.label}
-                </span>
-              </Link>
-            ))}
-          </nav>
-        </aside>
-
-        {/* Main Content */}
-        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-          <header className="h-16 border-b bg-card/50 backdrop-blur-md flex items-center px-8 shrink-0">
+...
             <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
+              onClick={toggleSidebar}
               className="mr-4 text-muted-foreground hover:text-foreground hidden md:block"
             >
               <Menu size={20} />
             </button>
+
             <div className="flex-1" />
             <div className="flex items-center gap-4">
               <div className="text-right hidden sm:block">
