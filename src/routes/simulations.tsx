@@ -2,15 +2,34 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Zap, BookOpen, AlertTriangle, ArrowRight, History, Info, CheckCircle2, Play, Settings2, Activity } from "lucide-react";
+import { 
+  Clock, 
+  Zap, 
+  BookOpen, 
+  AlertTriangle, 
+  ArrowRight, 
+  History, 
+  Info, 
+  CheckCircle2, 
+  Play, 
+  Settings2, 
+  Activity,
+  ChevronRight,
+  ChevronLeft,
+  FileText,
+  Search,
+  Hammer,
+  HelpCircle
+} from "lucide-react";
 import { useDiagnosis } from "@/hooks/useDiagnosis";
 import { useCase } from "@/hooks/useCase";
 import { useStartSession } from "@/hooks/useSession";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { z } from "zod";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { NodeType } from "@/domains/diagnosis/types/enums";
+import { Progress } from "@/components/ui/progress";
 
 const simulationSearchSchema = z.object({
   id: z.string().optional(),
