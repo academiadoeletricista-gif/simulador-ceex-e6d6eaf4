@@ -1,7 +1,7 @@
 import { CircuitSolver } from '../solver/CircuitSolver';
 import { SimulationState, SessionStatus } from '../sessions/SimulationSession';
 import { ElectricalComponent, SwitchComponent, ContactorComponent } from '../components/ElectricalComponent';
-import { CircuitBreakerComponent, ThermalRelayComponent } from '../components/IndustrialComponents';
+import { CircuitBreakerComponent, ThermalRelayComponent, MotorComponent } from '../components/IndustrialComponents';
 
 export type FaultType = 
   | 'OPEN_FUSE' 
@@ -121,20 +121,23 @@ export class DiagnosisEngine {
     this.components.forEach(c => c.updateState());
     this.solver.solve();
     
+    // Check success: Is the contactor energized?
+    const k1 = this.components.get('K1') as ContactorComponent;
+    const motor = this.components.get('M1') as MotorComponent;
+    
+    if (k1?.isEnergized) {
+      if (motor) motor.isRunning = true;
+      this.status = SessionStatus.COMPLETED;
+    } else {
+      if (motor) motor.isRunning = false;
+    }
+
     this.history.push({ 
       action, 
       params, 
       observation,
       timestamp: Date.now() 
     });
-    
-    // Check success: Is the contactor energized AND staying energized (seal)?
-    const k1 = this.components.get('K1') as ContactorComponent;
-    if (k1?.isEnergized) {
-      // In a real DOL, if we release start and it stays on, it's a success
-      // For now, simple energized check
-      this.status = SessionStatus.COMPLETED;
-    }
   }
 
   measureVoltage(nodeId1: string, nodeId2: string): number {
@@ -142,10 +145,10 @@ export class DiagnosisEngine {
   }
 
   getState(): SimulationState {
-    const k1 = this.components.get('K1') as ContactorComponent;
+    const motor = this.components.get('M1') as MotorComponent;
     return {
       history: this.history,
-      isMotorRunning: k1?.isEnergized || false,
+      isMotorRunning: motor?.isRunning || false,
       startTime: this.startTime,
       status: this.status,
       currentNodeId: 'sim',
@@ -158,6 +161,7 @@ export class DiagnosisEngine {
         failure: c.failureStatus,
         isEnergized: (c as any).isEnergized || false,
         isClosed: (c as any).isClosed ?? null,
+        isRunning: (c as any).isRunning ?? null,
       }))
     };
   }
