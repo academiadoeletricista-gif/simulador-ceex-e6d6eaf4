@@ -2,7 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const FeedbackService = {
   async getByCase(caseId: string) {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('case_feedback')
       .select('*')
       .eq('case_id', caseId);
@@ -12,7 +12,7 @@ export const FeedbackService = {
   },
 
   async saveFeedback(caseId: string, feedback: any) {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('case_feedback')
       .upsert({
         case_id: caseId,
