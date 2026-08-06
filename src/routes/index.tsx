@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+/** Execute esta instrucao no projeto: baixar arquivos */
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
