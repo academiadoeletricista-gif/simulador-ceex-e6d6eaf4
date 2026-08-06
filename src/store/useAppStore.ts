@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from '@/integrations/supabase/client';
+import { Laboratory } from '@/types/laboratory';
+
 
 export type UserLevel = 
   | 'Aprendiz' 
@@ -82,7 +84,9 @@ export interface Product {
 interface AppState {
   profile: Profile | null;
   cases: Case[];
+  laboratories: Laboratory[];
   sessions: Record<string, CaseSession>;
+
   achievements: Achievement[];
   marketplace: Product[];
   cart: string[];
@@ -115,7 +119,9 @@ export const getLevelTitle = (level: number): UserLevel => {
 export const useAppStore = create<AppState>((set, get) => ({
   profile: null,
   cases: [],
+  laboratories: [],
   sessions: {},
+
   achievements: [],
   marketplace: [],
   cart: [],
@@ -137,11 +143,18 @@ export const useAppStore = create<AppState>((set, get) => ({
         .eq('id', user.id)
         .single();
 
+      // Fetch Laboratories
+      const { data: labsData } = await supabase
+        .from('laboratories')
+        .select('*')
+        .eq('published', true);
+
       // Fetch Cases
       const { data: casesData } = await supabase
         .from('cases')
         .select('*')
         .eq('published', true);
+
 
       // Fetch Sessions
       const { data: sessionsData } = await supabase
@@ -176,12 +189,35 @@ export const useAppStore = create<AppState>((set, get) => ({
         content: c.content
       }));
 
+      const formattedLabs: Laboratory[] = (labsData || []).map(l => ({
+        id: l.id,
+        code: l.code,
+        name: l.name,
+        description: l.description || '',
+        learningObjectives: l.learning_objectives || [],
+        prerequisites: l.prerequisites || [],
+        level: l.level as any,
+        estimatedTime: l.estimated_time || '',
+        totalXp: l.total_xp || 0,
+        defectCount: (casesData || []).filter(c => c.laboratory_id === l.id).length,
+        progress: 0, // Calculate later
+        averageAccuracy: 0,
+        bestStreak: 0,
+        achievements: [],
+        baseCircuit: l.base_circuit_data || {},
+        panel: l.panel_data || {},
+        components: l.components || [],
+        measurementMap: l.measurements || []
+      }));
+
       set({ 
         profile: profile as any, 
+        laboratories: formattedLabs,
         cases: formattedCases, 
         sessions: sessionsMap,
         isLoading: false 
       });
+
     } catch (error) {
       console.error('Error fetching initial data:', error);
       set({ isLoading: false });
