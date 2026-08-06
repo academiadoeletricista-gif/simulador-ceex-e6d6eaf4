@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AchievementsRouteImport } from './routes/achievements'
 import { Route as CertificationsRouteImport } from './routes/certifications'
 import { Route as LibraryRouteImport } from './routes/library'
+import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as RankingRouteImport } from './routes/ranking'
 
@@ -36,6 +37,11 @@ const LibraryRoute = LibraryRouteImport.update({
   path: '/library',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MarketplaceRoute = MarketplaceRouteImport.update({
+  id: '/marketplace',
+  path: '/marketplace',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/achievements': typeof AchievementsRoute
   '/certifications': typeof CertificationsRoute
   '/library': typeof LibraryRoute
+  '/marketplace': typeof MarketplaceRoute
   '/profile': typeof ProfileRoute
   '/ranking': typeof RankingRoute
 }
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   '/achievements': typeof AchievementsRoute
   '/certifications': typeof CertificationsRoute
   '/library': typeof LibraryRoute
+  '/marketplace': typeof MarketplaceRoute
   '/profile': typeof ProfileRoute
   '/ranking': typeof RankingRoute
 }
@@ -69,6 +77,7 @@ export interface FileRoutesById {
   '/achievements': typeof AchievementsRoute
   '/certifications': typeof CertificationsRoute
   '/library': typeof LibraryRoute
+  '/marketplace': typeof MarketplaceRoute
   '/profile': typeof ProfileRoute
   '/ranking': typeof RankingRoute
 }
@@ -79,6 +88,7 @@ export interface FileRouteTypes {
     | '/achievements'
     | '/certifications'
     | '/library'
+    | '/marketplace'
     | '/profile'
     | '/ranking'
   fileRoutesByTo: FileRoutesByTo
@@ -87,6 +97,7 @@ export interface FileRouteTypes {
     | '/achievements'
     | '/certifications'
     | '/library'
+    | '/marketplace'
     | '/profile'
     | '/ranking'
   id:
@@ -95,6 +106,7 @@ export interface FileRouteTypes {
     | '/achievements'
     | '/certifications'
     | '/library'
+    | '/marketplace'
     | '/profile'
     | '/ranking'
   fileRoutesById: FileRoutesById
@@ -104,6 +116,7 @@ export interface RootRouteChildren {
   AchievementsRoute: typeof AchievementsRoute
   CertificationsRoute: typeof CertificationsRoute
   LibraryRoute: typeof LibraryRoute
+  MarketplaceRoute: typeof MarketplaceRoute
   ProfileRoute: typeof ProfileRoute
   RankingRoute: typeof RankingRoute
 }
@@ -138,6 +151,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LibraryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/marketplace': {
+      id: '/marketplace'
+      path: '/marketplace'
+      fullPath: '/marketplace'
+      preLoaderRoute: typeof MarketplaceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/profile': {
       id: '/profile'
       path: '/profile'
@@ -160,6 +180,7 @@ const rootRouteChildren: RootRouteChildren = {
   AchievementsRoute: AchievementsRoute,
   CertificationsRoute: CertificationsRoute,
   LibraryRoute: LibraryRoute,
+  MarketplaceRoute: MarketplaceRoute,
   ProfileRoute: ProfileRoute,
   RankingRoute: RankingRoute,
 }
