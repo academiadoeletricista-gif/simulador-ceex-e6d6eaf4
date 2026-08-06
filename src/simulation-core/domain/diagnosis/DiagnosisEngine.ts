@@ -176,10 +176,13 @@ export class DiagnosisEngine {
       if (motor) motor.isRunning = true;
       // Success condition: Contactor energized AND no active fault remaining
       if (!this.activeFault || this.activeFault === FaultType.NONE) {
-        this.generateQuiz(); // Success triggers a final quiz check or report
-        if (!this.quizState.currentQuestion) {
-          this.completeSession();
-        }
+        // Debounce completion check to ensure UI handles state updates correctly
+        setTimeout(() => {
+          this.generateQuiz();
+          if (!this.quizState.currentQuestion) {
+            this.completeSession();
+          }
+        }, 100);
       }
     } else {
       if (motor) motor.isRunning = false;
@@ -253,11 +256,11 @@ export class DiagnosisEngine {
   getState(): SimulationState {
     const motor = this.components.get('M1') as MotorComponent;
     return {
-      history: this.history,
+      history: [...this.history],
       isMotorRunning: motor?.isRunning || false,
       startTime: this.startTime,
       status: this.status,
-      currentNodeId: this.activeFault || 'sim',
+      currentNodeId: this.currentNodeId,
       xp: this.totalXP,
       score: this.totalScore,
       quiz: {
