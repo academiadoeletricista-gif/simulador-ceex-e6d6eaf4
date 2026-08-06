@@ -24,9 +24,11 @@ function SimulationsPage() {
   const { sessions, startCase, completeCase, addXp, profile } = useAppStore();
   const [activeCase, setActiveCase] = useState<any>(null);
 
+  const { cases: dbCases } = useAppStore();
+
   useEffect(() => {
     if (id) {
-      const foundCase = cases.find(c => c.id === id);
+      const foundCase = dbCases.find(c => c.id === id) || cases.find(c => c.id === id);
       if (foundCase) {
         setActiveCase(foundCase);
         if (!sessions[id]) {
@@ -34,7 +36,7 @@ function SimulationsPage() {
         }
       }
     }
-  }, [id, sessions, startCase]);
+  }, [id, sessions, startCase, dbCases]);
 
   const handleFinish = () => {
     if (activeCase) {
