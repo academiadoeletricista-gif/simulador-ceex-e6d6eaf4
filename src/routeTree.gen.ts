@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AchievementsRouteImport } from './routes/achievements'
+import { Route as B2bRouteImport } from './routes/b2b'
+import { Route as BillingRouteImport } from './routes/billing'
 import { Route as CertificationsRouteImport } from './routes/certifications'
 import { Route as LibraryRouteImport } from './routes/library'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
@@ -27,6 +29,16 @@ const IndexRoute = IndexRouteImport.update({
 const AchievementsRoute = AchievementsRouteImport.update({
   id: '/achievements',
   path: '/achievements',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const B2bRoute = B2bRouteImport.update({
+  id: '/b2b',
+  path: '/b2b',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BillingRoute = BillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CertificationsRoute = CertificationsRouteImport.update({
@@ -68,6 +80,8 @@ const SimulationsRoute = SimulationsRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/achievements': typeof AchievementsRoute
+  '/b2b': typeof B2bRoute
+  '/billing': typeof BillingRoute
   '/certifications': typeof CertificationsRoute
   '/library': typeof LibraryRoute
   '/marketplace': typeof MarketplaceRoute
@@ -79,6 +93,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/achievements': typeof AchievementsRoute
+  '/b2b': typeof B2bRoute
+  '/billing': typeof BillingRoute
   '/certifications': typeof CertificationsRoute
   '/library': typeof LibraryRoute
   '/marketplace': typeof MarketplaceRoute
@@ -91,6 +107,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/achievements': typeof AchievementsRoute
+  '/b2b': typeof B2bRoute
+  '/billing': typeof BillingRoute
   '/certifications': typeof CertificationsRoute
   '/library': typeof LibraryRoute
   '/marketplace': typeof MarketplaceRoute
@@ -104,6 +122,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/achievements'
+    | '/b2b'
+    | '/billing'
     | '/certifications'
     | '/library'
     | '/marketplace'
@@ -115,6 +135,8 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/achievements'
+    | '/b2b'
+    | '/billing'
     | '/certifications'
     | '/library'
     | '/marketplace'
@@ -126,6 +148,8 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/achievements'
+    | '/b2b'
+    | '/billing'
     | '/certifications'
     | '/library'
     | '/marketplace'
@@ -138,6 +162,8 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AchievementsRoute: typeof AchievementsRoute
+  B2bRoute: typeof B2bRoute
+  BillingRoute: typeof BillingRoute
   CertificationsRoute: typeof CertificationsRoute
   LibraryRoute: typeof LibraryRoute
   MarketplaceRoute: typeof MarketplaceRoute
@@ -161,6 +187,20 @@ declare module '@tanstack/react-router' {
       path: '/achievements'
       fullPath: '/achievements'
       preLoaderRoute: typeof AchievementsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/b2b': {
+      id: '/b2b'
+      path: '/b2b'
+      fullPath: '/b2b'
+      preLoaderRoute: typeof B2bRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/billing': {
+      id: '/billing'
+      path: '/billing'
+      fullPath: '/billing'
+      preLoaderRoute: typeof BillingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/certifications': {
@@ -218,6 +258,8 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AchievementsRoute: AchievementsRoute,
+  B2bRoute: B2bRoute,
+  BillingRoute: BillingRoute,
   CertificationsRoute: CertificationsRoute,
   LibraryRoute: LibraryRoute,
   MarketplaceRoute: MarketplaceRoute,
@@ -229,13 +271,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

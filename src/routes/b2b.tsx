@@ -196,7 +196,7 @@ function B2BPage() {
             <CardContent className="space-y-4 pt-0">
               <div className="flex justify-between items-center text-sm">
                 <span className="text-muted-foreground">Plano Atual</span>
-                <span className="font-bold text-primary">{organization.subscription.plan}</span>
+                <span className="font-bold text-primary">{organization?.subscription.plan}</span>
               </div>
               <div className="flex justify-between items-center text-sm">
                 <span className="text-muted-foreground">Próxima Fatura</span>
