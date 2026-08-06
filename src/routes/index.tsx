@@ -1,31 +1,61 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { useAppStore, getLevelTitle } from "@/store/useAppStore";
+import { getLevelTitle } from "@/store/useAppStore";
+import { useProfile } from "@/hooks/useProfile";
+import { useSessions } from "@/hooks/useSession";
+import { useCases } from "@/hooks/useCase";
+import { useLaboratories } from "@/hooks/useLaboratory";
+import { useAchievements } from "@/hooks/useAchievement";
 import { 
   Zap, 
   Clock, 
   Target, 
+  Trophy, 
   Award, 
   ArrowRight, 
   TrendingUp, 
   CheckCircle2, 
   Calendar,
-  Trophy,
   Star,
   BookOpen,
   ArrowUpRight
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/")({
   component: Index,
 });
 
 function Index() {
-  const { profile, sessions, achievements } = useAppStore();
+  const navigate = useNavigate();
+  
+  const { data: profileResult, isLoading: profileLoading } = useProfile();
+  const { data: sessionsResult, isLoading: sessionsLoading } = useSessions();
+  const { data: achievementsResult, isLoading: achievementsLoading } = useAchievements();
+  const { data: casesResult, isLoading: casesLoading } = useCases();
+  const { data: laboratoriesResult, isLoading: labsLoading } = useLaboratories();
+
+  const isLoading = profileLoading || sessionsLoading || achievementsLoading || casesLoading || labsLoading;
+
+  if (isLoading) {
+    return <div className="p-8 space-y-8 max-w-7xl mx-auto"><Skeleton className="w-full h-[400px]" /></div>;
+  }
+
+  const profile = profileResult?.success ? profileResult.data : null;
+  const sessions = sessionsResult?.success ? sessionsResult.data : [];
+  const achievements = achievementsResult?.success ? achievementsResult.data : [];
+  const allCases = casesResult?.success ? casesResult.data : [];
+  const laboratories = laboratoriesResult?.success ? laboratoriesResult.data : [];
+
+  const sessionsMap = sessions.reduce((acc, s) => {
+    acc[s.case_id] = s;
+    return acc;
+  }, {} as Record<string, any>);
+
   const userName = profile?.full_name || "Comandante";
   const xp = profile?.xp || 0;
   const level = profile?.level || 1;
@@ -41,16 +71,11 @@ function Index() {
 
   const xpProgress = (xp / nextLevelXp) * 100;
   
-  const { cases: dbCases, laboratories } = useAppStore();
-  const allCases = dbCases;
-  const navigate = useNavigate();
-  
   // Encontrar um laboratório com progresso pendente
   const recommendedLab = laboratories.find(l => l.progress < 100) || laboratories[0];
   
   // Encontrar um caso não concluído como recomendação
-  const recommendedCase = allCases.find(c => !sessions[c.id] || sessions[c.id]?.status !== 'completed') || allCases[0];
-
+  const recommendedCase = allCases.find(c => !sessionsMap[c.id] || sessionsMap[c.id]?.status !== 'completed') || allCases[0];
 
   return (
     <div className="p-8 space-y-8 max-w-7xl mx-auto pb-20">
@@ -59,7 +84,7 @@ function Index() {
         <div className="relative z-10 flex flex-col md:flex-row gap-8 items-center justify-between">
           <div className="space-y-4 text-center md:text-left">
             <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 px-3 py-1">
-              Sprint P0: Fluxo Real Ativado
+              Sprint 2B.6: Core Migration
             </Badge>
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
               Bom trabalho, <span className="text-primary">{userName.split(' ')[0]}</span>
@@ -174,8 +199,8 @@ function Index() {
                       <p className="text-xs text-muted-foreground line-clamp-2">{recommendedCase.description}</p>
                     </div>
                     <div className="flex items-center gap-4 text-xs font-bold text-muted-foreground">
-                      <span className="flex items-center gap-1"><Zap className="h-3 w-3 text-primary" /> +{recommendedCase.xp_reward} XP</span>
-                      <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {recommendedCase.time_estimate}</span>
+                      <span className="flex items-center gap-1"><Zap className="h-3 w-3 text-primary" /> +{recommendedCase.xpReward} XP</span>
+                      <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {recommendedCase.timeEstimate}</span>
                     </div>
                     <Button variant="ghost" className="w-full h-8 text-xs p-0 group-hover:gap-3 transition-all">
                       Iniciar Diagnóstico <ArrowUpRight className="h-3 w-3" />

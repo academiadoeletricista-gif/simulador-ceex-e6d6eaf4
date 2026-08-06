@@ -137,14 +137,9 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const sidebarOpen = useAppStore(state => state.isSidebarOpen);
+  const toggleSidebar = useAppStore(state => state.toggleSidebar);
   const location = useLocation();
-  const fetchInitialData = useAppStore(state => state.fetchInitialData);
-
-  useEffect(() => {
-    fetchInitialData();
-  }, [fetchInitialData]);
-
 
   const menuItems = [
     { icon: LayoutDashboard, label: "Dashboard", path: "/" },
@@ -181,7 +176,7 @@ function RootComponent() {
               <span className="whitespace-nowrap">Comandos LAB</span>
             </div>
             <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
+              onClick={toggleSidebar}
               className="md:hidden"
             >
               <X size={20} />
@@ -213,7 +208,7 @@ function RootComponent() {
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           <header className="h-16 border-b bg-card/50 backdrop-blur-md flex items-center px-8 shrink-0">
             <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
+              onClick={toggleSidebar}
               className="mr-4 text-muted-foreground hover:text-foreground hidden md:block"
             >
               <Menu size={20} />

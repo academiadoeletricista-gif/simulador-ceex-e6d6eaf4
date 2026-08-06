@@ -1,8 +1,78 @@
 import { create } from 'zustand';
-import { supabase } from '@/integrations/supabase/client';
-import { Laboratory } from '@/types/laboratory';
 
+export interface UIState {
+  theme: 'light' | 'dark';
+  language: string;
+  isSidebarOpen: boolean;
+  isLoading: boolean;
+  activeModals: Record<string, boolean>;
+  cart: string[]; // Product IDs
+}
 
+interface AppState extends UIState {
+  // Actions
+  setTheme: (theme: 'light' | 'dark') => void;
+  setLanguage: (lang: string) => void;
+  toggleSidebar: () => void;
+  setLoading: (loading: boolean) => void;
+  openModal: (modalId: string) => void;
+  closeModal: (modalId: string) => void;
+  toggleModal: (modalId: string) => void;
+  addToCart: (productId: string) => void;
+  removeFromCart: (productId: string) => void;
+  clearCart: () => void;
+}
+
+export const useAppStore = create<AppState>((set) => ({
+  theme: 'dark',
+  language: 'pt-BR',
+  isSidebarOpen: true,
+  isLoading: false,
+  activeModals: {},
+  cart: [],
+
+  setTheme: (theme) => {
+    set({ theme });
+    // Persistent theme logic could be added here or in a hook
+    if (typeof window !== 'undefined') {
+      document.documentElement.classList.toggle('dark', theme === 'dark');
+    }
+  },
+
+  setLanguage: (language) => set({ language }),
+  
+  toggleSidebar: () => set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
+  
+  setLoading: (isLoading) => set({ isLoading }),
+  
+  openModal: (modalId) => set((state) => ({
+    activeModals: { ...state.activeModals, [modalId]: true }
+  })),
+  
+  closeModal: (modalId) => set((state) => ({
+    activeModals: { ...state.activeModals, [modalId]: false }
+  })),
+  
+  toggleModal: (modalId) => set((state) => ({
+    activeModals: { 
+      ...state.activeModals, 
+      [modalId]: !state.activeModals[modalId] 
+    }
+  })),
+
+  addToCart: (productId) => set((state) => ({
+    cart: [...state.cart, productId]
+  })),
+
+  removeFromCart: (productId) => set((state) => ({
+    cart: state.cart.filter((id) => id !== productId)
+  })),
+
+  clearCart: () => set({ cart: [] }),
+}));
+
+// Export legacy types if needed by components during transition, 
+// but they should be moved to proper type files
 export type UserLevel = 
   | 'Aprendiz' 
   | 'Auxiliar' 
@@ -37,78 +107,6 @@ export interface Profile {
   notifications?: boolean;
 }
 
-export interface Achievement {
-  id: string;
-  title: string;
-  description: string;
-  progress: number;
-  maxProgress: number;
-  completed: boolean;
-  xpReward: number;
-}
-
-export interface Case {
-  id: string;
-  laboratory_id: string | null;
-  code: string | null;
-  slug: string;
-  title: string;
-  category: string;
-  level: string;
-  xp_reward: number;
-  time_estimate: string;
-  description: string;
-  symptoms: string[];
-  checklist: string[];
-  image_url: string;
-  diagram_url: string | null;
-  content?: any;
-}
-
-
-export interface CaseSession {
-  case_id: string;
-  status: 'in_progress' | 'completed';
-  current_step: number;
-  answers: Record<string, any>;
-  start_time: string;
-}
-
-export interface Product {
-  id: string;
-  title: string;
-  price: number;
-  type: 'Curso' | 'Biblioteca' | 'Simulador' | 'Mentoria' | 'Plano' | 'Certificação';
-  rating: number;
-  image?: string;
-  description?: string;
-}
-
-interface AppState {
-  profile: Profile | null;
-  cases: Case[];
-  laboratories: Laboratory[];
-  sessions: Record<string, CaseSession>;
-
-  achievements: Achievement[];
-  marketplace: Product[];
-  cart: string[];
-  isLoading: boolean;
-  
-  // Actions
-  fetchInitialData: () => Promise<void>;
-  updateProfile: (data: any) => Promise<void>;
-  startCase: (caseId: string) => Promise<void>;
-  completeCase: (caseId: string, success: boolean, timeTaken: number) => Promise<void>;
-  addXp: (amount: number) => Promise<void>;
-  signOut: () => Promise<void>;
-  addToCart: (id: string) => void;
-  removeFromCart: (id: string) => void;
-  setTheme: (theme: 'light' | 'dark') => Promise<void>;
-  setLanguage: (lang: string) => Promise<void>;
-  toggleNotifications: () => Promise<void>;
-}
-
 const LEVEL_TITLES: UserLevel[] = [
   'Aprendiz', 'Auxiliar', 'Técnico Júnior', 'Técnico Pleno', 'Técnico Sênior', 
   'Especialista', 'Engenheiro de Campo', 'Mestre em Diagnóstico', 'Lenda Industrial'
@@ -118,291 +116,3 @@ export const getLevelTitle = (level: number): UserLevel => {
   const titleIndex = Math.min(Math.floor(level / 5), LEVEL_TITLES.length - 1);
   return LEVEL_TITLES[titleIndex] || 'Aprendiz';
 };
-
-export const useAppStore = create<AppState>((set, get) => ({
-  profile: null,
-  cases: [],
-  laboratories: [],
-  sessions: {},
-
-  achievements: [],
-  marketplace: [],
-  cart: [],
-  isLoading: false,
-
-  fetchInitialData: async () => {
-    set({ isLoading: true });
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      // Fetch public data (Labs and Cases) - accessible to all
-      const { data: labsData } = await supabase
-        .from('laboratories')
-        .select('*')
-        .eq('published', true);
-
-      const { data: casesData } = await supabase
-        .from('cases')
-        .select('*')
-        .eq('published', true);
-
-
-      const formattedCases: Case[] = (casesData || []).map(c => ({
-
-        id: c.id,
-        laboratory_id: c.laboratory_id,
-        code: c.code,
-        slug: c.slug,
-        title: c.title,
-        category: c.category,
-        level: c.level,
-        xp_reward: c.xp_reward,
-        time_estimate: c.time_estimate,
-        description: c.description || '',
-        symptoms: c.symptoms || [],
-        checklist: c.checklist || [],
-        image_url: c.image_url || '',
-        diagram_url: c.diagram_url as string | null,
-        content: c.content
-      }));
-
-      const formattedLabs: Laboratory[] = (labsData || []).map(l => {
-        const lab = l as any;
-        return {
-          id: l.id,
-          code: l.code,
-          slug: lab.slug || '',
-          name: l.name,
-          description: l.description || '',
-          learningObjectives: l.learning_objectives || [],
-          competencies: lab.competencies || [],
-          prerequisites: l.prerequisites || [],
-          level: l.level as any,
-          estimatedDuration: lab.estimated_duration || l.estimated_time || '',
-          estimatedTime: l.estimated_time || '',
-          totalXp: l.total_xp || 0,
-          defectCount: (casesData || []).filter(c => c.laboratory_id === l.id).length,
-          componentCount: lab.component_count || 0,
-          measurementPointCount: lab.measurement_point_count || 0,
-          diagramCount: lab.diagram_count || 0,
-          resourceCount: lab.resource_count || 0,
-          status: (lab.status as any) || 'active',
-          version: lab.version || '1.0.0',
-          author: lab.author || '',
-          createdAt: l.created_at || new Date().toISOString(),
-          updatedAt: l.updated_at || new Date().toISOString(),
-          progress: 0, 
-          averageAccuracy: 0,
-          bestStreak: 0,
-          achievements: [],
-        };
-      });
-
-      if (!user) {
-        set({ 
-          profile: null,
-          laboratories: formattedLabs,
-          cases: formattedCases,
-          sessions: {},
-          isLoading: false 
-        });
-        return;
-      }
-
-      // Fetch Profile for authenticated user
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-
-      // Fetch Sessions for authenticated user
-      const { data: sessionsData } = await supabase
-        .from('case_sessions')
-        .select('*')
-        .eq('user_id', user.id);
-
-      const sessionsMap: Record<string, CaseSession> = {};
-      sessionsData?.forEach(s => {
-        sessionsMap[s.case_id] = {
-          case_id: s.case_id,
-          status: s.status as any,
-          current_step: s.current_step || 0,
-          answers: (s.answers as any) || {},
-          start_time: s.start_time || new Date().toISOString()
-        };
-      });
-
-      set({ 
-        profile: profile as any, 
-        laboratories: formattedLabs,
-        cases: formattedCases, 
-        sessions: sessionsMap,
-        isLoading: false 
-      });
-
-    } catch (error) {
-      console.error('Error fetching initial data:', error);
-      set({ isLoading: false });
-    }
-  },
-
-
-  updateProfile: async (data) => {
-    const { profile } = get();
-    if (!profile) return;
-
-    const { error } = await supabase
-      .from('profiles')
-      .update(data)
-      .eq('id', profile.id);
-
-    if (!error) {
-      set({ profile: { ...profile, ...data } });
-    }
-  },
-
-  startCase: async (caseId) => {
-    const { profile, sessions } = get();
-    if (!profile) return;
-
-    if (sessions[caseId]) return;
-
-    const newSession = {
-      user_id: profile.id,
-      case_id: caseId,
-      status: 'in_progress',
-      current_step: 0,
-      answers: {},
-      start_time: new Date().toISOString()
-    };
-
-    const { error } = await supabase
-      .from('case_sessions')
-      .upsert(newSession, { onConflict: 'user_id,case_id' });
-
-    if (!error) {
-      set({
-        sessions: {
-          ...sessions,
-          [caseId]: {
-            case_id: caseId,
-            status: 'in_progress',
-            current_step: 0,
-            answers: {},
-            start_time: newSession.start_time
-          }
-        }
-      });
-    }
-  },
-
-  completeCase: async (caseId, success, timeTaken) => {
-    const { profile, sessions } = get();
-    if (!profile || !sessions[caseId]) return;
-
-    const newTotalDiagnoses = (profile.total_diagnoses || 0) + 1;
-    const currentAccuracy = Number(profile.accuracy) || 0;
-    const newAccuracy = success 
-      ? (currentAccuracy * (profile.total_diagnoses || 0) + 100) / newTotalDiagnoses 
-      : (currentAccuracy * (profile.total_diagnoses || 0)) / newTotalDiagnoses;
-    
-    const newAvgTime = ((profile.avg_time || 0) * (profile.total_diagnoses || 0) + timeTaken) / newTotalDiagnoses;
-    
-    const caseObj = get().cases.find(c => c.id === caseId);
-    const xpReward = caseObj?.xp_reward || 0;
-    const newXp = (profile.xp || 0) + xpReward;
-    const newLevel = Math.floor(newXp / 1000) + 1;
-
-    const profileUpdate = {
-      total_diagnoses: newTotalDiagnoses,
-      accuracy: Number(newAccuracy.toFixed(1)),
-      avg_time: Math.floor(newAvgTime),
-      xp: newXp,
-      level: newLevel,
-      last_activity: new Date().toISOString()
-    };
-
-    const { error: sessionError } = await supabase
-      .from('case_sessions')
-      .update({ status: 'completed', completed_at: new Date().toISOString() })
-      .eq('user_id', profile.id)
-      .eq('case_id', caseId);
-
-    if (sessionError) return;
-
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .update(profileUpdate)
-      .eq('id', profile.id);
-
-    if (!profileError) {
-      set({
-        profile: { ...profile, ...profileUpdate },
-        sessions: {
-          ...sessions,
-          [caseId]: {
-            ...sessions[caseId],
-            status: 'completed'
-          }
-        }
-      });
-    }
-  },
-
-  addXp: async (amount) => {
-    const { profile } = get();
-    if (!profile) return;
-
-    const newXp = (profile.xp || 0) + amount;
-    const newLevel = Math.floor(newXp / 1000) + 1;
-
-    const { error } = await supabase
-      .from('profiles')
-      .update({ xp: newXp, level: newLevel })
-      .eq('id', profile.id);
-
-    if (!error) {
-      set({ profile: { ...profile, xp: newXp, level: newLevel } });
-    }
-  },
-
-  signOut: async () => {
-    await supabase.auth.signOut();
-    set({ profile: null, sessions: {}, cases: [] });
-  },
-
-  addToCart: (id) => set((state) => ({
-    cart: state.cart.includes(id) ? state.cart : [...state.cart, id]
-  })),
-
-  removeFromCart: (id) => set((state) => ({
-    cart: state.cart.filter(itemId => itemId !== id)
-  })),
-
-  setTheme: async (theme) => {
-    const { profile } = get();
-    if (profile) {
-      await supabase.from('profiles').update({ theme }).eq('id', profile.id);
-      set({ profile: { ...profile, theme } });
-    }
-  },
-
-  setLanguage: async (language) => {
-    const { profile } = get();
-    if (profile) {
-      await supabase.from('profiles').update({ language }).eq('id', profile.id);
-      set({ profile: { ...profile, language } });
-    }
-  },
-
-  toggleNotifications: async () => {
-    const { profile } = get();
-    if (profile) {
-      const notifications = !profile.notifications;
-      // Note: notifications is a virtual property in UI for now, 
-      // or we can add it to profiles table if needed.
-      set({ profile: { ...profile, notifications } });
-    }
-  }
-}));

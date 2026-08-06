@@ -1,223 +1,170 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { createFileRoute } from "@tanstack/react-router";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { useAppStore } from "@/store/useAppStore";
 import { 
-  Building2, 
   Users, 
-  UserPlus, 
+  TrendingUp, 
+  Award, 
+  Clock, 
+  Download, 
   BarChart3, 
   ShieldCheck, 
-  Download, 
-  Plus, 
-  Briefcase,
-  TrendingUp,
-  Mail
+  LayoutDashboard,
+  Search,
+  Filter
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useB2BData } from "@/hooks/useB2B";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useState } from "react";
 
 export const Route = createFileRoute("/b2b")({
   component: B2BPage,
 });
 
 function B2BPage() {
-  const organization = {
-    name: "Indústria Global S.A.",
-    subscription: { plan: "Enterprise" },
-    teams: [
-      { id: 't1', name: 'Manutenção Elétrica', memberCount: 12 },
-      { id: 't2', name: 'Engenharia de Automação', memberCount: 8 }
-    ]
-  };
+  const { data: b2bResult, isLoading } = useB2BData();
+  const [search, setSearch] = useState("");
+
+  if (isLoading) {
+    return (
+      <div className="p-8 space-y-6">
+        <Skeleton className="h-10 w-48" />
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-24 w-full" />)}
+        </div>
+        <Skeleton className="h-[500px] w-full" />
+      </div>
+    );
+  }
+
+  const { members, stats } = b2bResult?.success ? b2bResult.data : { members: [], stats: { total_members: 0, average_xp: 0, total_certifications: 0, active_simulations: 0 } };
+  
+  const filteredMembers = members.filter(m => 
+    m.full_name.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
-    <div className="p-8 space-y-8 max-w-7xl mx-auto pb-20">
-      {/* Header */}
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div className="flex items-center gap-4">
-          <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
-            <Building2 size={32} />
-          </div>
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">{organization.name}</h1>
-            <p className="text-muted-foreground flex items-center gap-2">
-              Painel Corporativo • <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20">{organization.subscription.plan}</Badge>
-            </p>
-          </div>
+    <div className="p-8 space-y-8 max-w-7xl mx-auto">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Painel Corporativo</h1>
+          <p className="text-muted-foreground">Monitore o desempenho e a evolução técnica da sua equipe.</p>
         </div>
-        <div className="flex gap-2 w-full md:w-auto">
-          <Button variant="outline" className="flex-1 md:flex-none gap-2">
-            <Download size={16} /> Relatórios
-          </Button>
-          <Button className="flex-1 md:flex-none gap-2">
-            <UserPlus size={16} /> Convidar Membro
-          </Button>
+        <div className="flex gap-3">
+          <Button variant="outline" className="gap-2"><Download size={16} /> Relatórios</Button>
+          <Button className="gap-2"><Users size={16} /> Convidar Técnico</Button>
         </div>
-      </header>
+      </div>
 
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card>
-          <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-            <CardDescription>Colaboradores Ativos</CardDescription>
-            <Users className="h-4 w-4 text-muted-foreground" />
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="bg-primary/5 border-primary/20">
+          <CardHeader className="p-4 pb-2">
+            <CardDescription className="text-[10px] uppercase font-bold tracking-widest">Equipe Ativa</CardDescription>
+            <CardTitle className="text-2xl flex items-center justify-between">
+              {stats.total_members}
+              <Users className="text-primary opacity-50" size={20} />
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">32</div>
-            <p className="text-xs text-green-500 font-medium mt-1">+4 este mês</p>
-          </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-            <CardDescription>Precisão Média</CardDescription>
-            <ShieldCheck className="h-4 w-4 text-primary" />
+        <Card className="bg-primary/5 border-primary/20">
+          <CardHeader className="p-4 pb-2">
+            <CardDescription className="text-[10px] uppercase font-bold tracking-widest">Média XP</CardDescription>
+            <CardTitle className="text-2xl flex items-center justify-between">
+              {Math.floor(stats.average_xp).toLocaleString()}
+              <TrendingUp className="text-primary opacity-50" size={20} />
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">92.4%</div>
-            <p className="text-xs text-muted-foreground mt-1">Acima da média industrial</p>
-          </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-            <CardDescription>Horas Treinadas</CardDescription>
-            <BarChart3 className="h-4 w-4 text-secondary" />
+        <Card className="bg-primary/5 border-primary/20">
+          <CardHeader className="p-4 pb-2">
+            <CardDescription className="text-[10px] uppercase font-bold tracking-widest">Certificações</CardDescription>
+            <CardTitle className="text-2xl flex items-center justify-between">
+              {stats.total_certifications}
+              <Award className="text-primary opacity-50" size={20} />
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">1,240h</div>
-            <p className="text-xs text-muted-foreground mt-1">Total acumulado</p>
-          </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-            <CardDescription>Certificados</CardDescription>
-            <TrendingUp className="h-4 w-4 text-primary" />
+        <Card className="bg-primary/5 border-primary/20">
+          <CardHeader className="p-4 pb-2">
+            <CardDescription className="text-[10px] uppercase font-bold tracking-widest">Simulações Hoje</CardDescription>
+            <CardTitle className="text-2xl flex items-center justify-between">
+              {stats.active_simulations}
+              <Clock className="text-primary opacity-50" size={20} />
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">18</div>
-            <p className="text-xs text-green-500 font-medium mt-1">+3 esta semana</p>
-          </CardContent>
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Teams & Departments */}
-        <div className="lg:col-span-2 space-y-8">
-          <section>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold flex items-center gap-2">
-                <Briefcase className="h-5 w-5 text-primary" /> Equipes e Departamentos
-              </h2>
-              <Button variant="ghost" size="sm" className="gap-2 text-primary">
-                <Plus size={14} /> Novo
-              </Button>
+      {/* Team Management */}
+      <Card>
+        <CardHeader className="border-b">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <CardTitle className="text-lg">Gestão de Colaboradores</CardTitle>
+            <div className="flex gap-2 w-full md:w-auto">
+              <div className="relative flex-1 md:w-64">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+                <Input 
+                  placeholder="Pesquisar membro..." 
+                  className="pl-9" 
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+              </div>
+              <Button variant="outline" size="icon"><Filter size={16} /></Button>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {organization.teams.map((team) => (
-                <Card key={team.id} className="hover:bg-accent/30 transition-colors cursor-pointer border-none bg-card/50">
-                  <CardContent className="p-6">
-                    <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <h3 className="font-bold text-lg">{team.name}</h3>
-                        <p className="text-sm text-muted-foreground">{team.memberCount} membros ativos</p>
-                      </div>
-                      <Badge variant="secondary">Equipe</Badge>
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-xs">
-                        <span>Progresso na Trilha NR10</span>
-                        <span className="font-bold text-primary">85%</span>
-                      </div>
-                      <Progress value={85} className="h-1.5" />
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </section>
-
-          {/* Pending Invitations */}
-          <section>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold flex items-center gap-2">
-                <Mail className="h-5 w-5 text-primary" /> Convites Pendentes
-              </h2>
-            </div>
-            <Card className="border-none bg-card/50">
-              <CardContent className="p-0">
-                {[
-                  { email: "roberto@industria.com.br", role: "Técnico", date: "Há 2 dias" },
-                  { email: "ana.claudia@industria.com.br", role: "Engenheira", date: "Há 4 dias" },
-                ].map((invite, i) => (
-                  <div key={i} className={cn(
-                    "flex items-center justify-between p-4",
-                    i !== 0 && "border-t"
-                  )}>
-                    <div className="flex items-center gap-4">
-                      <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground font-bold">
-                        {invite.email[0]?.toUpperCase() || "?"}
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">{invite.email}</p>
-                        <p className="text-xs text-muted-foreground">{invite.role} • {invite.date}</p>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button variant="ghost" size="sm" className="text-destructive">Cancelar</Button>
-                      <Button variant="outline" size="sm">Reenviar</Button>
-                    </div>
+          </div>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="divide-y">
+            {filteredMembers.map((member) => (
+              <div key={member.id} className="flex items-center justify-between p-4 hover:bg-muted/30 transition-colors">
+                <div className="flex items-center gap-4 w-64">
+                  <Avatar>
+                    <AvatarImage src={member.avatar_url} />
+                    <AvatarFallback>{member.full_name.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-semibold text-sm">{member.full_name}</p>
+                    <p className="text-[10px] text-muted-foreground">Nível {member.level}</p>
                   </div>
-                ))}
-              </CardContent>
-            </Card>
-          </section>
-        </div>
+                </div>
+                
+                <div className="flex-1 px-8 hidden lg:block">
+                  <div className="flex justify-between text-[10px] uppercase font-bold tracking-tighter mb-1">
+                    <span>Taxa de Acerto</span>
+                    <span>{member.completion_rate}%</span>
+                  </div>
+                  <Progress value={member.completion_rate} className="h-1.5" />
+                </div>
 
-        {/* Action Sidebar */}
-        <div className="space-y-6">
-          <Card className="bg-primary/5 border-primary/20">
-            <CardHeader>
-              <CardTitle className="text-lg">Próximos Passos</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4 pt-0">
-              <div className="p-4 rounded-xl bg-background/50 border space-y-3">
-                <p className="text-sm font-medium">Trilha Corporativa Privada</p>
-                <p className="text-xs text-muted-foreground">Crie uma trilha personalizada com seus próprios equipamentos e procedimentos.</p>
-                <Button className="w-full text-xs" size="sm">Criar Trilha</Button>
+                <div className="flex items-center gap-12">
+                  <div className="text-right w-24">
+                    <p className="text-[10px] text-muted-foreground uppercase font-bold">XP Total</p>
+                    <p className="font-mono font-bold text-sm">{member.xp.toLocaleString()}</p>
+                  </div>
+                  <div className="text-right w-32 hidden md:block">
+                    <p className="text-[10px] text-muted-foreground uppercase font-bold">Último Acesso</p>
+                    <p className="text-xs">{new Date(member.last_activity).toLocaleDateString()}</p>
+                  </div>
+                  <Button variant="ghost" size="sm" className="gap-2">
+                    <BarChart3 size={14} /> Detalhes
+                  </Button>
+                </div>
               </div>
-              <div className="p-4 rounded-xl bg-background/50 border space-y-3">
-                <p className="text-sm font-medium">Relatório ROI Semanal</p>
-                <p className="text-xs text-muted-foreground">Analise o retorno sobre o investimento em treinamento da sua equipe.</p>
-                <Button variant="outline" className="w-full text-xs" size="sm">Ver Relatório</Button>
+            ))}
+            {filteredMembers.length === 0 && (
+              <div className="p-12 text-center text-muted-foreground italic">
+                Nenhum colaborador encontrado.
               </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Assinatura</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4 pt-0">
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-muted-foreground">Plano Atual</span>
-                <span className="font-bold text-primary">{organization.subscription.plan}</span>
-              </div>
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-muted-foreground">Próxima Fatura</span>
-                <span className="font-medium">R$ 1.240,00</span>
-              </div>
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-muted-foreground">Data</span>
-                <span className="font-medium">15/09/2026</span>
-              </div>
-              <Button variant="outline" className="w-full mt-2" asChild>
-                <Link to="/billing">Gerenciar Assinatura</Link>
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
