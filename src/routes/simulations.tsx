@@ -27,7 +27,7 @@ function SimulationsPage() {
   
   const { data: caseResult, isLoading: caseLoading } = useCase(id || '');
   const startSessionMutation = useStartSession();
-  const { engine, state, currentNode, choices, loadCase, selectChoice, isLoading: diagnosisLoading } = useDiagnosis(id);
+  const { state, loadCase, selectChoice, measure, isLoading: diagnosisLoading } = useDiagnosis(id);
   const [multimeterValue, setMultimeterValue] = useState<number | null>(null);
 
   useEffect(() => {
