@@ -70,7 +70,7 @@ export class CircuitSolver {
             const diff = Math.abs(vA1 - vA2);
             
             const wasEnergized = c.isEnergized;
-            // Logical condition for DOL: if voltage diff is enough, coil tries to pull
+            // Logical condition for DOL/StarDelta: if voltage diff is enough, coil tries to pull
             const hasControlVoltage = diff >= 110;
             
             if (c.failureStatus === 'BURNT_COIL' || c.failureStatus === 'MECHANICAL_STUCK') {
@@ -79,7 +79,9 @@ export class CircuitSolver {
                c.isEnergized = hasControlVoltage;
             }
 
-            if (wasEnergized !== c.isEnergized) changed = true;
+            if (wasEnergized !== c.isEnergized) {
+              changed = true;
+            }
           }
         }
       });
