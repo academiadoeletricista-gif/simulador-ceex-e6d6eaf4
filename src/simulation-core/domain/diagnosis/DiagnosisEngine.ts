@@ -21,6 +21,7 @@ export class DiagnosisEngine {
   private activeFault: FaultType | null = null;
   private currentCase: DiagnosticCase | null = null;
   private currentNodeId: string = 's0';
+  private errorMessage: string | null = null;
   private quizState: QuizState = {
     currentQuestion: null,
     answeredQuestions: [],
