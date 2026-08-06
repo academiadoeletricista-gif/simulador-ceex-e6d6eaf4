@@ -110,6 +110,9 @@ export class DiagnosisEngine {
       if (relay) {
         relay.reset();
         observation = "Relé térmico resetado.";
+        if (this.activeFault === FaultType.TRIPPED_RELAY) {
+          this.activeFault = FaultType.NONE;
+        }
       }
     } else if (action === 'REPLACE_COMPONENT') {
       const comp = this.components.get(params.id);
