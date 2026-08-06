@@ -50,15 +50,30 @@ export class DiagnosisEngine {
         const k1 = this.components.get('K1');
         if (k1) k1.failureStatus = 'BURNT_COIL';
         break;
+      case 'SHORTED_COIL':
+        const k1_short = this.components.get('K1');
+        if (k1_short) k1_short.failureStatus = 'SHORTED_COIL';
+        break;
       case 'OPEN_START_BUTTON':
         const s2 = this.components.get('S2');
         if (s2) s2.failureStatus = 'STUCK_OPEN';
+        break;
+      case 'OPEN_STOP_BUTTON':
+        const s1 = this.components.get('S1');
+        if (s1) s1.failureStatus = 'STUCK_OPEN';
+        break;
+      case 'BROKEN_AUX_CONTACT':
+        const k1_aux = this.components.get('K1');
+        if (k1_aux) k1_aux.failureStatus = 'BROKEN_AUX';
         break;
       case 'TRIPPED_RELAY':
         const f2 = this.components.get('F2') as ThermalRelayComponent;
         if (f2) f2.isTripped = true;
         break;
-      // ... and so on for all 12 faults
+      case 'MECHANICAL_FAILURE':
+        const k1_mech = this.components.get('K1');
+        if (k1_mech) k1_mech.failureStatus = 'MECHANICAL_STUCK';
+        break;
     }
     
     this.components.forEach(c => c.updateState());
