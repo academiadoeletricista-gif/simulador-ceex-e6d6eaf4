@@ -17,24 +17,22 @@ export const Route = createFileRoute("/profile")({
 });
 
 function ProfilePage() {
-  const { 
-    userName, 
-    userAvatar,
-    userPhone,
-    userBio,
-    userCity,
-    userState,
-    userCompany,
-    level, 
-    levelTitle, 
-    xp, 
-    nextLevelXp,
-    accuracy,
-    avgTime,
-    totalDiagnoses,
-    streak,
-    updateProfile 
-  } = useAppStore();
+  const { profile, getLevelTitle, updateProfile } = useAppStore();
+  const userName = profile?.full_name || "Comandante";
+  const userAvatar = profile?.avatar_url || "";
+  const userPhone = profile?.phone || "";
+  const userBio = profile?.bio || "";
+  const userCity = profile?.city || "";
+  const userState = profile?.state || "";
+  const userCompany = profile?.company || "";
+  const level = profile?.level || 1;
+  const levelTitle = getLevelTitle(level);
+  const xp = profile?.xp || 0;
+  const nextLevelXp = 1000;
+  const accuracy = profile?.accuracy || 0;
+  const avgTime = profile?.avg_time || 0;
+  const totalDiagnoses = profile?.total_diagnoses || 0;
+  const streakCount = profile?.streak_current || 0;
 
   const [formData, setFormData] = useState({
     userName,
