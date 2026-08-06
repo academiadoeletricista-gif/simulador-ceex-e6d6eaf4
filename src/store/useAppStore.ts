@@ -166,35 +166,37 @@ export const useAppStore = create<AppState>((set, get) => ({
         content: c.content
       }));
 
-      const formattedLabs: Laboratory[] = (labsData || []).map(l => ({
-        id: l.id,
-        code: l.code,
-        slug: l.slug || '',
-        name: l.name,
-        description: l.description || '',
-        learningObjectives: l.learning_objectives || [],
-        competencies: l.competencies || [],
-        prerequisites: l.prerequisites || [],
-        level: l.level as any,
-        estimatedDuration: l.estimated_duration || l.estimated_time || '',
-        estimatedTime: l.estimated_time || '',
-        totalXp: l.total_xp || 0,
-        defectCount: (casesData || []).filter(c => c.laboratory_id === l.id).length,
-        componentCount: l.component_count || 0,
-        measurementPointCount: l.measurement_point_count || 0,
-        diagramCount: l.diagram_count || 0,
-        resource_count: l.resource_count || 0,
-        status: (l.status as any) || 'active',
-        version: l.version || '1.0.0',
-        author: l.author || '',
-        createdAt: l.created_at || new Date().toISOString(),
-        updatedAt: l.updated_at || new Date().toISOString(),
-        progress: 0, 
-        averageAccuracy: 0,
-        bestStreak: 0,
-        achievements: [],
-        resourceCount: l.resource_count || 0,
-      }));
+      const formattedLabs: Laboratory[] = (labsData || []).map(l => {
+        const lab = l as any;
+        return {
+          id: l.id,
+          code: l.code,
+          slug: lab.slug || '',
+          name: l.name,
+          description: l.description || '',
+          learningObjectives: l.learning_objectives || [],
+          competencies: lab.competencies || [],
+          prerequisites: l.prerequisites || [],
+          level: l.level as any,
+          estimatedDuration: lab.estimated_duration || l.estimated_time || '',
+          estimatedTime: l.estimated_time || '',
+          totalXp: l.total_xp || 0,
+          defectCount: (casesData || []).filter(c => c.laboratory_id === l.id).length,
+          componentCount: lab.component_count || 0,
+          measurementPointCount: lab.measurement_point_count || 0,
+          diagramCount: lab.diagram_count || 0,
+          resourceCount: lab.resource_count || 0,
+          status: (lab.status as any) || 'active',
+          version: lab.version || '1.0.0',
+          author: lab.author || '',
+          createdAt: l.created_at || new Date().toISOString(),
+          updatedAt: l.updated_at || new Date().toISOString(),
+          progress: 0, 
+          averageAccuracy: 0,
+          bestStreak: 0,
+          achievements: [],
+        };
+      });
 
       if (!user) {
         set({ 
