@@ -58,7 +58,9 @@ export const useDiagnosis = (caseId?: string) => {
     loadCase,
     selectChoice,
     collectEvidence,
+    useHint,
     isLoading: sessionLoading,
+
     sessionError: sessionError ? (sessionError as any).message : (sessionResult && !sessionResult.success ? sessionResult.error.message : null),
     isError: (!!sessionResult && !sessionResult.success) || state?.status === SessionStatus.ERROR || !!sessionError
   };
