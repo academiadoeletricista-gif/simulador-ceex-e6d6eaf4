@@ -41,25 +41,36 @@ export class CaseRepository {
       console.log('Fetching cases for lab:', labId);
       const { data, error } = await supabase
         .from('cases')
-        .select('*, case_hypotheses(*)')
-        .eq('published', true);
+        .select('*, case_hypotheses(*)');
 
       if (error) {
         console.error('Error fetching cases:', error);
         return fail(error.message, error.code);
       }
       
-      console.log(`Found ${data?.length || 0} total published cases`);
+      console.log(`Found ${data?.length || 0} total cases in database`);
       
       if (data && data.length > 0) {
-        // First try exact match
-        let filtered = data.filter(c => c.laboratory_id === labId);
+        // Log individual cases to see their published status and lab ID
+        data.forEach(c => console.log(`Case ${c.code}: published=${c.published}, labId=${c.laboratory_id}`));
+
+        // Filter for published cases and match the laboratory
+        let filtered = data.filter(c => c.published === true && c.laboratory_id === labId);
         
-        // If no cases for this lab, but we are in Partida Direta, force PD-001 for now
+        // Hard fallback for Partida Direta pilot case
         if (filtered.length === 0 && (labId === 'f0b5705a-fac8-4f7c-bf17-fbd1b059c1e6' || labId === 'LAB-01')) {
-          console.log('Forcing PD-001 for Partida Direta');
+          console.log('Pilot case fallback: PD-001');
           filtered = data.filter(c => c.code === 'PD-001');
         }
+
+        if (filtered.length > 0) {
+          return ok(filtered.map(this.mapToCamelCase));
+        }
+      }
+
+      return ok([]);
+    } catch (e: any) {
+
 
         if (filtered.length > 0) {
           return ok(filtered.map(this.mapToCamelCase));
