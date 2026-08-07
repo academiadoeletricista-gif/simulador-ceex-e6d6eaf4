@@ -279,6 +279,7 @@ function RootLayout() {
         </div>
       </div>
       <Toaster />
-    </QueryClientProvider>
+    </>
+
   );
 }
