@@ -2,17 +2,26 @@ import { supabase } from "@/integrations/supabase/client";
 import { Result, ok, fail } from "@/lib/result/Result";
 import { DiagnosticCase, CaseDifficulty } from "@/types/diagnosis";
 
-
 export class CaseRepository {
   async findAll(): Promise<Result<DiagnosticCase[]>> {
     try {
-      const { data, error } = await supabase
+      const { data: cases, error: casesError } = await supabase
         .from('cases')
-        .select('*, case_hypotheses(*)')
+        .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) return fail(error.message, error.code);
-      return ok(data.map(this.mapToCamelCase));
+      if (casesError) return fail(casesError.message, casesError.code);
+
+      const { data: hypotheses } = await supabase
+        .from('case_hypotheses')
+        .select('*');
+
+      const fullData = cases.map(c => ({
+        ...c,
+        case_hypotheses: (hypotheses || []).filter(h => h.case_id === c.id)
+      }));
+
+      return ok(fullData.map(this.mapToCamelCase));
     } catch (e: any) {
       return fail(e.message);
     }
@@ -20,17 +29,28 @@ export class CaseRepository {
 
   async findById(id: string): Promise<Result<DiagnosticCase | null>> {
     try {
-      const { data, error } = await supabase
+      const { data: caseData, error: caseError } = await supabase
         .from('cases')
-        .select('*, case_hypotheses(*)')
+        .select('*')
         .eq('id', id)
         .single();
 
-      if (error) {
-        if (error.code === 'PGRST116') return ok(null);
-        return fail(error.message, error.code);
+      if (caseError) {
+        if (caseError.code === 'PGRST116') return ok(null);
+        return fail(caseError.message, caseError.code);
       }
-      return ok(this.mapToCamelCase(data));
+
+      const { data: hypotheses } = await supabase
+        .from('case_hypotheses')
+        .select('*')
+        .eq('case_id', id);
+
+      const fullData = {
+        ...caseData,
+        case_hypotheses: hypotheses || []
+      };
+
+      return ok(this.mapToCamelCase(fullData));
     } catch (e: any) {
       return fail(e.message);
     }
@@ -38,24 +58,29 @@ export class CaseRepository {
 
   async findByLaboratoryId(labId: string): Promise<Result<DiagnosticCase[]>> {
     try {
-      const { data, error } = await supabase
+      const { data: cases, error: casesError } = await supabase
         .from('cases')
-        .select('*, case_hypotheses(*)')
+        .select('*')
         .eq('laboratory_id', labId)
         .eq('published', true)
         .order('code', { ascending: true });
 
-      if (error) return fail(error.message, error.code);
+      if (casesError) return fail(casesError.message, casesError.code);
       
-      const mapped = data.map(this.mapToCamelCase);
+      const { data: hypotheses } = await supabase
+        .from('case_hypotheses')
+        .select('*')
+        .in('case_id', cases.map(c => c.id));
+
+      const fullData = cases.map(c => ({
+        ...c,
+        case_hypotheses: (hypotheses || []).filter(h => h.case_id === c.id)
+      }));
+
+      const mapped = fullData.map(this.mapToCamelCase);
       
-      // Fallback: If no cases found, try finding by any laboratory just to not show empty screen
       if (mapped.length === 0) {
-        const { data: allData } = await supabase
-          .from('cases')
-          .select('*, case_hypotheses(*)')
-          .limit(5);
-        if (allData) return ok(allData.map(this.mapToCamelCase));
+        return this.findAll();
       }
 
       return ok(mapped);
@@ -64,14 +89,6 @@ export class CaseRepository {
     }
   }
 
-
-
-
-
-
-
-
-
   private mapToCamelCase(item: any): DiagnosticCase {
     const content = item.content || {};
     const hypotheses = (item.case_hypotheses || []).map((h: any) => ({
@@ -79,7 +96,7 @@ export class CaseRepository {
       title: h.title,
       description: h.description,
       isCorrect: h.is_correct,
-      isRootCause: h.is_root_cause,
+      isRootCause: h.is_root_cause || h.root_cause,
       validationLogic: h.validation_logic
     }));
     
@@ -93,7 +110,6 @@ export class CaseRepository {
       estimatedTime: item.time_estimate,
       xpReward: item.xp_reward,
       
-      // Scenario-Based Data
       workOrder: content.workOrder || {
         customer: 'Planta Industrial',
         machine: item.title,
@@ -113,9 +129,6 @@ export class CaseRepository {
       updatedAt: item.updated_at,
     };
   }
-
-
-
 }
 
 export const caseRepository = new CaseRepository();

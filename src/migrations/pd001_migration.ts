@@ -7,9 +7,9 @@ import { supabase } from "@/integrations/supabase/client";
 export async function migratePD001() {
   console.log("Starting migration for PD-001...");
 
-  // 1. Get PD-001 case id
+  // 1. Get PD-001 case id (Using public.diagnostic_cases as the main ID source for hypotheses)
   const { data: caseData, error: caseError } = await supabase
-    .from('cases')
+    .from('diagnostic_cases')
     .select('id')
     .eq('code', 'PD-001')
     .single();
@@ -28,7 +28,7 @@ export async function migratePD001() {
       title: "Fusível F1 Queimado",
       description: "O fusível de proteção do circuito de comando pode ter rompido.",
       is_correct: true,
-      is_root_cause: true,
+      root_cause: true, // Use root_cause instead of is_root_cause
       validation_logic: {
         requiredMeasurement: "F1_in-F1_out",
         expectedResult: "0V",
@@ -41,7 +41,7 @@ export async function migratePD001() {
       title: "Relé Térmico Atuado",
       description: "O relé térmico pode ter desarmado por sobrecarga.",
       is_correct: false,
-      is_root_cause: false,
+      root_cause: false,
       validation_logic: {
         requiredMeasurement: "95-96",
         expectedResult: "0V",
@@ -54,7 +54,7 @@ export async function migratePD001() {
       title: "Falha na Bobina K1",
       description: "A bobina do contator K1 pode estar interrompida.",
       is_correct: false,
-      is_root_cause: false,
+      root_cause: false,
       validation_logic: {
         requiredMeasurement: "K1_A1-K1_A2",
         expectedResult: "220V",
