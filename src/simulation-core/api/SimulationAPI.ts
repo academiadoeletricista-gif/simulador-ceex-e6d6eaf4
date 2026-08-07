@@ -39,7 +39,12 @@ export class SimulationAPI {
     this.engine.collectEvidence(evidenceId);
   }
 
+  public useHint() {
+    this.engine.useHint();
+  }
+
   // Backwards compatibility or future use
+
   public measure(nodeId1: string, nodeId2: string): number {
     return 0; 
   }
