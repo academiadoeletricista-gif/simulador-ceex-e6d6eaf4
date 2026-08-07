@@ -17,6 +17,21 @@ export const useDiagnosis = (caseId?: string) => {
   const { data: sessionResult, isLoading: sessionLoading, error: sessionError } = useSession(caseId || '');
   const updateSessionMutation = useUpdateSession();
 
+  // Force re-renders for the timer
+  useState(() => {
+    const interval = setInterval(() => {
+      setTicker(t => t + 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  });
+
+  const getLatestState = useCallback(() => {
+    const newState = player.getPlayerState();
+    setState(newState);
+    return newState;
+  }, [player]);
+
+
   const loadCase = useCallback((dbCase: DiagnosticCase) => {
     player.startSession(dbCase);
     setState(player.getPlayerState());
