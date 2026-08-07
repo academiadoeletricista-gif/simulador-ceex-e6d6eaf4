@@ -53,7 +53,7 @@ export const useDiagnosis = (caseId?: string) => {
     selectChoice,
     collectEvidence,
     isLoading: sessionLoading,
-    sessionError: sessionError ? (sessionError as any).message : (sessionResult && !sessionResult.success ? sessionResult.message : null),
+    sessionError: sessionError ? (sessionError as any).message : (sessionResult && !sessionResult.success ? sessionResult.error.message : null),
     isError: (!!sessionResult && !sessionResult.success) || state?.status === SessionStatus.ERROR || !!sessionError
   };
 };
