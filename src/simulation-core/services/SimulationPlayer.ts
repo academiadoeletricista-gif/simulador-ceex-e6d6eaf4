@@ -62,18 +62,12 @@ export class SimulationPlayer {
   }
 
   /**
-   * Performs a physical measurement between two nodes
+   * Collects evidence during investigation
    */
-  public performMeasurement(node1: string, node2: string): number {
-    return this.api.measure(node1, node2);
+  public collectEvidence(evidenceId: string) {
+    this.api.collectEvidence(evidenceId);
   }
 
-  /**
-   * Answers a technical quiz question
-   */
-  public submitQuizAnswer(optionIndex: number) {
-    this.api.answerQuiz(optionIndex);
-  }
 
   /**
    * Gets the current observable state of the simulation
