@@ -12,7 +12,9 @@ export class DiagnosisEngine {
   private history: any[] = [];
   
   // Scenario state
-  private hypotheses: Array<{ id: string; label: string; confidence: number }> = [];
+  private hypotheses: Array<{ id: string; label: string; confidence: number; description?: string; status?: 'pending' | 'confirmed' | 'discarded' }> = [];
+  private selectedHypothesisId: string | null = null;
+  private confirmedRootCause: boolean = false;
   private evidence: Array<{ id: string; type: any; label: string; value: string }> = [];
   private measurementPoints: string[] = [];
   private unlockedTools: string[] = ['Visual Inspection', 'Multimeter', 'Diagram'];

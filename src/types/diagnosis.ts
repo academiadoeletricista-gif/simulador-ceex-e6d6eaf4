@@ -34,6 +34,7 @@ export interface DiagnosticCase {
   }>;
 
   hints?: CaseHint[];
+  hypotheses?: CaseHypothesis[];
   availableTools: string[];
 
   
@@ -87,6 +88,21 @@ export interface DecisionOption {
   xpReward?: number;
   unlockedEvidenceIds?: string[];
 }
+
+export interface CaseHypothesis {
+  id: string;
+  title: string;
+  description: string;
+  isCorrect: boolean;
+  isRootCause: boolean;
+  validationLogic: {
+    requiredMeasurement: string;
+    expectedResult: string;
+    ifMatch: 'confirma' | 'descarta';
+    ifNoMatch: 'confirma' | 'descarta';
+  };
+}
+
 
 
 

@@ -24,11 +24,16 @@ export interface SimulationState {
   
   // Scenario Engine state
   currentNodeId: string;
+  selectedHypothesisId?: string | null;
+  confirmedRootCause?: boolean;
   currentHypotheses: Array<{
     id: string;
     label: string;
     confidence: number;
+    description?: string;
+    status?: 'pending' | 'confirmed' | 'discarded';
   }>;
+
   collectedEvidence: Array<{
     id: string;
     type: 'visual' | 'measurement' | 'inspection' | 'document';
