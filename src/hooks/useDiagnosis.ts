@@ -46,8 +46,14 @@ export const useDiagnosis = (caseId?: string) => {
     player.collectEvidence(evidenceId);
     setState(player.getPlayerState());
   }, [player]);
+  
+  const useHint = useCallback(() => {
+    player.useHint();
+    setState(player.getPlayerState());
+  }, [player]);
 
   return {
+
     state,
     loadCase,
     selectChoice,
