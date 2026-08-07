@@ -62,7 +62,8 @@ export async function migratePD001() {
         ifNoMatch: "descarta"
       }
     }
-  ];
+  ] as any[];
+
 
   // Clean existing hypotheses for this case first to avoid duplicates
   await supabase.from('case_hypotheses').delete().eq('case_id', caseId);
