@@ -160,9 +160,17 @@ function SimulationsPage() {
         {/* Sidebar: Navigation & Hypotheses */}
         <aside className="w-80 border-r bg-card/30 flex flex-col p-6 space-y-8 overflow-y-auto">
           <div className="space-y-4">
-            <h3 className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest flex items-center gap-2">
-              <Layers size={12} /> Fluxo de Trabalho
-            </h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest flex items-center gap-2">
+                <Layers size={12} /> Fluxo de Trabalho
+              </h3>
+              <div className="flex items-center gap-1">
+                <div className="h-1 w-8 bg-primary rounded-full" />
+                <div className={cn("h-1 w-8 rounded-full", activeTab === 'investigation' || activeTab === 'report' ? "bg-primary" : "bg-muted")} />
+                <div className={cn("h-1 w-8 rounded-full", activeTab === 'report' ? "bg-primary" : "bg-muted")} />
+              </div>
+            </div>
+
             <div className="space-y-2">
               {[
                 { id: 'work-order', label: 'Ordem de Serviço', icon: FileText },
