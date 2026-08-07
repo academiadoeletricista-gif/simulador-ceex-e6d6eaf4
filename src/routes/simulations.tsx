@@ -83,7 +83,7 @@ function SimulationsPage() {
   const anyError = isError || !caseResult?.success || !!caseError;
 
   // Waiting for state initialization after case is loaded
-  if (activeCase && !anyError && !state) {
+  if (activeCase && !anyError && (!state || state.status === 'ERROR')) {
     return (
       <div className="flex flex-col items-center justify-center h-[calc(100vh-4rem)] space-y-4">
         <Activity size={48} className="text-primary animate-pulse" />
