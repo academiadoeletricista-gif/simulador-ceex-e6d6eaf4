@@ -433,7 +433,10 @@ function SimulationsPage() {
                             key={point}
                             variant="secondary" 
                             className="h-10 text-[10px] font-mono hover:bg-primary/20 flex justify-between px-3"
-                            onClick={() => selectChoice('measure_voltage', { point })}
+                            onClick={() => {
+                              const points = point.split('-');
+                              selectChoice('measure_voltage', { pointA: points[0], pointB: points[1] });
+                            }}
                           >
                             <span>{point}</span>
                             <ArrowRight size={10} className="opacity-30" />
