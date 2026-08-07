@@ -153,9 +153,10 @@ export class DiagnosisEngine {
       collectedEvidence: this.evidence,
       unlockedTools: this.unlockedTools,
       activeHints: this.activeHints,
+      measurementPoints: this.measurementPoints,
       timer: Math.floor((Date.now() - this.startTime) / 1000)
-
     };
+
   }
 }
 
