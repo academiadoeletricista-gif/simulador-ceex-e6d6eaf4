@@ -36,4 +36,6 @@ export interface SimulationState {
     value: string;
   }>;
   unlockedTools: string[];
+  activeHints: string[];
+  timer: number;
 }
