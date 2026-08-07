@@ -96,9 +96,10 @@ export class CaseRepository {
         .maybeSingle();
 
       if (caseError) {
-        if (caseError.code === 'PGRST116') return ok(null);
         return fail(caseError.message, caseError.code);
       }
+
+      if (!caseItem) return ok(null);
 
       const { data: hypotheses } = await supabase
         .from('case_hypotheses')
