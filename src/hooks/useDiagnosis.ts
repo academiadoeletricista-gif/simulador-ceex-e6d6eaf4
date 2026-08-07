@@ -3,6 +3,7 @@ import { SimulationPlayer } from '../simulation-core/services/SimulationPlayer';
 import { SimulationState, SessionStatus } from '../simulation-core/domain/sessions/SimulationSession';
 import { useSession, useUpdateSession } from './useSession';
 import { DiagnosticCase } from '../types/diagnosis';
+import { caseRepository } from '@/repositories/CaseRepository';
 
 export const useDiagnosis = (caseId?: string) => {
   const [ticker, setTicker] = useState(0);
@@ -33,12 +34,17 @@ export const useDiagnosis = (caseId?: string) => {
   }, [player]);
 
   useEffect(() => {
-    if (sessionResult?.success && sessionResult.data?.case) {
-      console.log(`[useDiagnosis] Auto-loading case from session: ${sessionResult.data.case.code}`);
-      player.startSession(sessionResult.data.case);
-      setState(player.getPlayerState());
+    if (sessionResult?.success && sessionResult.data && caseId) {
+      console.log(`[useDiagnosis] Found session for caseId: ${caseId}. Fetching case data...`);
+      caseRepository.findById(caseId).then(result => {
+        if (result.success && result.data) {
+          console.log(`[useDiagnosis] Auto-loading case: ${result.data.code}`);
+          player.startSession(result.data);
+          setState(player.getPlayerState());
+        }
+      });
     }
-  }, [sessionResult, player]);
+  }, [sessionResult, player, caseId]);
 
   const selectChoice = useCallback(async (choiceId: string, params: any = {}) => {
     player.handleAction(choiceId, params);
