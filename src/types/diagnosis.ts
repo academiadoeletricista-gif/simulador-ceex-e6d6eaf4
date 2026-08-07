@@ -49,6 +49,13 @@ export interface DecisionNode {
   situation: string;
   isCompletion?: boolean;
   options: DecisionOption[];
+  // New field for step-by-step guidance
+  steps?: Array<{
+    situation: string;
+    reading?: string | null;
+    correct: string;
+    wrong?: [string, string][];
+  }>;
 }
 
 export interface DecisionOption {
