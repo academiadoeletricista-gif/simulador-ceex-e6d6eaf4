@@ -39,10 +39,10 @@ export const useDiagnosis = (caseId?: string) => {
 
   const selectChoice = useCallback(async (choiceId: string, params: any = {}) => {
     player.handleAction(choiceId, params);
-    const newState = player.getPlayerState();
-    setState(newState);
-
+    const newState = getLatestState();
+    
     // Persist session to database
+
     if (newState && caseId && sessionResult?.success && sessionResult.data) {
       await updateSessionMutation.mutateAsync({
         id: sessionResult.data.id,
