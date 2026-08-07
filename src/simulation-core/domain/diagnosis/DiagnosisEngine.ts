@@ -15,6 +15,10 @@ export class DiagnosisEngine {
   private hypotheses: Array<{ id: string; label: string; confidence: number }> = [];
   private evidence: Array<{ id: string; type: any; label: string; value: string }> = [];
   private unlockedTools: string[] = ['Visual Inspection', 'Multimeter', 'Diagram'];
+  private activeHints: string[] = [];
+  private timer: number = 0;
+  private timerInterval: any = null;
+
 
   constructor() {}
 
