@@ -376,57 +376,91 @@ function SimulationsPage() {
               <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500 pb-20">
                 <div className="flex justify-between items-center">
                    <h2 className="text-2xl font-bold flex items-center gap-3">
-                     <Search className="text-primary" /> Estágio de Investigação
+                     <Search className="text-primary" /> Investigação Técnica
                    </h2>
-                   <Badge variant="outline" className="font-mono">{state.collectedEvidence.length} Evidências</Badge>
+                   <Badge variant="outline" className="font-mono">{state.history.filter(h => h.type === 'MEASUREMENT').length} Medições</Badge>
                 </div>
 
-                {/* Multimeter Tool */}
-                {/* Multimeter Tool (Simplified for Scenario Engine) */}
-                <Card className="border-2 border-primary/20 bg-card/50">
-                    <CardHeader className="py-3 border-b flex flex-row items-center justify-between">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Actions & Tools */}
+                  <Card className="border-primary/20 bg-card">
+                    <CardHeader>
                       <CardTitle className="text-xs font-black uppercase tracking-widest flex items-center gap-2">
-                        <Zap size={14} className="text-primary" /> Multímetro
+                        <Zap size={14} className="text-primary" /> Ações e Ferramentas
                       </CardTitle>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="h-6 text-[10px] uppercase font-bold text-muted-foreground"
-                        onClick={() => setInfoCollapsed(!infoCollapsed)}
-                      >
-                        {infoCollapsed ? "Abrir" : "Fechar"}
-                      </Button>
                     </CardHeader>
-                    {!infoCollapsed && (
-                      <CardContent className="p-4">
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                          {state.measurementPoints.map((point) => {
-                            const isRequired = state.selectedHypothesisId && 
-                              (activeCase as any).hypotheses?.find((h: any) => h.id === state.selectedHypothesisId)?.validationLogic?.requiredMeasurement === point;
+                    <CardContent className="space-y-3">
+                      {state.unlockedTools.map((tool, i) => (
+                        <Button 
+                          key={i}
+                          variant="outline" 
+                          className="w-full justify-start h-12 gap-3 font-bold border-muted hover:border-primary/50 transition-all"
+                          onClick={() => {
+                            if (tool.includes('Inspeção')) {
+                              selectChoice('inspect_visual');
+                            }
+                          }}
+                        >
+                          <Search size={16} className="text-muted-foreground" /> {tool}
+                        </Button>
+                      ))}
+                      
+                      <div className="pt-4 border-t space-y-2">
+                        <p className="text-[10px] font-bold uppercase text-muted-foreground mb-2">Ações Especiais</p>
+                        <Button 
+                          variant={state.confirmedRootCause ? "default" : "secondary"}
+                          disabled={!state.confirmedRootCause}
+                          className="w-full h-12 gap-3 font-bold"
+                          onClick={() => selectChoice('perform_repair')}
+                        >
+                          <Hammer size={16} /> Realizar Reparo e Validar
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
 
-                            return (
-                              <Button 
-                                key={point} 
-                                variant={isRequired ? "default" : "outline"} 
-                                size="sm" 
-                                className={cn(
-                                  "text-[10px] font-mono h-8 flex justify-between group/btn relative overflow-hidden",
-                                  isRequired && "ring-2 ring-primary ring-offset-2 animate-pulse"
-                                )}
-                                onClick={() => {
-                                  selectChoice('MEASURE', { point });
-                                }}
-                              >
-                                <span>{point}</span>
-                                <ArrowRight size={10} className="group-hover/btn:translate-x-1 transition-transform" />
-                              </Button>
-                            );
-                          })}
+                  {/* Multimeter Measurement Points */}
+                  <Card className="border-primary/20 bg-card">
+                    <CardHeader>
+                      <CardTitle className="text-xs font-black uppercase tracking-widest flex items-center gap-2">
+                        <Activity size={14} className="text-primary" /> Pontos de Medição
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      <div className="grid grid-cols-2 gap-2">
+                        {state.measurementPoints.map((point) => (
+                          <Button 
+                            key={point}
+                            variant="secondary" 
+                            className="h-10 text-[10px] font-mono hover:bg-primary/20 flex justify-between px-3"
+                            onClick={() => selectChoice('measure_voltage', { point })}
+                          >
+                            <span>{point}</span>
+                            <ArrowRight size={10} className="opacity-30" />
+                          </Button>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
 
+                {state.history.filter(h => h.type === 'MEASUREMENT' || h.type === 'HYPOTHESIS_UPDATE').length > 0 && (
+                  <div className="space-y-4">
+                    <h3 className="text-xs font-black uppercase tracking-widest text-muted-foreground">Log de Evidências Recentes</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {state.history.filter(h => h.type === 'MEASUREMENT' || h.type === 'HYPOTHESIS_UPDATE').slice(-4).reverse().map((h, i) => (
+                        <div key={i} className={cn(
+                          "bg-card border-l-4 p-4 rounded-lg shadow-sm space-y-1",
+                          h.type === 'HYPOTHESIS_UPDATE' ? "border-green-500 bg-green-500/5" : "border-primary"
+                        )}>
+                          <p className="text-[10px] uppercase font-bold text-muted-foreground">{h.type === 'HYPOTHESIS_UPDATE' ? 'Diagnóstico' : 'Medição'}</p>
+                          <p className="text-sm font-mono font-bold">{h.description}</p>
                         </div>
-                      </CardContent>
-                    )}
-                </Card>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
 
 
                 {/* Scenario Node Context */}
