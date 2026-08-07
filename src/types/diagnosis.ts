@@ -33,7 +33,9 @@ export interface DiagnosticCase {
     impacts?: Record<string, number>; // Maps faultId -> confidence change
   }>;
 
+  hints?: CaseHint[];
   availableTools: string[];
+
   
   // Metadata & Legacy
   category?: string;
