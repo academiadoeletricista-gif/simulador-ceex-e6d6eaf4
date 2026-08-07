@@ -71,15 +71,15 @@ export const useDiagnosis = (caseId?: string) => {
 
   return {
 
-    state,
+    state: player.getPlayerState(), // Always get fresh state for timer
     loadCase,
     selectChoice,
     collectEvidence,
     useHint,
     isLoading: sessionLoading,
-
     sessionError: sessionError ? (sessionError as any).message : (sessionResult && !sessionResult.success ? sessionResult.error.message : null),
     isError: (!!sessionResult && !sessionResult.success) || state?.status === SessionStatus.ERROR || !!sessionError
   };
 };
+
 
