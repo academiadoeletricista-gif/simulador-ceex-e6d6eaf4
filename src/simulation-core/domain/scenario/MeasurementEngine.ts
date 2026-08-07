@@ -20,7 +20,8 @@ export class MeasurementEngine {
       e.type === 'measurement' && (
         e.label === point || 
         e.label.split('-').reverse().join('-') === point ||
-        (point.includes('-') && e.label === point.split('-')[0]) // Fallback for single point in list
+        (point.includes('-') && (e.label === point.split('-')[0] || e.label === point.split('-')[1])) || // Fallback for single point in list
+        (e.label.includes('(') && e.label.includes(point)) // Match "1-2 (S0)" with "1-2"
       )
     );
 

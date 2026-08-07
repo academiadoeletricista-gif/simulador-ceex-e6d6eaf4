@@ -78,7 +78,7 @@ export class ScenarioRuntime {
         description: h.description,
         status: 'PENDING',
         isCorrect: h.isCorrect,
-        isRootCause: h.isRootCause,
+        isRootCause: !!(h.isRootCause || (h as any).rootCause),
         validationLogic: h.validationLogic,
         confidence: 0
       } as any));
