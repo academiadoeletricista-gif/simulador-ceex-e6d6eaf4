@@ -38,37 +38,28 @@ export class CaseRepository {
 
   async findByLaboratoryId(labId: string): Promise<Result<DiagnosticCase[]>> {
     try {
-      console.log('CaseRepository: EMERGENCY OVERRIDE for lab:', labId);
+      const { data, error } = await supabase
+        .from('cases')
+        .select('*, case_hypotheses(*)')
+        .eq('laboratory_id', labId)
+        .eq('published', true)
+        .order('code', { ascending: true });
+
+      if (error) return fail(error.message, error.code);
       
-      const manualCase: DiagnosticCase = {
-        id: 'manual-pd-001-' + labId,
-        code: 'PD-001',
-        title: 'Motor não liga - Fusível Queimado',
-        description: 'O motor de uma bomba hidráulica parou de funcionar subitamente após um pico de tensão na rede.',
-        laboratoryId: labId,
-        difficulty: 'Iniciante' as CaseDifficulty,
-        estimatedTime: '15 min',
-        xpReward: 300,
-        workOrder: {
-          customer: 'Planta de Processamento',
-          machine: 'Bomba de Recalque M1',
-          symptoms: 'Motor não apresenta sinais de vida ao acionar S1.'
-        },
-        decisionTree: [],
-        possibleFaults: [],
-        evidenceData: [],
-        hints: [],
-        hypotheses: [],
-        availableTools: ['Multímetro', 'Inspeção Visual'],
-        status: 'published',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
+      const mapped = data.map(this.mapToCamelCase);
       
-      console.log('CaseRepository: Returning manual case bypass');
-      return ok([manualCase]);
+      // Fallback: If no cases found, try finding by any laboratory just to not show empty screen
+      if (mapped.length === 0) {
+        const { data: allData } = await supabase
+          .from('cases')
+          .select('*, case_hypotheses(*)')
+          .limit(5);
+        if (allData) return ok(allData.map(this.mapToCamelCase));
+      }
+
+      return ok(mapped);
     } catch (e: any) {
-      console.error('CaseRepository Exception:', e);
       return fail(e.message);
     }
   }
