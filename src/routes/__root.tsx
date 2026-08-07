@@ -7,7 +7,9 @@ import {
   HeadContent,
   Scripts,
   useLocation,
+  useNavigate,
 } from "@tanstack/react-router";
+
 import { useEffect, useState, type ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { reportLovableError } from "../lib/lovable-error-reporting";
