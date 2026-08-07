@@ -1,8 +1,6 @@
-import { DiagnosisEngine, FaultType } from '../domain/diagnosis/DiagnosisEngine';
+import { DiagnosisEngine } from '../domain/diagnosis/DiagnosisEngine';
 import { SimulationState } from '../domain/sessions/SimulationSession';
-import { DOLCircuit } from '../domain/circuits/library/DOLCircuit';
-import { StarDeltaCircuit } from '../domain/circuits/library/StarDeltaCircuit';
-import { ReversingCircuit } from '../domain/circuits/library/ReversingCircuit';
+import { DiagnosticCase } from '@/types/diagnosis';
 
 export class SimulationAPI {
   private static instance: SimulationAPI;
@@ -19,27 +17,13 @@ export class SimulationAPI {
     return SimulationAPI.instance;
   }
 
-  public createSession(caseData: any) {
+  public createSession(caseData: DiagnosticCase) {
     try {
-      console.log(`[SimulationAPI] Creating new session for case: ${caseData?.id}`);
+      console.log(`[SimulationAPI] Creating new scenario session for case: ${caseData?.id}`);
       this.engine = new DiagnosisEngine();
-      
-      // circuitId determines which topology to load
-      const circuitId = caseData?.circuitId || 'DOL';
-      console.log(`[SimulationAPI] Loading circuit topology: ${circuitId}`);
-      
-      this.engine.loadCase(caseData, (solver) => {
-        if (circuitId === 'STAR_DELTA') {
-          StarDeltaCircuit.setup(solver);
-        } else if (circuitId === 'REVERSING') {
-          ReversingCircuit.setup(solver);
-        } else {
-          DOLCircuit.setup(solver);
-        }
-      });
+      this.engine.loadCase(caseData);
     } catch (error) {
       console.error(`[SimulationAPI] Error creating session:`, error);
-      // Engine handles status update to ERROR
     }
   }
 
@@ -47,20 +31,25 @@ export class SimulationAPI {
     return this.engine.getState();
   }
 
-  public executeAction(action: string, params: any = {}) {
-    this.engine.performAction(action, params);
+  public executeAction(actionId: string, params: any = {}) {
+    this.engine.performAction(actionId, params);
   }
 
+  public collectEvidence(evidenceId: string) {
+    this.engine.collectEvidence(evidenceId);
+  }
+
+  // Backwards compatibility or future use
   public measure(nodeId1: string, nodeId2: string): number {
-    return this.engine.measureVoltage(nodeId1, nodeId2);
+    return 0; 
   }
 
   public answerQuiz(optionIndex: number) {
-    this.engine.answerQuiz(optionIndex);
+    // Handled by decision nodes in new engine
   }
-
 
   public async saveSession(sessionId: string, userId: string) {
     console.log(`Saving session ${sessionId} for user ${userId}`);
   }
 }
+

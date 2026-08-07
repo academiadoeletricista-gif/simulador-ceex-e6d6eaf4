@@ -1,6 +1,3 @@
-import { Asset } from "./assets";
-import { FaultType } from "@/simulation-core/domain/diagnosis/FaultType";
-
 export type CaseDifficulty = 'Iniciante' | 'Intermediário' | 'Avançado' | 'Especialista';
 export type CaseStatus = 'draft' | 'published' | 'archived';
 
@@ -10,59 +7,57 @@ export interface DiagnosticCase {
   title: string;
   description: string;
   laboratoryId: string;
-  topology: 'DOL' | 'REVERSING' | 'STAR_DELTA';
   difficulty: CaseDifficulty;
   estimatedTime: string;
   xpReward: number;
-  objective: string;
   
-  // Electrical Core
-  circuit: {
-    baseVoltage: number;
-    nodes: Array<{ id: string; voltage: number; connections: string[] }>;
+  // Scenario Data (Supabase content JSONB)
+  workOrder?: {
+    customer: string;
+    machine: string;
+    symptoms: string;
   };
   
-  components: CaseComponent[];
-  
-  fault: {
-    type: FaultType;
-    componentTag: string;
-    description: string;
-  };
-  
-  initialState: Record<string, any>;
-  expectedMeasurements: Array<{ point: string; value: number }>;
-  
-  // Tools & Actions
-  availableTools: string[];
-  repairActions: Array<{
+  decisionTree?: DecisionNode[];
+  possibleFaults?: Array<{
     id: string;
     label: string;
-    type: 'REPLACE' | 'RESET' | 'CLEAN' | 'ADJUST';
-    targetTag: string;
-    clearsFault: boolean;
+    confidence: number;
   }>;
   
-  completionCriteria: {
-    faultRemoved: boolean;
-    motorRunning: boolean;
-    allMeasurementsCorrect?: boolean;
-  };
+  evidenceData?: Array<{
+    id: string;
+    type: 'visual' | 'measurement' | 'inspection' | 'document';
+    label: string;
+    value: string;
+    impacts?: Record<string, number>; // Maps faultId -> confidence change
+  }>;
 
-  // Legacy/UI Compatibility
+  availableTools: string[];
+  
+  // Metadata & Legacy
   category?: string;
+  topology?: string;
   status?: CaseStatus;
   createdAt?: string;
   updatedAt?: string;
-  symptoms?: Array<{ id: string; description: string }>;
 }
 
-export interface CaseComponent {
+export interface DecisionNode {
   id: string;
-  tag: string;
-  type: 'CONTACTOR' | 'BREAKER' | 'RELAY' | 'FUSE' | 'MOTOR' | 'BUTTON' | 'TIMER';
   label: string;
-  isFaulty: boolean;
-  failureDetails?: string;
+  situation: string;
+  isCompletion?: boolean;
+  options: DecisionOption[];
 }
+
+export interface DecisionOption {
+  label: string;
+  detail?: string;
+  consequence?: string;
+  nextNodeId: string;
+  xpReward?: number;
+  unlockedEvidenceIds?: string[];
+}
+
 

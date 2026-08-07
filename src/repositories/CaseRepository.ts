@@ -55,45 +55,33 @@ export class CaseRepository {
     
     return {
       id: item.id,
-      code: item.code || content.code,
+      code: item.code || content.code || 'PD-000',
       title: item.title,
       description: item.description || content.description,
       laboratoryId: item.laboratory_id,
-      topology: content.topology || 'DOL',
       difficulty: item.level as CaseDifficulty,
       estimatedTime: item.time_estimate,
       xpReward: item.xp_reward,
-      objective: content.objective || item.description,
       
-      circuit: content.circuit || { baseVoltage: 220, nodes: [] },
-      components: content.components || [],
-      
-      fault: content.fault || {
-        type: 'NONE',
-        componentTag: '',
-        description: 'Nenhuma falha'
+      // Scenario-Based Data
+      workOrder: content.workOrder || {
+        customer: 'Planta Industrial',
+        machine: item.title,
+        symptoms: item.description || 'Falha desconhecida'
       },
-      
-      initialState: content.initialState || {},
-      expectedMeasurements: content.expectedMeasurements || [],
-      
+      decisionTree: content.decisionTree || [],
+      possibleFaults: content.possibleFaults || [],
+      evidenceData: content.evidenceData || [],
       availableTools: content.availableTools || ['Multímetro', 'Inspeção Visual'],
-      repairActions: content.repairActions || [],
-      
-      completionCriteria: content.completionCriteria || {
-        faultRemoved: true,
-        motorRunning: true
-      },
 
+      topology: content.topology,
       category: item.category,
       status: (item.published ? 'published' : 'draft') as any,
       createdAt: item.created_at,
       updatedAt: item.updated_at,
-      symptoms: Array.isArray(item.symptoms) 
-        ? item.symptoms.map((s: string, i: number) => ({ id: `${item.id}-s-${i}`, description: s }))
-        : [],
     };
   }
+
 
 }
 
