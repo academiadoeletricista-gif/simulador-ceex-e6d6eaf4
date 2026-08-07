@@ -187,18 +187,13 @@ function RootLayout() {
     { icon: LayoutDashboard, label: "Dashboard", path: "/" },
     { icon: Library, label: "Biblioteca", path: "/library" },
     { icon: Zap, label: "Simulações", path: "/simulations" },
-    { icon: Target, label: "Desafios", path: "/challenges" },
-    { icon: Trophy, label: "Ranking", path: "/ranking" },
     { icon: Award, label: "Conquistas", path: "/achievements" },
-    { icon: Award, label: "Certificações", path: "/certifications" },
-    { icon: Briefcase, label: "Empresas", path: "/b2b" },
-    { icon: Store, label: "Marketplace", path: "/marketplace" },
-    { icon: User, label: "Perfil", path: "/profile" },
-    { icon: CreditCard, label: "Assinatura", path: "/billing" },
-    { icon: Settings, label: "Configurações", path: "/settings" },
-    { icon: ShieldCheck, label: "Admin", path: "/admin" },
-    { icon: BarChart3, label: "Enterprise", path: "/analytics" },
+    { icon: Trophy, label: "Ranking", path: "/ranking" },
   ];
+
+  // Hidden/Admin items
+  const isAdmin = profile?.role === 'admin';
+
 
   if (isAuthenticating) {
     return (
