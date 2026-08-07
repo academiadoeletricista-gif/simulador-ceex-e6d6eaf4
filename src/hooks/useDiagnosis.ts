@@ -9,6 +9,8 @@ import { DiagnosticCase } from '../types/diagnosis';
  * which centralizes all diagnostic session logic.
  */
 export const useDiagnosis = (caseId?: string) => {
+  const [ticker, setTicker] = useState(0);
+
   const player = SimulationPlayer.getInstance();
   const [state, setState] = useState<SimulationState | null>(player.getPlayerState());
   
