@@ -47,8 +47,11 @@ function SimulationsPage() {
   const { data: caseResult, isLoading: caseLoading, error: caseError } = useCase(id || '');
   const { state, loadCase, selectChoice, useHint, isLoading: diagnosisLoading, isError, sessionError } = useDiagnosis(id);
   const [showDiagram, setShowDiagram] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [infoCollapsed, setInfoCollapsed] = useState(false);
   const [activeTab, setActiveTab] = useState<'work-order' | 'investigation' | 'report'>('work-order');
   const [lastMessage, setLastMessage] = useState<string | null>(null);
+
 
   useEffect(() => {
     if (caseResult?.success && caseResult.data) {
