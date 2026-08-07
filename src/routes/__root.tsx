@@ -22,17 +22,23 @@ import {
   Trophy,
   Award,
   Users,
-  Store,
   User,
   Settings,
   Menu,
   X,
-  Briefcase,
-  CreditCard,
   ShieldCheck,
-  BarChart3,
   LogOut,
+  ChevronDown,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
 import { useProfile } from "@/hooks/useProfile";
 
 import appCss from "../styles.css?url";
