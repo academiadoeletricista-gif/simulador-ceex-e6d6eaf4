@@ -10,6 +10,7 @@ export const useDiagnosis = (caseId?: string) => {
 
   const player = SimulationPlayer.getInstance();
   const [state, setState] = useState<SimulationState | null>(player.getPlayerState());
+  const [isInitializing, setIsInitializing] = useState(false);
   
   const { data: sessionResult, isLoading: sessionLoading, error: sessionError } = useSession(caseId || '');
   const updateSessionMutation = useUpdateSession();
@@ -34,14 +35,19 @@ export const useDiagnosis = (caseId?: string) => {
   }, [player]);
 
   useEffect(() => {
-    if (sessionResult?.success && sessionResult.data && caseId) {
+    if (sessionResult?.success && sessionResult.data && caseId && !isInitializing) {
       console.log(`[useDiagnosis] Found session for caseId: ${caseId}. Fetching case data...`);
+      setIsInitializing(true);
       caseRepository.findById(caseId).then(result => {
         if (result.success && result.data) {
           console.log(`[useDiagnosis] Auto-loading case: ${result.data.code}`);
           player.startSession(result.data);
           setState(player.getPlayerState());
+        } else {
+          console.error(`[useDiagnosis] Failed to fetch case data for initialization:`, result.error);
         }
+      }).finally(() => {
+        setIsInitializing(false);
       });
     }
   }, [sessionResult, player, caseId]);
@@ -81,18 +87,21 @@ export const useDiagnosis = (caseId?: string) => {
     setState(player.getPlayerState());
   }, [player]);
 
-  const derivedIsError = (!!sessionResult && !sessionResult.success) || 
-                         (state?.status === SessionStatus.ERROR) || 
-                         !!sessionError;
+  // If the engine state is already ERROR, we show it.
+  // We ONLY show the error screen if we are NOT loading and have a genuine session/engine error.
+  const isEngineError = state?.status === SessionStatus.ERROR;
+  const isSessionError = !!sessionResult && !sessionResult.success;
+  
+  const derivedIsError = !sessionLoading && (isSessionError || isEngineError || !!sessionError);
 
   return {
-    state: player.getPlayerState() || state, 
+    state: state || player.getPlayerState(), 
     loadCase,
     selectChoice,
     selectHypothesis,
     collectEvidence,
     useHint,
-    isLoading: sessionLoading,
+    isLoading: sessionLoading || isInitializing,
     sessionError: sessionError ? (sessionError as any).message : (sessionResult && !sessionResult.success ? sessionResult.error.message : null),
     isError: derivedIsError
   };
