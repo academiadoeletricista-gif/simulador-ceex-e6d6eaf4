@@ -97,7 +97,7 @@ export class DiagnosisEngine {
       })),
       case: this.currentCase,
       currentNodeId: scenario.currentStepId || 'start',
-      selectedHypothesisId: scenario.hypotheses.find(h => h.status === 'PENDING')?.id || null, 
+      selectedHypothesisId: scenario.hypotheses.find(h => h.status === 'PENDING')?.id || null, lesson: scenario.status === 'COMPLETED' ? (this.currentCase as any).decisionTree?.find((n: any) => n.isCompletion)?.lesson : null, 
       confirmedRootCause: scenario.hypotheses.some(h => h.isRootCause && h.status === 'CONFIRMED'),
       currentHypotheses: scenario.hypotheses.map(h => ({
         id: h.id,
