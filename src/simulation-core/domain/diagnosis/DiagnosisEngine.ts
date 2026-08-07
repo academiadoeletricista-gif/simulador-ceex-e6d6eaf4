@@ -111,7 +111,7 @@ export class DiagnosisEngine {
   }
 
   getState(): SimulationState | null {
-    if (!this.currentCase) {
+    if (!this.currentCase && this.status !== SessionStatus.ERROR) {
         return null;
     }
 
@@ -122,7 +122,7 @@ export class DiagnosisEngine {
       score: this.totalScore,
       error: this.errorMessage,
       history: this.history,
-      case: this.currentCase,
+      case: this.currentCase!,
       currentNodeId: this.currentNodeId,
       currentHypotheses: this.hypotheses,
       collectedEvidence: this.evidence,
