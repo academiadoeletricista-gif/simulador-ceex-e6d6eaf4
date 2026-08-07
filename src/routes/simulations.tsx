@@ -44,8 +44,8 @@ function SimulationsPage() {
   const { id } = Route.useSearch();
   const navigate = useNavigate();
   
-  const { data: caseResult, isLoading: caseLoading } = useCase(id || '');
-  const { state, loadCase, selectChoice, isLoading: diagnosisLoading, isError } = useDiagnosis(id);
+  const { data: caseResult, isLoading: caseLoading, error: caseError } = useCase(id || '');
+  const { state, loadCase, selectChoice, isLoading: diagnosisLoading, isError, sessionError } = useDiagnosis(id);
   const [showDiagram, setShowDiagram] = useState(false);
   const [activeTab, setActiveTab] = useState<'work-order' | 'investigation' | 'report'>('work-order');
   const [lastMessage, setLastMessage] = useState<string | null>(null);
@@ -56,45 +56,61 @@ function SimulationsPage() {
     }
   }, [caseResult, loadCase]);
 
+  // Loading state
   if (caseLoading || diagnosisLoading) {
     return (
       <div className="flex flex-col items-center justify-center h-[calc(100vh-4rem)] space-y-4">
         <Activity size={48} className="text-primary animate-pulse" />
-        <p className="text-muted-foreground animate-pulse">Iniciando cenário de diagnóstico...</p>
+        <p className="text-muted-foreground animate-pulse font-mono uppercase text-xs tracking-widest">Iniciando cenário de diagnóstico...</p>
       </div>
     );
   }
 
   const activeCase = caseResult?.success ? caseResult.data : null;
+  const anyError = isError || !caseResult?.success || !!caseError || !!sessionError;
 
-  if (activeCase && !isError && !state) {
+  // Waiting for state initialization after case is loaded
+  if (activeCase && !anyError && !state) {
     return (
       <div className="flex flex-col items-center justify-center h-[calc(100vh-4rem)] space-y-4">
         <Activity size={48} className="text-primary animate-pulse" />
-        <p className="text-muted-foreground animate-pulse">Preparando cenário...</p>
+        <p className="text-muted-foreground animate-pulse font-mono uppercase text-xs tracking-widest">Preparando cenário...</p>
       </div>
     );
   }
 
-  if (!activeCase || !id || isError || !state) {
+  // Error handling
+  if (!activeCase || !id || anyError || !state) {
+    const errorDetail = state?.error || (caseResult && !caseResult.success ? caseResult.error.message : null) || sessionError || caseError?.message;
+    
     return (
-      <div className="flex flex-col items-center justify-center h-[calc(100vh-4rem)] space-y-4">
-        <div className="p-8 text-center max-w-md space-y-4">
-          <div className="bg-red-500/10 p-4 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
-            <BookOpen size={40} className="text-red-500" />
+      <div className="flex flex-col items-center justify-center h-[calc(100vh-4rem)] space-y-4 p-8">
+        <div className="text-center max-w-md space-y-6">
+          <div className="bg-red-500/10 p-6 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-4 border-2 border-red-500/20">
+            <AlertTriangle size={48} className="text-red-500" />
           </div>
-          <h2 className="text-2xl font-bold tracking-tight">Erro ao carregar sessão</h2>
-          <p className="text-muted-foreground">
-            Houve um problema ao carregar os dados do seu cenário. Tente iniciar novamente pela biblioteca.
-          </p>
-          {state?.error && (
-            <div className="text-xs bg-red-500/5 p-3 rounded font-mono text-red-400 mt-4 text-left border border-red-500/20">
-              {state?.error}
+          <div className="space-y-2">
+            <h2 className="text-2xl font-black uppercase italic tracking-tighter text-foreground">Erro ao carregar sessão</h2>
+            <p className="text-muted-foreground text-sm">
+              Houve um problema ao carregar os dados do seu cenário. Certifique-se de que o laboratório foi iniciado corretamente.
+            </p>
+          </div>
+          
+          {errorDetail && (
+            <div className="text-[10px] bg-card p-4 rounded-lg font-mono text-red-400 border border-red-500/20 text-left overflow-auto max-h-32">
+              <p className="font-bold uppercase mb-1 opacity-50">Debug info:</p>
+              {errorDetail}
             </div>
           )}
-          <Button className="w-full mt-6" onClick={() => navigate({ to: "/library" })}>
-            Ir para Biblioteca
-          </Button>
+
+          <div className="flex flex-col gap-3 pt-4">
+            <Button size="lg" className="w-full font-bold uppercase italic" onClick={() => window.location.reload()}>
+              <RefreshCcw size={18} className="mr-2" /> Tentar Novamente
+            </Button>
+            <Button variant="outline" size="lg" className="w-full font-bold uppercase italic" onClick={() => navigate({ to: "/library" })}>
+              <ArrowLeft size={18} className="mr-2" /> Voltar para Biblioteca
+            </Button>
+          </div>
         </div>
       </div>
     );
