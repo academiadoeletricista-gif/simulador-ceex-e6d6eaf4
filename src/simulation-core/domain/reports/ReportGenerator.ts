@@ -4,12 +4,9 @@ import { SimulationState } from '../sessions/SimulationSession';
 export class ReportGenerator {
   static generate(state: SimulationState, laboratoryName: string): TechnicalReport {
     const duration = Math.floor((Date.now() - state.startTime) / 1000);
-    const inspected = state.history
-      .filter(h => h.action === 'REPLACE_COMPONENT' || h.action === 'MEASURE_VOLTAGE')
-      .map(h => h.params?.id || h.params?.node1)
-      .filter((v, i, a) => v && a.indexOf(v) === i);
-
-    const measurementsCount = state.history.filter(h => h.action === 'MEASURE_VOLTAGE').length;
+    
+    const measurementsCount = state.history.filter(h => h.type === 'MEASUREMENT').length;
+    const inspected = state.collectedEvidence.map(e => e.label);
     
     // Logic for grade based on time and efficiency
     let grade: TechnicalReport['performanceGrade'] = 'B';
@@ -23,7 +20,7 @@ export class ReportGenerator {
       endTime: Date.now(),
       durationSeconds: duration,
       injectedFault: state.currentNodeId,
-      inspectedComponents: inspected as string[],
+      inspectedComponents: inspected,
       measurementsCount,
       quizScore: state.score,
       totalXP: state.xp,
@@ -35,7 +32,8 @@ export class ReportGenerator {
   private static getRecommendations(state: SimulationState): string[] {
     const recs = [];
     if (state.score < 70) recs.push('Revise a teoria de componentes antes da próxima prática.');
-    if (state.history.length > 20) recs.push('Tente ser mais assertivo nas medições para reduzir o tempo de diagnóstico.');
+    if (state.history.length > 20) recs.push('Tente ser mais assertivo nas decisões para reduzir o tempo de diagnóstico.');
     return recs;
   }
 }
+
