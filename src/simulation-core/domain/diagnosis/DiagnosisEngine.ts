@@ -34,6 +34,10 @@ export class DiagnosisEngine {
       this.startTime = Date.now();
       this.history = [];
       this.evidence = [];
+      this.measurementPoints = (caseData as any).topology === 'Reversing' 
+        ? ['L1-L2', 'L2-L3', 'L1-L3', 'F1_in-F1_out', 'K1_1-K1_2', 'K2_1-K2_2', 'Motor_U-Motor_V']
+        : ['L1-N', 'F1_in-F1_out', '95-96', 'Start-A1', 'K1_A1-K1_A2'];
+
       this.totalXP = 0;
       this.totalScore = 100;
       
