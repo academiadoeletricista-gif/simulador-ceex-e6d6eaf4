@@ -265,6 +265,7 @@ function SimulationsPage() {
           </div>
         </aside>
 
+
         {/* Main Content */}
         <main className="flex-1 flex flex-col bg-background relative overflow-y-auto">
           <div className="max-w-4xl mx-auto w-full p-8 space-y-8">
