@@ -170,8 +170,10 @@ export class ScenarioRuntime {
   }
 
   private handleRepair(params: any) {
-    const { componentId = 'F1' } = params; // Default for PD-001
+    const { componentId = 'F1' } = params; 
     
+    if (!this.currentCase) return;
+
     const rootCauseConfirmed = this.state.hypotheses.some(h => h.isRootCause && h.status === 'CONFIRMED');
     
     if (!rootCauseConfirmed) {
@@ -181,18 +183,21 @@ export class ScenarioRuntime {
       return;
     }
 
-    // Success logic for PD-001
-    const isCorrectComponent = componentId === 'F1';
+    // Success logic: Check if the component corresponds to the confirmed root cause hypothesis
+    const confirmedHypothesis = this.state.hypotheses.find(h => h.isRootCause && h.status === 'CONFIRMED');
+    
+    // We can mapping componentId to root cause title or a specific metadata in validationLogic
+    const isCorrectComponent = confirmedHypothesis?.title.includes(componentId);
     
     if (isCorrectComponent) {
       this.isFaultActive = false;
       this.state.status = 'VALIDATING';
-      this.addActionRecord('REPAIR', `Componente ${componentId} substituído. Realize o teste funcional.`, 50);
+      this.addActionRecord('REPAIR', `Componente ${componentId} reparado/substituído. Realize o teste funcional.`, 50);
       
       const repairRecord: RepairRecord = {
         id: `r_${Date.now()}`,
         componentId,
-        action: 'REPLACE',
+        action: 'REPAIR',
         timestamp: new Date().toISOString(),
         success: true
       };
@@ -200,7 +205,7 @@ export class ScenarioRuntime {
     } else {
       this.state.mistakes += 1;
       this.state.score -= 50;
-      this.addActionRecord('REPAIR_ERROR', `Componente incorreto: ${componentId} não é a causa raiz.`, -50);
+      this.addActionRecord('REPAIR_ERROR', `Componente incorreto: ${componentId} não resolve a causa raiz confirmada.`, -50);
     }
   }
 
@@ -211,8 +216,8 @@ export class ScenarioRuntime {
 
   private handleTest(params: any) {
     const desc = this.isFaultActive 
-      ? "O motor não parte. Contator K1 não atracou." 
-      : "O motor partiu normalmente. K1 atracou e M1 está girando.";
+      ? (this.currentCase?.description || "O motor não parte ou apresenta comportamento irregular.") 
+      : "O motor está operando normalmente conforme especificações técnicas.";
     
     this.addActionRecord('TEST', `Teste funcional: ${desc}`, 10);
 
