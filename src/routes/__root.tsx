@@ -139,6 +139,15 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  return (
+    <QueryClientProvider client={queryClient}>
+      <RootLayout />
+    </QueryClientProvider>
+  );
+}
+
+function RootLayout() {
+
   const sidebarOpen = useAppStore(state => state.isSidebarOpen);
   const toggleSidebar = useAppStore(state => state.toggleSidebar);
   const location = useLocation();
@@ -197,7 +206,8 @@ function RootComponent() {
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
+    <>
+
       <div className="flex h-screen overflow-hidden bg-background text-foreground">
         {/* Sidebar */}
         <aside
@@ -269,6 +279,7 @@ function RootComponent() {
         </div>
       </div>
       <Toaster />
-    </QueryClientProvider>
+    </>
+
   );
 }
