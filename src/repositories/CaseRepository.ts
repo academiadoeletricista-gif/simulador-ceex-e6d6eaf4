@@ -21,7 +21,7 @@ export class CaseRepository {
         case_hypotheses: (hypotheses || []).filter(h => h.case_id === c.id)
       }));
 
-      return ok(fullData.map(this.mapToCamelCase));
+      return ok(fullData.map(item => this.mapToCamelCase(item)));
     } catch (e: any) {
       return fail(e.message);
     }
@@ -56,6 +56,49 @@ export class CaseRepository {
     }
   }
 
+  async findByCode(code: string): Promise<Result<DiagnosticCase | null>> {
+    console.log(`Repository: Fetching case with code: ${code}`);
+    try {
+      // 1. Try to fetch from diagnostic_cases first as it has the definitive IDs for hypotheses
+      const { data: diagCase, error: diagError } = await supabase
+        .from('diagnostic_cases')
+        .select('*')
+        .eq('code', code)
+        .single();
+
+      if (!diagError && diagCase) {
+        // Fetch hypotheses for this diagnostic_case ID
+        const { data: hypotheses } = await supabase
+          .from('case_hypotheses')
+          .select('*')
+          .eq('case_id', diagCase.id);
+
+        return ok(this.mapToCamelCase({ ...diagCase, case_hypotheses: hypotheses || [] }));
+      }
+
+      // 2. Fallback to cases table
+      const { data: caseItem, error: caseError } = await supabase
+        .from('cases')
+        .select('*')
+        .eq('code', code)
+        .single();
+
+      if (caseError) {
+        if (caseError.code === 'PGRST116') return ok(null);
+        return fail(caseError.message, caseError.code);
+      }
+
+      const { data: hypotheses } = await supabase
+        .from('case_hypotheses')
+        .select('*')
+        .eq('case_id', caseItem.id);
+
+      return ok(this.mapToCamelCase({ ...caseItem, case_hypotheses: hypotheses || [] }));
+    } catch (e: any) {
+      return fail(e.message);
+    }
+  }
+
   async findByLaboratoryId(labId: string): Promise<Result<DiagnosticCase[]>> {
     try {
       const { data: cases, error: casesError } = await supabase
@@ -77,7 +120,7 @@ export class CaseRepository {
         case_hypotheses: (hypotheses || []).filter(h => h.case_id === c.id)
       }));
 
-      const mapped = fullData.map(this.mapToCamelCase);
+      const mapped = fullData.map(item => this.mapToCamelCase(item));
       
       if (mapped.length === 0) {
         return this.findAll();
