@@ -177,8 +177,15 @@ function RootLayout() {
           const { error } = await supabase.auth.signInAnonymously();
           if (error) {
             console.error("Failed to sign in anonymously:", error);
+          } else {
+            console.log("Anonymous sign-in successful. Running migrations...");
+            await migratePD001();
           }
+        } else {
+          // Check if we need to run migrations for already logged users too
+          await migratePD001();
         }
+
       } catch (err) {
         console.error("Auth bootstrap error:", err);
       } finally {
