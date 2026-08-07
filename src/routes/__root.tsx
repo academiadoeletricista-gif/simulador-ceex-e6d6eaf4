@@ -206,7 +206,8 @@ function RootLayout() {
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
+    <>
+
       <div className="flex h-screen overflow-hidden bg-background text-foreground">
         {/* Sidebar */}
         <aside
