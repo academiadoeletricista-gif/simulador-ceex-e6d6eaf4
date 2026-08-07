@@ -47,8 +47,11 @@ function SimulationsPage() {
   const { data: caseResult, isLoading: caseLoading, error: caseError } = useCase(id || '');
   const { state, loadCase, selectChoice, useHint, isLoading: diagnosisLoading, isError, sessionError } = useDiagnosis(id);
   const [showDiagram, setShowDiagram] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [infoCollapsed, setInfoCollapsed] = useState(false);
   const [activeTab, setActiveTab] = useState<'work-order' | 'investigation' | 'report'>('work-order');
   const [lastMessage, setLastMessage] = useState<string | null>(null);
+
 
   useEffect(() => {
     if (caseResult?.success && caseResult.data) {
@@ -125,128 +128,148 @@ function SimulationsPage() {
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)] overflow-hidden bg-background">
       {/* Header Bar */}
-      <div className="border-b bg-card px-8 py-3 flex items-center justify-between">
+      <div className="border-b bg-card px-8 py-3 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-6">
            <Button variant="ghost" size="sm" onClick={() => navigate({ to: "/library" })} className="gap-2">
-             <ArrowLeft size={16} /> Voltar
+             <ArrowLeft size={16} /> Sair
            </Button>
            <div className="h-6 w-px bg-muted" />
            <div>
-             <h2 className="text-sm font-bold uppercase tracking-tight">{activeCase.title}</h2>
-             <p className="text-[10px] text-muted-foreground font-mono">CODE: {activeCase.code}</p>
+             <h2 className="text-sm font-black uppercase tracking-tight leading-none">{activeCase.title}</h2>
+             <p className="text-[10px] text-muted-foreground font-mono mt-1 leading-none uppercase">ID: {activeCase.code}</p>
            </div>
         </div>
 
-        <div className="flex items-center gap-4">
-           <div className="flex flex-col items-end mr-4">
-             <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Cronômetro</p>
-             <p className="text-sm font-black font-mono text-primary">
+        <div className="flex items-center gap-6">
+           <div className="flex items-center gap-2 bg-primary/5 px-3 py-1.5 rounded-lg border border-primary/10">
+             <Clock size={14} className="text-primary" />
+             <p className="text-lg font-black font-mono text-primary leading-none">
                {Math.floor(state.timer / 60).toString().padStart(2, '0')}:{(state.timer % 60).toString().padStart(2, '0')}
              </p>
            </div>
-           <div className="h-8 w-px bg-muted mx-2" />
-           <Badge variant="outline" className="font-mono text-[10px] bg-primary/5">{state.xp} XP</Badge>
-           <Button variant="outline" size="sm" className="h-8 gap-2" onClick={() => window.location.reload()}>
-             <RefreshCcw size={14} /> Reiniciar
-           </Button>
-           <Button variant="outline" size="sm" className="h-8 gap-2" onClick={() => setShowDiagram(true)}>
-             <BookOpen size={14} /> Diagrama
-           </Button>
+           
+           <div className="h-8 w-px bg-muted" />
+           
+           <div className="flex items-center gap-4">
+             <div className="text-right hidden sm:block">
+               <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest leading-none">Status</p>
+               <p className="text-xs font-bold mt-1 leading-none">{isCompleted ? "Diagnóstico Concluído" : "Em Investigação"}</p>
+             </div>
+             <Button variant="outline" size="sm" className="h-9 gap-2 font-bold uppercase text-[10px]" onClick={() => setShowDiagram(true)}>
+               <BookOpen size={14} /> Diagrama
+             </Button>
+           </div>
         </div>
       </div>
 
 
+
       <div className="flex-1 flex overflow-hidden">
-        {/* Sidebar: Navigation & Hypotheses */}
-        <aside className="w-80 border-r bg-card/30 flex flex-col p-6 space-y-8 overflow-y-auto">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest flex items-center gap-2">
-                <Layers size={12} /> Fluxo de Trabalho
-              </h3>
-              <div className="flex items-center gap-1">
-                <div className="h-1 w-8 bg-primary rounded-full" />
-                <div className={cn("h-1 w-8 rounded-full", activeTab === 'investigation' || activeTab === 'report' ? "bg-primary" : "bg-muted")} />
-                <div className={cn("h-1 w-8 rounded-full", activeTab === 'report' ? "bg-primary" : "bg-muted")} />
+        {/* Sidebar: Navigation & History (Collapsible) */}
+        <aside className={cn(
+          "border-r bg-card/30 flex flex-col transition-all duration-300 relative",
+          sidebarCollapsed ? "w-12" : "w-80"
+        )}>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="absolute -right-3 top-20 z-10 h-6 w-6 rounded-full border bg-background shadow-sm"
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+          >
+            {sidebarCollapsed ? <ArrowRight size={10} /> : <ArrowLeft size={10} />}
+          </Button>
+
+          <div className={cn("flex flex-col h-full p-6 space-y-8 overflow-y-auto", sidebarCollapsed && "hidden")}>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest flex items-center gap-2">
+                  <Layers size={12} /> Fluxo de Trabalho
+                </h3>
+                <div className="flex items-center gap-1">
+                  <div className="h-1 w-8 bg-primary rounded-full" />
+                  <div className={cn("h-1 w-8 rounded-full", activeTab === 'investigation' || activeTab === 'report' ? "bg-primary" : "bg-muted")} />
+                  <div className={cn("h-1 w-8 rounded-full", activeTab === 'report' ? "bg-primary" : "bg-muted")} />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                {[
+                  { id: 'work-order', label: 'Ordem de Serviço', icon: FileText },
+                  { id: 'investigation', label: 'Investigação Técnica', icon: Search },
+                  { id: 'report', label: 'Relatório Final', icon: CheckCircle2, disabled: !isCompleted }
+                ].map((tab) => (
+                  <Button
+                    key={tab.id}
+                    variant={activeTab === tab.id ? "secondary" : "ghost"}
+                    disabled={tab.disabled}
+                    className={cn(
+                      "w-full justify-start gap-3 text-sm h-11 transition-all",
+                      activeTab === tab.id ? "bg-primary/10 text-primary border-l-2 border-primary rounded-l-none" : ""
+                    )}
+                    onClick={() => setActiveTab(tab.id as any)}
+                  >
+                    <tab.icon size={16} /> {tab.label}
+                  </Button>
+                ))}
               </div>
             </div>
 
-            <div className="space-y-2">
-              {[
-                { id: 'work-order', label: 'Ordem de Serviço', icon: FileText },
-                { id: 'investigation', label: 'Investigação Técnica', icon: Search },
-                { id: 'report', label: 'Relatório Final', icon: CheckCircle2, disabled: !isCompleted }
-              ].map((tab) => (
-                <Button
-                  key={tab.id}
-                  variant={activeTab === tab.id ? "secondary" : "ghost"}
-                  disabled={tab.disabled}
-                  className={cn(
-                    "w-full justify-start gap-3 text-sm h-11 transition-all",
-                    activeTab === tab.id ? "bg-primary/10 text-primary border-l-2 border-primary rounded-l-none" : ""
-                  )}
-                  onClick={() => setActiveTab(tab.id as any)}
-                >
-                  <tab.icon size={16} /> {tab.label}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          {/* Active Symptoms Panel */}
-          <div className="space-y-4">
-            <h3 className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest flex items-center gap-2">
-              <AlertTriangle size={12} /> Sintomas Ativos
-            </h3>
-            <div className="space-y-2">
-              {currentNode?.situation ? (
-                <div className="p-3 bg-red-500/5 border border-red-500/10 rounded-lg">
-                  <p className="text-[10px] leading-tight text-red-600 italic">"{currentNode.situation}"</p>
-                </div>
-              ) : (
-                <p className="text-[10px] italic text-muted-foreground">Nenhum sintoma observado.</p>
-              )}
-            </div>
-          </div>
-
-          {/* Hypotheses Panel */}
-          <div className="space-y-4">
-            <h3 className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest flex items-center gap-2">
-              <Settings2 size={12} /> Painel de Hipóteses
-            </h3>
+            {/* Active Symptoms Panel */}
             <div className="space-y-4">
-              {state.currentHypotheses.length > 0 ? (
-                state.currentHypotheses.map((h) => (
-                  <div key={h.id} className="space-y-2">
-                    <div className="flex justify-between text-[10px]">
-                      <span className="font-bold truncate max-w-[140px]">{h.label}</span>
-                      <span className="font-mono text-primary">{h.confidence}%</span>
-                    </div>
-                    <Progress value={h.confidence} className="h-1" />
+              <h3 className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest flex items-center gap-2">
+                <AlertTriangle size={12} /> Sintomas Ativos
+              </h3>
+              <div className="space-y-2">
+                {currentNode?.situation ? (
+                  <div className="p-3 bg-red-500/5 border border-red-500/10 rounded-lg">
+                    <p className="text-[10px] leading-tight text-red-600 italic">"{currentNode.situation}"</p>
                   </div>
-                ))
-              ) : (
-                <p className="text-[10px] italic text-muted-foreground">Colete evidências para gerar hipóteses.</p>
-              )}
+                ) : (
+                  <p className="text-[10px] italic text-muted-foreground">Nenhum sintoma observado.</p>
+                )}
+              </div>
             </div>
-          </div>
 
+            {/* Hypotheses Panel */}
+            <div className="space-y-4">
+              <h3 className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest flex items-center gap-2">
+                <Settings2 size={12} /> Painel de Hipóteses
+              </h3>
+              <div className="space-y-4">
+                {state.currentHypotheses.length > 0 ? (
+                  state.currentHypotheses.map((h) => (
+                    <div key={h.id} className="space-y-2">
+                      <div className="flex justify-between text-[10px]">
+                        <span className="font-bold truncate max-w-[140px]">{h.label}</span>
+                        <span className="font-mono text-primary">{h.confidence}%</span>
+                      </div>
+                      <Progress value={h.confidence} className="h-1" />
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-[10px] italic text-muted-foreground">Colete evidências para gerar hipóteses.</p>
+                )}
+              </div>
+            </div>
 
-          {/* History */}
-          <div className="space-y-4 pt-4 border-t">
-            <h3 className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest flex items-center gap-2">
-              <History size={12} /> Log de Ações
-            </h3>
-            <div className="space-y-3">
-              {state.history.slice(-5).reverse().map((h, i) => (
-                <div key={i} className="text-[10px] border-l-2 border-muted pl-3 py-1">
-                  <p className="font-bold truncate">{h.description}</p>
-                  <p className="text-muted-foreground">{new Date(h.timestamp).toLocaleTimeString()}</p>
-                </div>
-              ))}
+            {/* History */}
+            <div className="space-y-4 pt-4 border-t">
+              <h3 className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest flex items-center gap-2">
+                <History size={12} /> Log de Ações
+              </h3>
+              <div className="space-y-3">
+                {state.history.slice(-5).reverse().map((h, i) => (
+                  <div key={i} className="text-[10px] border-l-2 border-muted pl-3 py-1">
+                    <p className="font-bold truncate">{h.description}</p>
+                    <p className="text-muted-foreground">{new Date(h.timestamp).toLocaleTimeString()}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </aside>
+
+
 
         {/* Main Content */}
         <main className="flex-1 flex flex-col bg-background relative overflow-y-auto">
@@ -334,35 +357,46 @@ function SimulationsPage() {
                 </div>
 
                 {/* Multimeter Tool */}
+                {/* Multimeter Tool (Simplified for Scenario Engine) */}
                 <Card className="border-2 border-primary/20 bg-card/50">
-                    <CardHeader className="py-4 border-b">
+                    <CardHeader className="py-3 border-b flex flex-row items-center justify-between">
                       <CardTitle className="text-xs font-black uppercase tracking-widest flex items-center gap-2">
-                        <Zap size={14} className="text-primary" /> Multímetro (Pontos de Medição)
+                        <Zap size={14} className="text-primary" /> Multímetro
                       </CardTitle>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-6 text-[10px] uppercase font-bold text-muted-foreground"
+                        onClick={() => setInfoCollapsed(!infoCollapsed)}
+                      >
+                        {infoCollapsed ? "Abrir" : "Fechar"}
+                      </Button>
                     </CardHeader>
-                    <CardContent className="p-4">
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                        {state.measurementPoints.map((point) => (
-                          <Button 
-                            key={point} 
-                            variant="outline" 
-                            size="sm" 
-                            className="text-[10px] font-mono h-8 flex justify-between"
-                            onClick={() => {
-                              const evidence = (activeCase as any).evidenceData?.find((e: any) => e.label.includes(point));
-                              if (evidence) {
-                                // Simplified for now: just trigger evidence collection if found
-                                selectChoice(state.currentNodeId, { evidenceId: evidence.id });
-                              }
-                            }}
-                          >
-                            <span>{point}</span>
-                            <ArrowRight size={10} className="opacity-50" />
-                          </Button>
-                        ))}
-                      </div>
-                    </CardContent>
+                    {!infoCollapsed && (
+                      <CardContent className="p-4">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                          {state.measurementPoints.map((point) => (
+                            <Button 
+                              key={point} 
+                              variant="outline" 
+                              size="sm" 
+                              className="text-[10px] font-mono h-8 flex justify-between group/btn"
+                              onClick={() => {
+                                const evidence = (activeCase as any).evidenceData?.find((e: any) => e.label.includes(point));
+                                if (evidence) {
+                                  selectChoice(state.currentNodeId, { evidenceId: evidence.id });
+                                }
+                              }}
+                            >
+                              <span>{point}</span>
+                              <ArrowRight size={10} className="opacity-0 group-hover/btn:opacity-100 transition-opacity" />
+                            </Button>
+                          ))}
+                        </div>
+                      </CardContent>
+                    )}
                 </Card>
+
 
                 {/* Scenario Node Context */}
 

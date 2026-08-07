@@ -78,75 +78,70 @@ function Index() {
 
   return (
     <div className="p-8 space-y-8 max-w-7xl mx-auto pb-20">
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/10 via-background to-secondary/5 border p-8 md:p-12">
-        <div className="relative z-10 flex flex-col md:flex-row gap-8 items-center justify-between">
-          <div className="space-y-4 text-center md:text-left">
-            <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 px-3 py-1">
-              Painel de Controle
-            </Badge>
-            <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
-              Bem-vindo, <span className="text-primary">{userName.split(' ')[0]}</span>
-            </h1>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto md:mx-0">
-              Sua jornada para se tornar uma lenda industrial continua. Analise casos, realize medições e resolva defeitos complexos.
+      <section className="relative overflow-hidden rounded-3xl bg-card border shadow-sm p-8 md:p-12">
+        <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-primary/5 to-transparent pointer-events-none" />
+        <div className="relative z-10 flex flex-col md:flex-row gap-12 items-center">
+          <div className="flex-1 space-y-6 text-center md:text-left">
+            <div className="space-y-2">
+              <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 font-bold px-3 py-1 uppercase tracking-wider text-[10px]">
+                Área do Aluno
+              </Badge>
+              <h1 className="text-4xl md:text-6xl font-black tracking-tight leading-tight">
+                Olá, <span className="text-primary">{userName.split(' ')[0]}</span>
+              </h1>
+            </div>
+            
+            <p className="text-muted-foreground text-lg max-w-xl">
+              Você tem <span className="text-foreground font-bold">{recommendedLab?.defectCount || 0} casos</span> pendentes no laboratório <span className="text-foreground font-bold">{recommendedLab?.name}</span>. Vamos resolver?
             </p>
             
-            <div className="flex flex-wrap gap-4 pt-4 justify-center md:justify-start">
-              <Button size="lg" className="rounded-full px-8 gap-2 group" onClick={() => navigate({ to: '/library' })}>
-                Iniciar Novo Diagnóstico
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-              </Button>
-              <Button size="lg" variant="outline" className="rounded-full px-8 gap-2" onClick={() => navigate({ to: '/ranking' })}>
-                Ver Ranking Global
-                <Trophy className="w-4 h-4 text-yellow-500" />
+            <div className="flex flex-wrap gap-4 pt-2 justify-center md:justify-start">
+              <Button size="lg" className="rounded-xl px-8 h-14 text-lg font-bold gap-3 shadow-lg shadow-primary/20 group" onClick={() => navigate({ to: '/library' })}>
+                Continuar de onde parei
+                <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
               </Button>
             </div>
           </div>
 
-          <div className="w-full max-w-md space-y-6">
-            <Card className="bg-background/40 backdrop-blur-sm border-primary/10">
-              <CardContent className="pt-6 space-y-6">
-                <div className="flex justify-between items-end">
-                  <div className="space-y-1">
-                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{levelTitle}</p>
-                    <p className="text-2xl font-bold">Nível {level}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">XP Total</p>
-                    <p className="text-2xl font-bold text-primary">{xp.toLocaleString()}</p>
-                  </div>
+          <Card className="w-full max-w-sm bg-background/50 backdrop-blur-sm border-primary/10 shadow-xl overflow-hidden shrink-0">
+            <div className="h-1 bg-primary w-full" />
+            <CardContent className="pt-8 space-y-8">
+              <div className="flex justify-between items-center">
+                <div className="space-y-1">
+                  <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{levelTitle}</p>
+                  <p className="text-3xl font-black">Nível {level}</p>
                 </div>
-                
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Progresso para Nível {level + 1}</span>
-                    <span className="font-medium">{Math.round(xpProgress)}%</span>
-                  </div>
-                  <Progress value={xpProgress} className="h-2" />
-                  <p className="text-[10px] text-center text-muted-foreground">Faltam {nextLevelXp - (xp % nextLevelXp)} XP para o próximo nível</p>
+                <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20">
+                  <Trophy className="w-8 h-8 text-primary" />
                 </div>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="flex justify-between text-xs font-bold uppercase tracking-wider">
+                  <span className="text-muted-foreground">Progresso do Nível</span>
+                  <span className="text-primary">{Math.round(xpProgress)}%</span>
+                </div>
+                <Progress value={xpProgress} className="h-2.5 bg-primary/10" />
+                <p className="text-[10px] text-center text-muted-foreground font-medium uppercase tracking-widest">
+                  Faltam {nextLevelXp - (xp % nextLevelXp)} XP para o próximo nível
+                </p>
+              </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1 p-3 rounded-2xl bg-primary/5 border border-primary/10">
-                    <div className="flex items-center gap-2 text-primary">
-                      <TrendingUp className="w-4 h-4" />
-                      <span className="text-xs font-bold">Precisão</span>
-                    </div>
-                    <p className="text-xl font-bold">{accuracy}%</p>
-                  </div>
-                  <div className="space-y-1 p-3 rounded-2xl bg-secondary/5 border border-secondary/10">
-                    <div className="flex items-center gap-2 text-secondary-foreground">
-                      <Clock className="w-4 h-4" />
-                      <span className="text-xs font-bold">Tempo Médio</span>
-                    </div>
-                    <p className="text-xl font-bold">{avgTime}m</p>
-                  </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 rounded-2xl bg-muted/30 border border-border/50 text-center">
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase mb-1">Precisão</p>
+                  <p className="text-2xl font-black text-foreground">{accuracy}%</p>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+                <div className="p-4 rounded-2xl bg-muted/30 border border-border/50 text-center">
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase mb-1">XP Total</p>
+                  <p className="text-2xl font-black text-primary">{xp.toLocaleString()}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </section>
+
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
