@@ -80,7 +80,7 @@ function SimulationsPage() {
   }
 
   const activeCase = caseResult?.success ? caseResult.data : null;
-  const anyError = isError || !caseResult?.success || !!caseError || !!sessionError;
+  const anyError = isError || !caseResult?.success || !!caseError;
 
   // Waiting for state initialization after case is loaded
   if (activeCase && !anyError && !state) {
@@ -94,7 +94,7 @@ function SimulationsPage() {
 
   // Error handling
   if (!activeCase || !id || anyError || !state) {
-    const errorDetail = state?.error || (caseResult && !caseResult.success ? caseResult.error.message : null) || sessionError || caseError?.message;
+    const errorDetail = state?.error || (caseResult && !caseResult.success ? caseResult.error.message : null) || caseError?.message;
     
     return (
       <div className="flex flex-col items-center justify-center h-[calc(100vh-4rem)] space-y-4 p-8">

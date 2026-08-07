@@ -2,35 +2,116 @@ import { supabase } from "@/integrations/supabase/client";
 import { Result, ok, fail } from "@/lib/result/Result";
 import { DiagnosticCase, CaseDifficulty } from "@/types/diagnosis";
 
-
 export class CaseRepository {
   async findAll(): Promise<Result<DiagnosticCase[]>> {
     try {
-      const { data, error } = await supabase
+      const { data: cases, error: casesError } = await supabase
         .from('cases')
-        .select('*, case_hypotheses(*)')
+        .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) return fail(error.message, error.code);
-      return ok(data.map(this.mapToCamelCase));
+      if (casesError) return fail(casesError.message, casesError.code);
+
+      const { data: hypotheses } = await supabase
+        .from('case_hypotheses')
+        .select('*');
+
+      const fullData = cases.map(c => ({
+        ...c,
+        case_hypotheses: (hypotheses || []).filter(h => h.case_id === c.id)
+      }));
+
+      return ok(fullData.map(item => this.mapToCamelCase(item)));
     } catch (e: any) {
       return fail(e.message);
     }
   }
 
   async findById(id: string): Promise<Result<DiagnosticCase | null>> {
+    console.log(`Repository: findById ${id}`);
     try {
-      const { data, error } = await supabase
-        .from('cases')
-        .select('*, case_hypotheses(*)')
+      // 1. Try diagnostic_cases first
+      const { data: diagCases, error: diagError } = await supabase
+        .from('diagnostic_cases')
+        .select('*')
         .eq('id', id)
-        .single();
 
-      if (error) {
-        if (error.code === 'PGRST116') return ok(null);
-        return fail(error.message, error.code);
+      const diagCase = diagCases && diagCases.length > 0 ? diagCases[0] : null;
+
+      if (!diagError && diagCase) {
+        const { data: hypotheses } = await supabase
+          .from('case_hypotheses')
+          .select('*')
+          .eq('case_id', diagCase.id);
+
+        return ok(this.mapToCamelCase({ ...diagCase, case_hypotheses: hypotheses || [] }));
       }
-      return ok(this.mapToCamelCase(data));
+
+      // 2. Fallback to cases
+      const { data: casesData, error: caseError } = await supabase
+        .from('cases')
+        .select('*')
+        .eq('id', id)
+
+      const caseData = casesData && casesData.length > 0 ? casesData[0] : null;
+
+      if (caseError) {
+        if (caseError.code === 'PGRST116') return ok(null);
+        return fail(caseError.message, caseError.code);
+      }
+
+      const { data: hypotheses } = await supabase
+        .from('case_hypotheses')
+        .select('*')
+        .eq('case_id', id);
+
+      return ok(this.mapToCamelCase({ ...caseData, case_hypotheses: hypotheses || [] }));
+    } catch (e: any) {
+      return fail(e.message);
+    }
+  }
+
+  async findByCode(code: string): Promise<Result<DiagnosticCase | null>> {
+    console.log(`Repository: findByCode ${code}`);
+    try {
+      // 1. Try to fetch from diagnostic_cases first
+      const { data: diagCases, error: diagError } = await supabase
+        .from('diagnostic_cases')
+        .select('*')
+        .eq('code', code)
+
+      const diagCase = diagCases && diagCases.length > 0 ? diagCases[0] : null;
+
+      if (!diagError && diagCase) {
+        const { data: hypotheses } = await supabase
+          .from('case_hypotheses')
+          .select('*')
+          .eq('case_id', diagCase.id);
+
+        return ok(this.mapToCamelCase({ ...diagCase, case_hypotheses: hypotheses || [] }));
+      }
+
+      // 2. Fallback to cases table
+      const { data: caseItems, error: caseError } = await supabase
+        .from('cases')
+        .select('*')
+        .eq('code', code)
+        
+
+      const caseItem = caseItems && caseItems.length > 0 ? caseItems[0] : null;
+
+      if (caseError) {
+        return fail(caseError.message, caseError.code);
+      }
+
+      if (!caseItem) return ok(null);
+
+      const { data: hypotheses } = await supabase
+        .from('case_hypotheses')
+        .select('*')
+        .eq('case_id', caseItem.id);
+
+      return ok(this.mapToCamelCase({ ...caseItem, case_hypotheses: hypotheses || [] }));
     } catch (e: any) {
       return fail(e.message);
     }
@@ -38,24 +119,29 @@ export class CaseRepository {
 
   async findByLaboratoryId(labId: string): Promise<Result<DiagnosticCase[]>> {
     try {
-      const { data, error } = await supabase
+      const { data: cases, error: casesError } = await supabase
         .from('cases')
-        .select('*, case_hypotheses(*)')
+        .select('*')
         .eq('laboratory_id', labId)
         .eq('published', true)
         .order('code', { ascending: true });
 
-      if (error) return fail(error.message, error.code);
+      if (casesError) return fail(casesError.message, casesError.code);
       
-      const mapped = data.map(this.mapToCamelCase);
+      const { data: hypotheses } = await supabase
+        .from('case_hypotheses')
+        .select('*')
+        .in('case_id', cases.map(c => c.id));
+
+      const fullData = cases.map(c => ({
+        ...c,
+        case_hypotheses: (hypotheses || []).filter(h => h.case_id === c.id)
+      }));
+
+      const mapped = fullData.map(item => this.mapToCamelCase(item));
       
-      // Fallback: If no cases found, try finding by any laboratory just to not show empty screen
       if (mapped.length === 0) {
-        const { data: allData } = await supabase
-          .from('cases')
-          .select('*, case_hypotheses(*)')
-          .limit(5);
-        if (allData) return ok(allData.map(this.mapToCamelCase));
+        return this.findAll();
       }
 
       return ok(mapped);
@@ -64,14 +150,6 @@ export class CaseRepository {
     }
   }
 
-
-
-
-
-
-
-
-
   private mapToCamelCase(item: any): DiagnosticCase {
     const content = item.content || {};
     const hypotheses = (item.case_hypotheses || []).map((h: any) => ({
@@ -79,7 +157,7 @@ export class CaseRepository {
       title: h.title,
       description: h.description,
       isCorrect: h.is_correct,
-      isRootCause: h.is_root_cause,
+      isRootCause: h.is_root_cause || h.root_cause,
       validationLogic: h.validation_logic
     }));
     
@@ -89,11 +167,10 @@ export class CaseRepository {
       title: item.title,
       description: item.description || content.description,
       laboratoryId: item.laboratory_id,
-      difficulty: item.level as CaseDifficulty,
-      estimatedTime: item.time_estimate,
-      xpReward: item.xp_reward,
+      difficulty: (item.level || item.difficulty || 'Básico') as CaseDifficulty,
+      estimatedTime: item.time_estimate || item.estimated_time || 15,
+      xpReward: item.xp_reward || 100,
       
-      // Scenario-Based Data
       workOrder: content.workOrder || {
         customer: 'Planta Industrial',
         machine: item.title,
@@ -113,9 +190,6 @@ export class CaseRepository {
       updatedAt: item.updated_at,
     };
   }
-
-
-
 }
 
 export const caseRepository = new CaseRepository();

@@ -12,13 +12,18 @@ export class HypothesisEngine {
 
     // Check if the evidence point matches the hypothesis requirement
     // Support both single point and point-to-point (A-B)
-    const points = validationLogic.requiredMeasurement.split('-');
-    const evidencePoints = evidence.point.split('-');
+    const reqPoint = validationLogic.requiredMeasurement.toLowerCase();
+    const evPoint = evidence.point.toLowerCase();
     
-    const isPointMatch = validationLogic.requiredMeasurement === evidence.point || 
+    const points = reqPoint.split('-');
+    const evidencePoints = evPoint.split('-');
+    
+    const isPointMatch = reqPoint === evPoint || 
                         (points.length === 2 && evidencePoints.length === 2 && 
                          ((points[0] === evidencePoints[0] && points[1] === evidencePoints[1]) || 
-                          (points[0] === evidencePoints[1] && points[1] === evidencePoints[0])));
+                          (points[0] === evidencePoints[1] && points[1] === evidencePoints[0]))) ||
+                        reqPoint.includes(evPoint) ||
+                        evPoint.includes(reqPoint);
 
     if (!isPointMatch) return hypothesis;
 
