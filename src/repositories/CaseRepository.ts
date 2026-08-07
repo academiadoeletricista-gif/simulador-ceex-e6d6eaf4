@@ -28,7 +28,25 @@ export class CaseRepository {
   }
 
   async findById(id: string): Promise<Result<DiagnosticCase | null>> {
+    console.log(`Repository: findById ${id}`);
     try {
+      // 1. Try diagnostic_cases first
+      const { data: diagCase, error: diagError } = await supabase
+        .from('diagnostic_cases')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (!diagError && diagCase) {
+        const { data: hypotheses } = await supabase
+          .from('case_hypotheses')
+          .select('*')
+          .eq('case_id', diagCase.id);
+
+        return ok(this.mapToCamelCase({ ...diagCase, case_hypotheses: hypotheses || [] }));
+      }
+
+      // 2. Fallback to cases
       const { data: caseData, error: caseError } = await supabase
         .from('cases')
         .select('*')
@@ -45,21 +63,16 @@ export class CaseRepository {
         .select('*')
         .eq('case_id', id);
 
-      const fullData = {
-        ...caseData,
-        case_hypotheses: hypotheses || []
-      };
-
-      return ok(this.mapToCamelCase(fullData));
+      return ok(this.mapToCamelCase({ ...caseData, case_hypotheses: hypotheses || [] }));
     } catch (e: any) {
       return fail(e.message);
     }
   }
 
   async findByCode(code: string): Promise<Result<DiagnosticCase | null>> {
-    console.log(`Repository: Fetching case with code: ${code}`);
+    console.log(`Repository: findByCode ${code}`);
     try {
-      // 1. Try to fetch from diagnostic_cases first as it has the definitive IDs for hypotheses
+      // 1. Try to fetch from diagnostic_cases first
       const { data: diagCase, error: diagError } = await supabase
         .from('diagnostic_cases')
         .select('*')
@@ -67,7 +80,6 @@ export class CaseRepository {
         .single();
 
       if (!diagError && diagCase) {
-        // Fetch hypotheses for this diagnostic_case ID
         const { data: hypotheses } = await supabase
           .from('case_hypotheses')
           .select('*')
@@ -149,8 +161,8 @@ export class CaseRepository {
       title: item.title,
       description: item.description || content.description,
       laboratoryId: item.laboratory_id,
-      difficulty: item.level as CaseDifficulty,
-      estimatedTime: item.time_estimate,
+      difficulty: (item.level || item.difficulty) as CaseDifficulty,
+      estimatedTime: item.time_estimate || item.estimated_time,
       xpReward: item.xp_reward,
       
       workOrder: content.workOrder || {
