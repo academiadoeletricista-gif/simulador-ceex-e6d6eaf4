@@ -1,4 +1,4 @@
-import { CaseDifficulty } from "@/domains/diagnosis/types/enums";
+import { CaseDifficulty } from "./diagnosis";
 import { Asset } from "./assets";
 
 export interface ComponentCategory {
