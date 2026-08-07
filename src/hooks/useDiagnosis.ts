@@ -1,13 +1,9 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { SimulationPlayer } from '../simulation-core/services/SimulationPlayer';
 import { SimulationState, SessionStatus } from '../simulation-core/domain/sessions/SimulationSession';
 import { useSession, useUpdateSession } from './useSession';
 import { DiagnosticCase } from '../types/diagnosis';
 
-/**
- * useDiagnosis hook now consumes the SimulationPlayer service,
- * which centralizes all diagnostic session logic.
- */
 export const useDiagnosis = (caseId?: string) => {
   const [ticker, setTicker] = useState(0);
 
@@ -17,13 +13,12 @@ export const useDiagnosis = (caseId?: string) => {
   const { data: sessionResult, isLoading: sessionLoading, error: sessionError } = useSession(caseId || '');
   const updateSessionMutation = useUpdateSession();
 
-  // Force re-renders for the timer
-  useState(() => {
+  useEffect(() => {
     const interval = setInterval(() => {
       setTicker(t => t + 1);
     }, 1000);
     return () => clearInterval(interval);
-  });
+  }, []);
 
   const getLatestState = useCallback(() => {
     const newState = player.getPlayerState();
@@ -31,18 +26,24 @@ export const useDiagnosis = (caseId?: string) => {
     return newState;
   }, [player]);
 
-
   const loadCase = useCallback((dbCase: DiagnosticCase) => {
+    console.log(`[useDiagnosis] Manually loading case: ${dbCase.code}`);
     player.startSession(dbCase);
     setState(player.getPlayerState());
   }, [player]);
+
+  useEffect(() => {
+    if (sessionResult?.success && sessionResult.data?.case) {
+      console.log(`[useDiagnosis] Auto-loading case from session: ${sessionResult.data.case.code}`);
+      player.startSession(sessionResult.data.case);
+      setState(player.getPlayerState());
+    }
+  }, [sessionResult, player]);
 
   const selectChoice = useCallback(async (choiceId: string, params: any = {}) => {
     player.handleAction(choiceId, params);
     const newState = getLatestState();
     
-    // Persist session to database
-
     if (newState && caseId && sessionResult?.success && sessionResult.data) {
       await updateSessionMutation.mutateAsync({
         id: sessionResult.data.id,
@@ -57,7 +58,7 @@ export const useDiagnosis = (caseId?: string) => {
         }
       });
     }
-  }, [caseId, sessionResult, updateSessionMutation, player]);
+  }, [caseId, sessionResult, updateSessionMutation, player, getLatestState]);
 
   const collectEvidence = useCallback((evidenceId: string) => {
     player.collectEvidence(evidenceId);
@@ -74,20 +75,19 @@ export const useDiagnosis = (caseId?: string) => {
     setState(player.getPlayerState());
   }, [player]);
 
+  const derivedIsError = (!!sessionResult && !sessionResult.success) || 
+                         (state?.status === SessionStatus.ERROR) || 
+                         !!sessionError;
+
   return {
-
-
-    state: player.getPlayerState(), // Always get fresh state for timer
+    state: player.getPlayerState() || state, 
     loadCase,
     selectChoice,
     selectHypothesis,
     collectEvidence,
-
     useHint,
     isLoading: sessionLoading,
     sessionError: sessionError ? (sessionError as any).message : (sessionResult && !sessionResult.success ? sessionResult.error.message : null),
-    isError: (!!sessionResult && !sessionResult.success) || state?.status === SessionStatus.ERROR || !!sessionError
+    isError: derivedIsError
   };
 };
-
-
