@@ -97,7 +97,7 @@ export class DiagnosisEngine {
       })),
       case: this.currentCase,
       currentNodeId: scenario.currentStepId || 'start',
-      selectedHypothesisId: scenario.hypotheses.find(h => h.status === 'PENDING')?.id, // Rough mapping
+      selectedHypothesisId: scenario.hypotheses.find(h => h.status === 'PENDING')?.id || null, // Rough mapping
       confirmedRootCause: scenario.hypotheses.some(h => h.isRootCause && h.status === 'CONFIRMED'),
       currentHypotheses: scenario.hypotheses.map(h => ({
         id: h.id,
