@@ -180,90 +180,90 @@ function SimulationsPage() {
                 <h3 className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest flex items-center gap-2">
                   <Layers size={12} /> Fluxo de Trabalho
                 </h3>
+                <div className="flex items-center gap-1">
+                  <div className="h-1 w-8 bg-primary rounded-full" />
+                  <div className={cn("h-1 w-8 rounded-full", activeTab === 'investigation' || activeTab === 'report' ? "bg-primary" : "bg-muted")} />
+                  <div className={cn("h-1 w-8 rounded-full", activeTab === 'report' ? "bg-primary" : "bg-muted")} />
+                </div>
+              </div>
 
-              <div className="flex items-center gap-1">
-                <div className="h-1 w-8 bg-primary rounded-full" />
-                <div className={cn("h-1 w-8 rounded-full", activeTab === 'investigation' || activeTab === 'report' ? "bg-primary" : "bg-muted")} />
-                <div className={cn("h-1 w-8 rounded-full", activeTab === 'report' ? "bg-primary" : "bg-muted")} />
+              <div className="space-y-2">
+                {[
+                  { id: 'work-order', label: 'Ordem de Serviço', icon: FileText },
+                  { id: 'investigation', label: 'Investigação Técnica', icon: Search },
+                  { id: 'report', label: 'Relatório Final', icon: CheckCircle2, disabled: !isCompleted }
+                ].map((tab) => (
+                  <Button
+                    key={tab.id}
+                    variant={activeTab === tab.id ? "secondary" : "ghost"}
+                    disabled={tab.disabled}
+                    className={cn(
+                      "w-full justify-start gap-3 text-sm h-11 transition-all",
+                      activeTab === tab.id ? "bg-primary/10 text-primary border-l-2 border-primary rounded-l-none" : ""
+                    )}
+                    onClick={() => setActiveTab(tab.id as any)}
+                  >
+                    <tab.icon size={16} /> {tab.label}
+                  </Button>
+                ))}
               </div>
             </div>
 
-            <div className="space-y-2">
-              {[
-                { id: 'work-order', label: 'Ordem de Serviço', icon: FileText },
-                { id: 'investigation', label: 'Investigação Técnica', icon: Search },
-                { id: 'report', label: 'Relatório Final', icon: CheckCircle2, disabled: !isCompleted }
-              ].map((tab) => (
-                <Button
-                  key={tab.id}
-                  variant={activeTab === tab.id ? "secondary" : "ghost"}
-                  disabled={tab.disabled}
-                  className={cn(
-                    "w-full justify-start gap-3 text-sm h-11 transition-all",
-                    activeTab === tab.id ? "bg-primary/10 text-primary border-l-2 border-primary rounded-l-none" : ""
-                  )}
-                  onClick={() => setActiveTab(tab.id as any)}
-                >
-                  <tab.icon size={16} /> {tab.label}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          {/* Active Symptoms Panel */}
-          <div className="space-y-4">
-            <h3 className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest flex items-center gap-2">
-              <AlertTriangle size={12} /> Sintomas Ativos
-            </h3>
-            <div className="space-y-2">
-              {currentNode?.situation ? (
-                <div className="p-3 bg-red-500/5 border border-red-500/10 rounded-lg">
-                  <p className="text-[10px] leading-tight text-red-600 italic">"{currentNode.situation}"</p>
-                </div>
-              ) : (
-                <p className="text-[10px] italic text-muted-foreground">Nenhum sintoma observado.</p>
-              )}
-            </div>
-          </div>
-
-          {/* Hypotheses Panel */}
-          <div className="space-y-4">
-            <h3 className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest flex items-center gap-2">
-              <Settings2 size={12} /> Painel de Hipóteses
-            </h3>
+            {/* Active Symptoms Panel */}
             <div className="space-y-4">
-              {state.currentHypotheses.length > 0 ? (
-                state.currentHypotheses.map((h) => (
-                  <div key={h.id} className="space-y-2">
-                    <div className="flex justify-between text-[10px]">
-                      <span className="font-bold truncate max-w-[140px]">{h.label}</span>
-                      <span className="font-mono text-primary">{h.confidence}%</span>
-                    </div>
-                    <Progress value={h.confidence} className="h-1" />
+              <h3 className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest flex items-center gap-2">
+                <AlertTriangle size={12} /> Sintomas Ativos
+              </h3>
+              <div className="space-y-2">
+                {currentNode?.situation ? (
+                  <div className="p-3 bg-red-500/5 border border-red-500/10 rounded-lg">
+                    <p className="text-[10px] leading-tight text-red-600 italic">"{currentNode.situation}"</p>
                   </div>
-                ))
-              ) : (
-                <p className="text-[10px] italic text-muted-foreground">Colete evidências para gerar hipóteses.</p>
-              )}
+                ) : (
+                  <p className="text-[10px] italic text-muted-foreground">Nenhum sintoma observado.</p>
+                )}
+              </div>
             </div>
-          </div>
 
+            {/* Hypotheses Panel */}
+            <div className="space-y-4">
+              <h3 className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest flex items-center gap-2">
+                <Settings2 size={12} /> Painel de Hipóteses
+              </h3>
+              <div className="space-y-4">
+                {state.currentHypotheses.length > 0 ? (
+                  state.currentHypotheses.map((h) => (
+                    <div key={h.id} className="space-y-2">
+                      <div className="flex justify-between text-[10px]">
+                        <span className="font-bold truncate max-w-[140px]">{h.label}</span>
+                        <span className="font-mono text-primary">{h.confidence}%</span>
+                      </div>
+                      <Progress value={h.confidence} className="h-1" />
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-[10px] italic text-muted-foreground">Colete evidências para gerar hipóteses.</p>
+                )}
+              </div>
+            </div>
 
-          {/* History */}
-          <div className="space-y-4 pt-4 border-t">
-            <h3 className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest flex items-center gap-2">
-              <History size={12} /> Log de Ações
-            </h3>
-            <div className="space-y-3">
-              {state.history.slice(-5).reverse().map((h, i) => (
-                <div key={i} className="text-[10px] border-l-2 border-muted pl-3 py-1">
-                  <p className="font-bold truncate">{h.description}</p>
-                  <p className="text-muted-foreground">{new Date(h.timestamp).toLocaleTimeString()}</p>
-                </div>
-              ))}
+            {/* History */}
+            <div className="space-y-4 pt-4 border-t">
+              <h3 className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest flex items-center gap-2">
+                <History size={12} /> Log de Ações
+              </h3>
+              <div className="space-y-3">
+                {state.history.slice(-5).reverse().map((h, i) => (
+                  <div key={i} className="text-[10px] border-l-2 border-muted pl-3 py-1">
+                    <p className="font-bold truncate">{h.description}</p>
+                    <p className="text-muted-foreground">{new Date(h.timestamp).toLocaleTimeString()}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </aside>
+
 
 
         {/* Main Content */}
