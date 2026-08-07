@@ -13,6 +13,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/useAppStore";
+import { supabase } from "@/integrations/supabase/client";
 import {
   LayoutDashboard,
   Library,
@@ -32,6 +33,7 @@ import {
   BarChart3,
   LogOut,
 } from "lucide-react";
+import { useProfile } from "@/hooks/useProfile";
 
 import appCss from "../styles.css?url";
 
@@ -140,6 +142,31 @@ function RootComponent() {
   const sidebarOpen = useAppStore(state => state.isSidebarOpen);
   const toggleSidebar = useAppStore(state => state.toggleSidebar);
   const location = useLocation();
+  const { data: profileResult } = useProfile();
+  const profile = profileResult?.success ? profileResult.data : null;
+  const [isAuthenticating, setIsAuthenticating] = useState(true);
+
+  useEffect(() => {
+    const initAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session) {
+          console.log("No active session found, signing in anonymously...");
+          const { error } = await supabase.auth.signInAnonymously();
+          if (error) {
+            console.error("Failed to sign in anonymously:", error);
+          }
+        }
+      } catch (err) {
+        console.error("Auth bootstrap error:", err);
+      } finally {
+        setIsAuthenticating(false);
+      }
+    };
+
+    initAuth();
+  }, []);
 
   const menuItems = [
     { icon: LayoutDashboard, label: "Dashboard", path: "/" },
@@ -157,6 +184,17 @@ function RootComponent() {
     { icon: ShieldCheck, label: "Admin", path: "/admin" },
     { icon: BarChart3, label: "Enterprise", path: "/analytics" },
   ];
+
+  if (isAuthenticating) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+          <p className="text-sm text-muted-foreground animate-pulse">Iniciando laboratório...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -216,8 +254,8 @@ function RootComponent() {
             <div className="flex-1" />
             <div className="flex items-center gap-4">
               <div className="text-right hidden sm:block">
-                <div className="text-sm font-medium">Eng. Carlos Alberto</div>
-                <div className="text-xs text-muted-foreground">Membro Premium</div>
+                <div className="text-sm font-medium">{profile?.full_name || "Carregando..."}</div>
+                <div className="text-xs text-muted-foreground">{profile?.role || (profile?.level ? `Nível ${profile.level}` : "Membro")}</div>
               </div>
               <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center border-2 border-primary/40">
                 <User size={20} className="text-primary" />
