@@ -1,14 +1,13 @@
 import { supabase } from "@/integrations/supabase/client";
 import { Result, ok, fail } from "@/lib/result/Result";
-import { CaseSession } from "./SessionRepository";
+import { CaseSession, sessionRepository } from "@/repositories/SessionRepository";
 
 export const SessionService = {
   async getByCaseId(caseId: string): Promise<Result<CaseSession | null>> {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        console.warn("[SessionService] No authenticated user found, attempting anonymous session search");
-        // Fallback for potential anonymous sessions if allowed by RLS
+        console.warn("[SessionService] No authenticated user found");
       }
       
       const userId = user?.id;
@@ -57,6 +56,3 @@ export const SessionService = {
     return sessionRepository.update(id, data);
   }
 };
-
-// Re-export repository logic or import correctly
-import { sessionRepository } from "@/repositories/SessionRepository";

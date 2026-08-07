@@ -50,11 +50,11 @@ export class SessionRepository {
 
   async upsert(session: Partial<CaseSession>): Promise<Result<CaseSession>> {
     try {
-      // Manual check to avoid RLS conflicts on upsert if necessary
-      const { data: existing } = await this.findByUserIdAndCaseId(session.user_id!, session.case_id!);
+      // Manual check to avoid RLS conflicts on upsert
+      const existingResult = await this.findByUserIdAndCaseId(session.user_id!, session.case_id!);
       
-      if (existing) {
-        return this.update(existing.id, session);
+      if (existingResult.success && existingResult.data) {
+        return this.update(existingResult.data.id, session);
       }
 
       const { data, error } = await supabase
