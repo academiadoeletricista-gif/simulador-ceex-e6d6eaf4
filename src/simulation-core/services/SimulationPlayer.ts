@@ -36,11 +36,11 @@ export class SimulationPlayer {
       this.api.createSession(caseData);
       
       const state = this.getPlayerState();
-      if (state.status === SessionStatus.ERROR) {
+      if (state?.status === SessionStatus.ERROR) {
         throw new Error(state.error || 'Unknown error during simulation initialization');
       }
       
-      console.log(`[SimulationPlayer] Session successfully started and in state: ${state.status}`);
+      console.log(`[SimulationPlayer] Session successfully started and in state: ${state?.status}`);
     } catch (error: any) {
       console.error(`[SimulationPlayer] FAILED to start simulation:`, error);
       // Ensure we are in ERROR state if not already set by engine
@@ -72,7 +72,7 @@ export class SimulationPlayer {
   /**
    * Gets the current observable state of the simulation
    */
-  public getPlayerState(): SimulationState {
+  public getPlayerState(): SimulationState | null {
     return this.api.getSessionState();
   }
 
@@ -81,7 +81,7 @@ export class SimulationPlayer {
    */
   public finishSession() {
     const state = this.getPlayerState();
-    if (state.status === SessionStatus.COMPLETED) {
+    if (state?.status === SessionStatus.COMPLETED) {
       console.log(`[SimulationPlayer] Session finished successfully. XP: ${state.xp}`);
       // Here we would trigger final persistence or achievement checks
     }

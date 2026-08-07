@@ -27,7 +27,7 @@ export class SimulationAPI {
     }
   }
 
-  public getSessionState(): SimulationState {
+  public getSessionState(): SimulationState | null {
     return this.engine.getState();
   }
 

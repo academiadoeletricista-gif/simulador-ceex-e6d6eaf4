@@ -10,7 +10,7 @@ import { DiagnosticCase } from '../types/diagnosis';
  */
 export const useDiagnosis = (caseId?: string) => {
   const player = SimulationPlayer.getInstance();
-  const [state, setState] = useState<SimulationState>(player.getPlayerState());
+  const [state, setState] = useState<SimulationState | null>(player.getPlayerState());
   
   const { data: sessionResult, isLoading: sessionLoading, error: sessionError } = useSession(caseId || '');
   const updateSessionMutation = useUpdateSession();
@@ -26,7 +26,7 @@ export const useDiagnosis = (caseId?: string) => {
     setState(newState);
 
     // Persist session to database
-    if (caseId && sessionResult?.success && sessionResult.data) {
+    if (newState && caseId && sessionResult?.success && sessionResult.data) {
       await updateSessionMutation.mutateAsync({
         id: sessionResult.data.id,
         data: {
@@ -53,7 +53,7 @@ export const useDiagnosis = (caseId?: string) => {
     selectChoice,
     collectEvidence,
     isLoading: sessionLoading,
-    isError: (!!sessionResult && !sessionResult.success) || state.status === SessionStatus.ERROR || !!sessionError
+    isError: (!!sessionResult && !sessionResult.success) || state?.status === SessionStatus.ERROR || !!sessionError
   };
 };
 

@@ -110,9 +110,9 @@ export class DiagnosisEngine {
     this.totalXP += 500; // Bonus
   }
 
-  getState(): SimulationState {
+  getState(): SimulationState | null {
     if (!this.currentCase) {
-        throw new Error("No case loaded");
+        return null;
     }
 
     return {
