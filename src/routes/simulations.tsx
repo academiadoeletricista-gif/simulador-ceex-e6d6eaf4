@@ -129,12 +129,14 @@ function SimulationsPage() {
     );
   }
 
-  const isCompleted = state.status === 'COMPLETED';
+  const isCompleted = state?.status === 'COMPLETED';
 
   // Find current decision node
-  const currentNode = state.lesson ? { id: 'COMPLETED', lesson: state.lesson } : 
-                     ((activeCase as any).decisionTree?.find((n: any) => n.id === state.currentNodeId) || 
-                      (activeCase as any).decisionTree?.[0]);
+  const currentNode = state?.lesson ? { id: 'COMPLETED', lesson: state.lesson } : 
+                     (state ? ((activeCase as any).decisionTree?.find((n: any) => n.id === state.currentNodeId) || 
+                      (activeCase as any).decisionTree?.[0]) : null);
+
+  if (!state) return null;
 
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)] overflow-hidden bg-background">
