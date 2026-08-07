@@ -161,9 +161,9 @@ export class CaseRepository {
       title: item.title,
       description: item.description || content.description,
       laboratoryId: item.laboratory_id,
-      difficulty: (item.level || item.difficulty) as CaseDifficulty,
-      estimatedTime: item.time_estimate || item.estimated_time,
-      xpReward: item.xp_reward,
+      difficulty: (item.level || item.difficulty || 'Básico') as CaseDifficulty,
+      estimatedTime: item.time_estimate || item.estimated_time || 15,
+      xpReward: item.xp_reward || 100,
       
       workOrder: content.workOrder || {
         customer: 'Planta Industrial',
