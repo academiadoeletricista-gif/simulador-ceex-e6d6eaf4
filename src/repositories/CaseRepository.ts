@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { Result, ok, fail } from "@/lib/result/Result";
-import { DiagnosticCase } from "@/types/diagnosis";
+import { DiagnosticCase, CaseDifficulty } from "@/types/diagnosis";
+
 
 export class CaseRepository {
   async findAll(): Promise<Result<DiagnosticCase[]>> {

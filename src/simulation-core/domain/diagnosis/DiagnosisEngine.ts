@@ -46,66 +46,33 @@ export class DiagnosisEngine {
       this.loadCircuit(setupFn);
       console.log(`[DiagnosisEngine] Circuit initialized with ${this.components.size} components`);
       
-      // Inject fault based on case components if applicable
-      // First check for components[] array from newer schema
-      let faultyComp = caseData.components?.find(c => c.isFaulty);
-      
-      // Fallback: If no components array, check title/description/content for implicit faults
-      // (This helps bridge the gap with simpler seeded data)
-      let failureDetails = faultyComp?.failureDetails;
-      let componentTag = faultyComp?.componentTag;
-      
-      if (!failureDetails) {
-        const titleUpper = caseData.title.toUpperCase();
-        if (titleUpper.includes('FALHA NO SELO')) {
-          failureDetails = 'BROKEN_AUX_CONTACT';
-          componentTag = 'K1';
-        } else if (titleUpper.includes('RELÉ TÉRMICO')) {
-          failureDetails = 'TRIPPED_RELAY';
-          componentTag = 'F2';
-        } else if (titleUpper.includes('MOTOR NÃO LIGA')) {
-          failureDetails = 'OPEN_FUSE';
-          componentTag = 'F1';
-        } else if (titleUpper.includes('CONTATOR NÃO ATRACA')) {
-          failureDetails = 'BROKEN_COIL';
-          componentTag = 'K1';
-        } else if (titleUpper.includes('REVERSÃO')) {
-          failureDetails = 'BROKEN_AUX_CONTACT';
-          componentTag = 'K2';
-        }
-      }
-
-      if (failureDetails) {
-        console.log(`[DiagnosisEngine] Fault detected: ${failureDetails} for component ${componentTag || 'default'}`);
+      // SINGLE SOURCE OF TRUTH: Inject fault from diagnosticCase.fault
+      if (caseData.fault && caseData.fault.type !== FaultType.NONE) {
+        const faultType = caseData.fault.type;
+        const componentTag = caseData.fault.componentTag;
         
-        // Use FaultMapper for normalization and validation
-        const faultType = FaultMapper.map(failureDetails);
-        console.log(`[DiagnosisEngine] Normalized fault: ${faultType}`);
-
-        // Set default tags if missing
-        const finalTag = componentTag || (faultType === FaultType.TRIPPED_RELAY ? 'F2' : (faultType === FaultType.OPEN_FUSE ? 'F1' : 'K1'));
-
-        // Validate component exists in initialized circuit
-        if (!this.components.has(finalTag)) {
-          console.warn(`[DiagnosisEngine] Component "${finalTag}" not found in current circuit topology. Attempting fallback.`);
-          // Try to find ANY component of the same type if the specific tag failed
-          const fallback = Array.from(this.components.values()).find(c => {
+        console.log(`[DiagnosisEngine] Injecting Fault: ${faultType} on ${componentTag}`);
+        
+        if (!this.components.has(componentTag)) {
+           // Fallback for generic tags if specific one missing
+           const fallback = Array.from(this.components.values()).find(c => {
              if (faultType === FaultType.TRIPPED_RELAY) return c instanceof ThermalRelayComponent;
              if (faultType === FaultType.OPEN_FUSE) return c instanceof CircuitBreakerComponent;
              if (faultType === FaultType.BROKEN_COIL) return c instanceof ContactorComponent;
              return false;
-          });
-          if (fallback) {
-            console.log(`[DiagnosisEngine] Found fallback component: ${fallback.id}`);
-            this.injectFault(faultType, fallback.id);
-          } else {
-            throw new Error(`Component "${finalTag}" not found in circuit topology and no fallback found.`);
-          }
+           });
+           
+           if (fallback) {
+             console.log(`[DiagnosisEngine] Found fallback component for fault: ${fallback.id}`);
+             this.injectFault(faultType, fallback.id);
+           } else {
+             throw new Error(`CRITICAL: Fault component "${componentTag}" not found in circuit topology.`);
+           }
         } else {
-          this.injectFault(faultType, finalTag);
+          this.injectFault(faultType, componentTag);
         }
       } else {
-        console.log('[DiagnosisEngine] No fault identified from case data');
+        console.log('[DiagnosisEngine] No fault defined for this case.');
       }
     } catch (error: any) {
       console.error(`[DiagnosisEngine] CRITICAL ERROR during case loading:`, error);
@@ -114,6 +81,7 @@ export class DiagnosisEngine {
       throw error; 
     }
   }
+
 
   loadCircuit(setupFn: (solver: CircuitSolver) => void) {
     setupFn(this.solver);
@@ -228,11 +196,11 @@ export class DiagnosisEngine {
 
     let observation = "Ação executada.";
 
-    // Handle narrative node transitions if the action matches a choice in the current node
-    if (this.currentCase?.occurrence) {
-      // For now, if the action is a choice label from the reference project style
-      // We map these to the narrative flow
+    // Single Source of Truth: Narrative flow or State Machine check
+    if (this.currentCase?.objective) {
+      // Logic for mission objectives
     }
+
 
     if (action === 'PRESS_START') {
       const targetId = params.id || 'S2';
@@ -274,10 +242,11 @@ export class DiagnosisEngine {
           console.log(`[DiagnosisEngine] Component ${params.id} replaced. Checking if it clears active fault: ${this.activeFault}`);
           
           const faultyComp = this.currentCase?.components?.find(c => c.isFaulty);
-          if (faultyComp && faultyComp.componentTag === params.id) {
+          if (faultyComp && faultyComp.tag === params.id) {
             console.log(`[DiagnosisEngine] Success! Faulty component ${params.id} replaced. Clearing fault.`);
             this.activeFault = FaultType.NONE;
           } else {
+
             // Fallback for generic cases or legacy data
             const faultComponentMap: Record<string, FaultType> = {
               'F1': FaultType.OPEN_FUSE,
