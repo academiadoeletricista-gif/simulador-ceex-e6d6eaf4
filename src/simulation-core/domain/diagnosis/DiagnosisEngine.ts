@@ -379,6 +379,7 @@ export class DiagnosisEngine {
       xp: this.totalXP,
       score: this.totalScore,
       error: this.errorMessage,
+      case: this.currentCase, // Expose current case for UI
       quiz: {
         currentQuestion: this.quizState.currentQuestion,
         isCorrect: null
@@ -396,4 +397,5 @@ export class DiagnosisEngine {
       }))
     };
   }
+
 }
