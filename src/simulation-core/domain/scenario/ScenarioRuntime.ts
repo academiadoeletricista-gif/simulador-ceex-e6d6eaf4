@@ -175,8 +175,9 @@ export class ScenarioRuntime {
     this.validateHypothesesByAction('inspection', params.target);
   }
 
-  private validateHypothesesByAction(type: string, target: string) {
+  private validateHypothesesByAction(type: string, target: string, value?: string) {
     this.state.hypotheses.forEach(h => {
+
       if (h.status !== 'PENDING') return;
 
       const logic = h.validationLogic;
