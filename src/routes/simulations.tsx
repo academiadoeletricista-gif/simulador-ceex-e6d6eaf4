@@ -185,6 +185,22 @@ function SimulationsPage() {
             </div>
           </div>
 
+          {/* Active Symptoms Panel */}
+          <div className="space-y-4">
+            <h3 className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest flex items-center gap-2">
+              <AlertTriangle size={12} /> Sintomas Ativos
+            </h3>
+            <div className="space-y-2">
+              {currentNode?.situation ? (
+                <div className="p-3 bg-red-500/5 border border-red-500/10 rounded-lg">
+                  <p className="text-[10px] leading-tight text-red-600 italic">"{currentNode.situation}"</p>
+                </div>
+              ) : (
+                <p className="text-[10px] italic text-muted-foreground">Nenhum sintoma observado.</p>
+              )}
+            </div>
+          </div>
+
           {/* Hypotheses Panel */}
           <div className="space-y-4">
             <h3 className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest flex items-center gap-2">
@@ -206,6 +222,7 @@ function SimulationsPage() {
               )}
             </div>
           </div>
+
 
           {/* History */}
           <div className="space-y-4 pt-4 border-t">
