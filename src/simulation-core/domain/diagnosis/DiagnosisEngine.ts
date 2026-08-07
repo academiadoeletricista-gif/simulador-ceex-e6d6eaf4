@@ -1,7 +1,8 @@
 import { SimulationState, SessionStatus } from '../sessions/SimulationSession';
 import { DiagnosticCase } from '@/types/diagnosis';
 import { ScenarioRuntime } from '../scenario/ScenarioRuntime';
-import { ScenarioState } from '../scenario/ScenarioState';
+import { ScenarioState, ScenarioStatus } from '../scenario/ScenarioState';
+
 
 export class DiagnosisEngine {
   private runtime: ScenarioRuntime | null = null;
