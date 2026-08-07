@@ -16,6 +16,8 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/useAppStore";
 import { supabase } from "@/integrations/supabase/client";
+import { migratePD001 } from "@/migrations/pd001_migration";
+
 import {
   LayoutDashboard,
   Library,
