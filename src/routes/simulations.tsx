@@ -30,7 +30,7 @@ import { useEffect, useState, useMemo } from "react";
 import { z } from "zod";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { NodeType } from "@/domains/diagnosis/types/enums";
+// Removed legacy NodeType import
 import { Progress } from "@/components/ui/progress";
 
 const simulationSearchSchema = z.object({
@@ -602,7 +602,7 @@ function SimulationsPage() {
             </div>
             <div className="flex justify-between text-xs">
               <span className="text-muted-foreground">Nível:</span>
-              <span className="font-medium text-primary">{activeCase.level}</span>
+              <span className="font-medium text-primary">{activeCase.difficulty}</span>
             </div>
             <div className="flex justify-between text-xs">
               <span className="text-muted-foreground">XP em jogo:</span>

@@ -166,7 +166,7 @@ function LabDetail() {
                     <CardHeader className="pb-2">
                       <div className="flex justify-between items-start mb-2">
                         <Badge variant="outline" className="font-mono text-[10px] border-2">{defect.code}</Badge>
-                        {!isCompleted && <Badge variant="secondary" className="text-[10px]">{defect.level}</Badge>}
+                        {!isCompleted && <Badge variant="secondary" className="text-[10px]">{defect.difficulty}</Badge>}
                       </div>
                       <CardTitle className="text-lg group-hover:text-primary transition-colors">{defect.title}</CardTitle>
                       <CardDescription className="line-clamp-2 text-xs">{defect.description}</CardDescription>
@@ -174,7 +174,7 @@ function LabDetail() {
                     <CardContent className="space-y-4">
                       <div className="flex items-center gap-4 text-[10px] font-bold text-muted-foreground uppercase">
                         <span className="flex items-center gap-1"><Zap className="h-3 w-3 text-primary" /> +{defect.xpReward} XP</span>
-                        <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {defect.timeEstimate}</span>
+                        <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {defect.estimatedTime}</span>
                       </div>
                       
                       <Button 
