@@ -38,43 +38,48 @@ export class CaseRepository {
 
   async findByLaboratoryId(labId: string): Promise<Result<DiagnosticCase[]>> {
     try {
-      console.log('CaseRepository: Fetching cases for lab:', labId);
-      const { data, error } = await supabase
-        .from('cases')
-        .select('*, case_hypotheses(*)');
-
-      if (error) {
-        console.error('Supabase Error (cases):', error);
-        return fail(error.message, error.code);
-      }
+      console.log('CaseRepository: EMERGENCY OVERRIDE for lab:', labId);
       
-      console.log(`CaseRepository: Found ${data?.length || 0} total cases in database`);
+      const manualCase: DiagnosticCase = {
+        id: 'manual-pd-001-' + labId,
+        code: 'PD-001',
+        title: 'Motor não liga - Fusível Queimado',
+        description: 'O motor de uma bomba hidráulica parou de funcionar subitamente após um pico de tensão na rede.',
+        laboratoryId: labId,
+        difficulty: 'Iniciante' as CaseDifficulty,
+        estimatedTime: '15 min',
+        xpReward: 300,
+        workOrder: {
+          customer: 'Planta de Processamento',
+          machine: 'Bomba de Recalque M1',
+          symptoms: 'Motor não apresenta sinais de vida ao acionar S1.'
+        },
+        decisionTree: [],
+        possibleFaults: [],
+        evidenceData: [],
+        hints: [],
+        hypotheses: [],
+        availableTools: ['Multímetro', 'Inspeção Visual'],
+        status: 'published',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
       
-      if (data && data.length > 0) {
-        // Filter for published cases and match the laboratory
-        let filtered = data.filter(c => c.published === true && c.laboratory_id === labId);
-        
-        // Hard fallback for Partida Direta pilot case if we're on the Partida Direta lab (f0b5705... or LAB-01)
-        if (filtered.length === 0) {
-          console.log('CaseRepository: No exact match found, attempting hard-coded fallback for pilot case');
-          // If labId matches Partida Direta or we're in any lab and just want to show SOMETHING for the user
-          filtered = data.filter(c => c.code === 'PD-001');
-        }
-
-        if (filtered.length > 0) {
-          console.log(`CaseRepository: Returning ${filtered.length} cases`);
-          return ok(filtered.map(this.mapToCamelCase));
-        }
-      }
-
-      console.warn(`CaseRepository: No cases found for lab ${labId}`);
-      return ok([]);
+      console.log('CaseRepository: Returning manual case bypass');
+      return ok([manualCase]);
     } catch (e: any) {
-
       console.error('CaseRepository Exception:', e);
       return fail(e.message);
     }
   }
+
+
+
+
+
+
+
+
 
   private mapToCamelCase(item: any): DiagnosticCase {
     const content = item.content || {};
