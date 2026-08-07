@@ -71,8 +71,23 @@ export class DiagnosisEngine {
       this.addHistory('ACTION', actionId);
     }
   }
+  
+  useHint() {
+    if (!this.currentCase || this.status === SessionStatus.COMPLETED) return;
+    
+    const allHints: any[] = (this.currentCase as any).hints || [];
+    const availableHints = allHints.filter(h => !this.activeHints.includes(h.text));
+    
+    if (availableHints.length > 0) {
+      // Get the next hint by level
+      const nextHint = availableHints.sort((a, b) => a.level - b.level)[0];
+      this.activeHints.push(nextHint.text);
+      this.addHistory('HINT_USED', `Dica Nível ${nextHint.level} utilizada`, -(nextHint.xpPenalty || 0));
+    }
+  }
 
   collectEvidence(evidenceId: string) {
+
     const evidenceData = (this.currentCase as any).evidenceData?.find((e: any) => e.id === evidenceId);
     if (evidenceData && !this.evidence.find(e => e.id === evidenceId)) {
       this.evidence.push({
