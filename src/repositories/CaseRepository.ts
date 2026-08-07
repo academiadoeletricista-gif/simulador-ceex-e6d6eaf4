@@ -35,7 +35,7 @@ export class CaseRepository {
         .from('diagnostic_cases')
         .select('*')
         .eq('id', id)
-        .single();
+        .maybeSingle();
 
       if (!diagError && diagCase) {
         const { data: hypotheses } = await supabase
@@ -51,7 +51,7 @@ export class CaseRepository {
         .from('cases')
         .select('*')
         .eq('id', id)
-        .single();
+        .maybeSingle();
 
       if (caseError) {
         if (caseError.code === 'PGRST116') return ok(null);
@@ -77,7 +77,7 @@ export class CaseRepository {
         .from('diagnostic_cases')
         .select('*')
         .eq('code', code)
-        .single();
+        .maybeSingle();
 
       if (!diagError && diagCase) {
         const { data: hypotheses } = await supabase
@@ -93,7 +93,7 @@ export class CaseRepository {
         .from('cases')
         .select('*')
         .eq('code', code)
-        .single();
+        .maybeSingle();
 
       if (caseError) {
         if (caseError.code === 'PGRST116') return ok(null);
