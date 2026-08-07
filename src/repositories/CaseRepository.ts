@@ -51,7 +51,27 @@ export class CaseRepository {
       }
       
       console.log(`Found ${data?.length || 0} cases for lab ${labId}`);
-      return ok(data.map(this.mapToCamelCase));
+      if (data && data.length > 0) {
+        return ok(data.map(this.mapToCamelCase));
+      }
+
+      // Fallback: Se não houver laboratório vinculado, tenta buscar todos (pode ser útil se o ID mudou)
+      console.log('No cases found for labId. Trying fallback...');
+      const { data: allData, error: allErrors } = await supabase
+        .from('cases')
+        .select('*, case_hypotheses(*)')
+        .eq('published', true);
+      
+      if (allData) {
+        // Se encontrarmos casos com laboratory_id nulo, vamos usá-los como fallback
+        const filtered = allData.filter(c => !c.laboratory_id || c.laboratory_id === labId);
+        if (filtered.length > 0) {
+          console.log(`Fallback found ${filtered.length} cases`);
+          return ok(filtered.map(this.mapToCamelCase));
+        }
+      }
+
+      return ok([]);
     } catch (e: any) {
       console.error('Exception in findByLaboratoryId:', e);
       return fail(e.message);
