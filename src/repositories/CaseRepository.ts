@@ -72,7 +72,9 @@ export class CaseRepository {
       decisionTree: content.decisionTree || [],
       possibleFaults: content.possibleFaults || [],
       evidenceData: content.evidenceData || [],
+      hints: content.hints || [],
       availableTools: content.availableTools || ['Multímetro', 'Inspeção Visual'],
+
 
       topology: content.topology,
       category: item.category,
