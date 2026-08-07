@@ -67,6 +67,15 @@ function SimulationsPage() {
 
   const activeCase = caseResult?.success ? caseResult.data : null;
 
+  if (activeCase && !isError && !state) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[calc(100vh-4rem)] space-y-4">
+        <Activity size={48} className="text-primary animate-pulse" />
+        <p className="text-muted-foreground animate-pulse">Preparando cenário...</p>
+      </div>
+    );
+  }
+
   if (!activeCase || !id || isError || !state) {
     return (
       <div className="flex flex-col items-center justify-center h-[calc(100vh-4rem)] space-y-4">
