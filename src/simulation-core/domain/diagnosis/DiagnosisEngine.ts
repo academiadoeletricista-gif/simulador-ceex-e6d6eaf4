@@ -1,5 +1,8 @@
 import { SimulationState, SessionStatus } from '../sessions/SimulationSession';
 import { DiagnosticCase } from '@/types/diagnosis';
+import { ScenarioRuntime } from '../scenario/ScenarioRuntime';
+import { ScenarioState } from '../scenario/ScenarioState';
+
 
 export class DiagnosisEngine {
   private startTime: number = Date.now();
