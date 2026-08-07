@@ -17,7 +17,11 @@ export class MeasurementEngine {
     // For PD-001 functional implementation, we use evidenceData from the case.
     
     const evidence = currentCase.evidenceData?.find(e => 
-      e.type === 'measurement' && (e.label === point || e.label.split('-').reverse().join('-') === point)
+      e.type === 'measurement' && (
+        e.label === point || 
+        e.label.split('-').reverse().join('-') === point ||
+        (point.includes('-') && e.label === point.split('-')[0]) // Fallback for single point in list
+      )
     );
 
     if (evidence) {
