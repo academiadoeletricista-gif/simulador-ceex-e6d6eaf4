@@ -38,17 +38,17 @@ export class CaseRepository {
 
   async findByLaboratoryId(labId: string): Promise<Result<DiagnosticCase[]>> {
     try {
-      console.log('Fetching cases for lab:', labId);
+      console.log('CaseRepository: Fetching cases for lab:', labId);
       const { data, error } = await supabase
         .from('cases')
         .select('*, case_hypotheses(*)');
 
       if (error) {
-        console.error('Error fetching cases:', error);
+        console.error('Supabase Error (cases):', error);
         return fail(error.message, error.code);
       }
       
-      console.log(`Found ${data?.length || 0} total cases in database`);
+      console.log(`CaseRepository: Found ${data?.length || 0} total cases in database`);
       
       if (data && data.length > 0) {
         // Log individual cases to see their published status and lab ID
@@ -59,7 +59,7 @@ export class CaseRepository {
         
         // Hard fallback for Partida Direta pilot case
         if (filtered.length === 0 && (labId === 'f0b5705a-fac8-4f7c-bf17-fbd1b059c1e6' || labId === 'LAB-01')) {
-          console.log('Pilot case fallback: PD-001');
+          console.log('CaseRepository: Pilot case fallback: PD-001');
           filtered = data.filter(c => c.code === 'PD-001');
         }
 
@@ -68,9 +68,10 @@ export class CaseRepository {
         }
       }
 
+      console.warn(`CaseRepository: No cases found for lab ${labId}`);
       return ok([]);
     } catch (e: any) {
-      console.error('Exception in findByLaboratoryId:', e);
+      console.error('CaseRepository Exception:', e);
       return fail(e.message);
     }
   }

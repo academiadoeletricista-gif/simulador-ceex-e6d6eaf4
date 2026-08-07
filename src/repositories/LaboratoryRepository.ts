@@ -5,15 +5,21 @@ import { Laboratory } from "@/types/laboratory";
 export class LaboratoryRepository {
   async findAll(): Promise<Result<Laboratory[]>> {
     try {
+      console.log('Repository: Fetching all laboratories');
       const { data, error } = await supabase
         .from('laboratories')
         .select('*');
 
-      if (error) return fail(error.message, error.code);
+      if (error) {
+        console.error('Supabase Error (laboratories):', error);
+        return fail(error.message, error.code);
+      }
       
+      console.log(`Repository: Found ${data?.length || 0} laboratories`);
       const labs = (data || []).map(l => this.mapToDomain(l));
       return ok(labs);
     } catch (e: any) {
+      console.error('Repository Exception (laboratories):', e);
       return fail(e.message);
     }
   }
