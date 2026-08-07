@@ -157,6 +157,8 @@ function RootLayout() {
   const sidebarOpen = useAppStore(state => state.isSidebarOpen);
   const toggleSidebar = useAppStore(state => state.toggleSidebar);
   const location = useLocation();
+  const navigate = useNavigate();
+
   const { data: profileResult } = useProfile();
   const profile = profileResult?.success ? profileResult.data : null;
   const [isAuthenticating, setIsAuthenticating] = useState(true);
