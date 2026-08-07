@@ -38,14 +38,22 @@ export class CaseRepository {
 
   async findByLaboratoryId(labId: string): Promise<Result<DiagnosticCase[]>> {
     try {
+      console.log('Fetching cases for lab:', labId);
       const { data, error } = await supabase
         .from('cases')
         .select('*, case_hypotheses(*)')
-        .eq('laboratory_id', labId);
+        .eq('laboratory_id', labId)
+        .eq('published', true);
 
-      if (error) return fail(error.message, error.code);
+      if (error) {
+        console.error('Error fetching cases:', error);
+        return fail(error.message, error.code);
+      }
+      
+      console.log(`Found ${data?.length || 0} cases for lab ${labId}`);
       return ok(data.map(this.mapToCamelCase));
     } catch (e: any) {
+      console.error('Exception in findByLaboratoryId:', e);
       return fail(e.message);
     }
   }
