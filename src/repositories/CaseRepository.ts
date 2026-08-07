@@ -50,34 +50,50 @@ export class CaseRepository {
   }
 
   private mapToCamelCase(item: any): DiagnosticCase {
-    // Map database snake_case fields to domain camelCase fields
-    // Based on the 'cases' table schema in migrations
+    const content = item.content || {};
+    
     return {
       id: item.id,
-      laboratoryId: item.laboratory_id,
-      code: item.code,
+      code: item.code || content.code,
       title: item.title,
-      description: item.description,
-      category: item.category,
-      level: item.level,
+      description: item.description || content.description,
+      laboratoryId: item.laboratory_id,
+      topology: content.topology || 'DOL',
+      difficulty: item.level as CaseDifficulty,
+      estimatedTime: item.time_estimate,
       xpReward: item.xp_reward,
-      timeEstimate: item.time_estimate,
-      complexity: item.complexity || 0,
-      author: item.author,
-      version: item.version || '1.0.0',
+      objective: content.objective || item.description,
+      
+      circuit: content.circuit || { baseVoltage: 220, nodes: [] },
+      components: content.components || [],
+      
+      fault: content.fault || {
+        type: 'NONE',
+        componentTag: '',
+        description: 'Nenhuma falha'
+      },
+      
+      initialState: content.initialState || {},
+      expectedMeasurements: content.expectedMeasurements || [],
+      
+      availableTools: content.availableTools || ['Multímetro', 'Inspeção Visual'],
+      repairActions: content.repairActions || [],
+      
+      completionCriteria: content.completionCriteria || {
+        faultRemoved: true,
+        motorRunning: true
+      },
+
+      category: item.category,
       status: (item.published ? 'published' : 'draft') as any,
       createdAt: item.created_at,
       updatedAt: item.updated_at,
-      
-      // Handle array fields or JSONB content if present
       symptoms: Array.isArray(item.symptoms) 
         ? item.symptoms.map((s: string, i: number) => ({ id: `${item.id}-s-${i}`, description: s }))
         : [],
-      
-      // Map other fields from JSONB 'content' if it exists
-      ...(item.content || {})
-    } as unknown as DiagnosticCase;
+    };
   }
+
 }
 
 export const caseRepository = new CaseRepository();
