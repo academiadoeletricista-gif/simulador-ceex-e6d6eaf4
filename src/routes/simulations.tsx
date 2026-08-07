@@ -357,52 +357,46 @@ function SimulationsPage() {
                 </div>
 
                 {/* Multimeter Tool */}
+                {/* Multimeter Tool (Simplified for Scenario Engine) */}
                 <Card className="border-2 border-primary/20 bg-card/50">
-                    <CardHeader className="py-4 border-b">
+                    <CardHeader className="py-3 border-b flex flex-row items-center justify-between">
                       <CardTitle className="text-xs font-black uppercase tracking-widest flex items-center gap-2">
-                        <Zap size={14} className="text-primary" /> Multímetro (Pontos de Medição)
+                        <Zap size={14} className="text-primary" /> Multímetro
                       </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-4">
-                      <div className="flex justify-between items-center mb-4">
-                        <CardTitle className="text-xs font-black uppercase tracking-widest flex items-center gap-2">
-                          <Zap size={14} className="text-primary" /> Pontos de Medição
-                        </CardTitle>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="h-6 text-[10px] uppercase font-bold text-muted-foreground hover:text-primary transition-colors"
-                          onClick={() => setInfoCollapsed(!infoCollapsed)}
-                        >
-                          {infoCollapsed ? "Expandir" : "Recolher"}
-                        </Button>
-                      </div>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-6 text-[10px] uppercase font-bold text-muted-foreground"
+                        onClick={() => setInfoCollapsed(!infoCollapsed)}
+                      >
+                        {infoCollapsed ? "Abrir" : "Fechar"}
+                      </Button>
                     </CardHeader>
                     {!infoCollapsed && (
-                      <CardContent className="p-4 pt-0">
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                      <CardContent className="p-4">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                           {state.measurementPoints.map((point) => (
                             <Button 
                               key={point} 
                               variant="outline" 
                               size="sm" 
                               className="text-[10px] font-mono h-8 flex justify-between group/btn"
-
-                            onClick={() => {
-                              const evidence = (activeCase as any).evidenceData?.find((e: any) => e.label.includes(point));
-                              if (evidence) {
-                                // Simplified for now: just trigger evidence collection if found
-                                selectChoice(state.currentNodeId, { evidenceId: evidence.id });
-                              }
-                            }}
-                          >
-                            <span>{point}</span>
-                            <ArrowRight size={10} className="opacity-50" />
-                          </Button>
-                        ))}
-                      </div>
-                    </CardContent>
+                              onClick={() => {
+                                const evidence = (activeCase as any).evidenceData?.find((e: any) => e.label.includes(point));
+                                if (evidence) {
+                                  selectChoice(state.currentNodeId, { evidenceId: evidence.id });
+                                }
+                              }}
+                            >
+                              <span>{point}</span>
+                              <ArrowRight size={10} className="opacity-0 group-hover/btn:opacity-100 transition-opacity" />
+                            </Button>
+                          ))}
+                        </div>
+                      </CardContent>
+                    )}
                 </Card>
+
 
                 {/* Scenario Node Context */}
 
