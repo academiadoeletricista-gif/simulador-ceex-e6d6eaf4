@@ -137,7 +137,7 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
-function RootContent() {
+function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const sidebarOpen = useAppStore(state => state.isSidebarOpen);
   const toggleSidebar = useAppStore(state => state.toggleSidebar);
