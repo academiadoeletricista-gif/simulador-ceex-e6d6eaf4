@@ -381,7 +381,7 @@ function SimulationsPage() {
                     <CardTitle className="text-3xl font-black uppercase italic">RELATÓRIO TÉCNICO FINAL</CardTitle>
                     <CardDescription className="text-green-600 font-bold uppercase tracking-widest">Diagnóstico Concluído com Sucesso</CardDescription>
                   </CardHeader>
-                  <CardContent className="p-10 space-y-8">
+                  <CardContent className="p-10 space-y-10">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
                       <div className="space-y-1">
                         <p className="text-[10px] text-muted-foreground uppercase font-black">Nota Técnica</p>
@@ -396,10 +396,52 @@ function SimulationsPage() {
                         <p className="text-4xl font-black text-foreground">{state.score}%</p>
                       </div>
                       <div className="space-y-1">
-                        <p className="text-[10px] text-muted-foreground uppercase font-black">Status</p>
-                        <p className="text-4xl font-black text-blue-500">OPK</p>
+                        <p className="text-[10px] text-muted-foreground uppercase font-black">Tempo</p>
+                        <p className="text-4xl font-black text-blue-500 font-mono">
+                          {Math.floor(state.timer / 60)}:{(state.timer % 60).toString().padStart(2, '0')}
+                        </p>
                       </div>
                     </div>
+
+                    {/* Pedagogical Lesson Content */}
+                    {currentNode?.lesson && (
+                      <div className="space-y-8 animate-in fade-in duration-700 delay-300">
+                        <div className="p-6 bg-primary/5 border-l-4 border-primary rounded-r-xl space-y-3">
+                          <h4 className="text-sm font-black uppercase tracking-widest text-primary flex items-center gap-2">
+                            <BookOpen size={16} /> Resumo Técnico do Caso
+                          </h4>
+                          <p className="text-lg font-medium leading-relaxed italic">
+                            "{currentNode.lesson.technicalSummary}"
+                          </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                          <div className="space-y-3">
+                            <h5 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Explicação da Falha</h5>
+                            <p className="text-sm leading-relaxed">{currentNode.lesson.failureExplanation}</p>
+                          </div>
+                          <div className="space-y-3">
+                            <h5 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Teoria de Circuitos</h5>
+                            <p className="text-sm leading-relaxed">{currentNode.lesson.circuitTheory}</p>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                           <div className="p-4 bg-muted/30 rounded-lg border space-y-2">
+                             <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Base Fundamental</p>
+                             <p className="text-xs font-medium">{currentNode.lesson.fundamentalBasis}</p>
+                           </div>
+                           <div className="p-4 bg-green-500/5 rounded-lg border border-green-500/10 space-y-2">
+                             <p className="text-[10px] font-black uppercase tracking-widest text-green-600">Melhores Práticas</p>
+                             <p className="text-xs">{currentNode.lesson.bestPractices || "Siga sempre o diagrama elétrico e utilize EPIs adequados."}</p>
+                           </div>
+                           <div className="p-4 bg-red-500/5 rounded-lg border border-red-500/10 space-y-2">
+                             <p className="text-[10px] font-black uppercase tracking-widest text-red-600">Alertas de Segurança</p>
+                             <p className="text-xs">{currentNode.lesson.safetyWarnings || "Nunca realize medições de continuidade em circuitos energizados."}</p>
+                           </div>
+                        </div>
+                      </div>
+                    )}
 
                     <div className="space-y-4 border-t pt-8">
                       <h4 className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-4">Cronologia do Diagnóstico</h4>
@@ -409,7 +451,11 @@ function SimulationsPage() {
                             <span className="text-[10px] font-mono text-muted-foreground mt-1 shrink-0">{new Date(h.timestamp).toLocaleTimeString()}</span>
                             <div className="space-y-1">
                               <p className="font-bold">{h.description}</p>
-                              {h.points && h.points > 0 && <span className="text-[10px] font-bold text-green-500">+{h.points} XP</span>}
+                              {h.points !== undefined && h.points !== 0 && (
+                                <span className={cn("text-[10px] font-bold", h.points > 0 ? "text-green-500" : "text-red-500")}>
+                                  {h.points > 0 ? '+' : ''}{h.points} XP
+                                </span>
+                              )}
                             </div>
                           </div>
                         ))}
@@ -420,6 +466,7 @@ function SimulationsPage() {
                       Finalizar e Sair do Laboratório
                     </Button>
                   </CardContent>
+
                 </Card>
               </div>
             )}
