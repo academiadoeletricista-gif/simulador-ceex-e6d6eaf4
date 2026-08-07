@@ -56,6 +56,25 @@ export interface DecisionNode {
     correct: string;
     wrong?: [string, string][];
   }>;
+  // Pedagogical content for completion nodes
+  lesson?: CaseLesson;
+}
+
+export interface CaseLesson {
+  technicalSummary: string;
+  failureExplanation: string;
+  circuitTheory: string;
+  fundamentalBasis: string;
+  bestPractices?: string;
+  commonMistakes?: string;
+  safetyWarnings?: string;
+}
+
+export interface CaseHint {
+  id: string;
+  text: string;
+  xpPenalty: number;
+  level: 1 | 2 | 3;
 }
 
 export interface DecisionOption {
@@ -66,5 +85,6 @@ export interface DecisionOption {
   xpReward?: number;
   unlockedEvidenceIds?: string[];
 }
+
 
 
