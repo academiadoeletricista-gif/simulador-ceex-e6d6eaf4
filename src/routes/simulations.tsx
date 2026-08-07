@@ -333,7 +333,39 @@ function SimulationsPage() {
                    <Badge variant="outline" className="font-mono">{state.collectedEvidence.length} Evidências</Badge>
                 </div>
 
+                {/* Multimeter Tool */}
+                <Card className="border-2 border-primary/20 bg-card/50">
+                    <CardHeader className="py-4 border-b">
+                      <CardTitle className="text-xs font-black uppercase tracking-widest flex items-center gap-2">
+                        <Zap size={14} className="text-primary" /> Multímetro (Pontos de Medição)
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-4">
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                        {state.measurementPoints.map((point) => (
+                          <Button 
+                            key={point} 
+                            variant="outline" 
+                            size="sm" 
+                            className="text-[10px] font-mono h-8 flex justify-between"
+                            onClick={() => {
+                              const evidence = (activeCase as any).evidenceData?.find((e: any) => e.label.includes(point));
+                              if (evidence) {
+                                // Simplified for now: just trigger evidence collection if found
+                                selectChoice(state.currentNodeId, { evidenceId: evidence.id });
+                              }
+                            }}
+                          >
+                            <span>{point}</span>
+                            <ArrowRight size={10} className="opacity-50" />
+                          </Button>
+                        ))}
+                      </div>
+                    </CardContent>
+                </Card>
+
                 {/* Scenario Node Context */}
+
                 {currentNode && (
                   <Card className="border-primary shadow-xl overflow-hidden ring-4 ring-primary/5">
                     <CardHeader className="bg-primary/5 border-b py-4">
