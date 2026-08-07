@@ -67,7 +67,16 @@ function SimulationsPage() {
 
   const activeCase = caseResult?.success ? caseResult.data : null;
 
-  if (!activeCase || !id || isError) {
+  if (activeCase && !isError && !state) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[calc(100vh-4rem)] space-y-4">
+        <Activity size={48} className="text-primary animate-pulse" />
+        <p className="text-muted-foreground animate-pulse">Preparando cenário...</p>
+      </div>
+    );
+  }
+
+  if (!activeCase || !id || isError || !state) {
     return (
       <div className="flex flex-col items-center justify-center h-[calc(100vh-4rem)] space-y-4">
         <div className="p-8 text-center max-w-md space-y-4">
@@ -78,9 +87,9 @@ function SimulationsPage() {
           <p className="text-muted-foreground">
             Houve um problema ao carregar os dados do seu cenário. Tente iniciar novamente pela biblioteca.
           </p>
-          {state.error && (
+          {state?.error && (
             <div className="text-xs bg-red-500/5 p-3 rounded font-mono text-red-400 mt-4 text-left border border-red-500/20">
-              {state.error}
+              {state?.error}
             </div>
           )}
           <Button className="w-full mt-6" onClick={() => navigate({ to: "/library" })}>
