@@ -13,6 +13,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/useAppStore";
+import { supabase } from "@/integrations/supabase/client";
 import {
   LayoutDashboard,
   Library,
@@ -140,6 +141,29 @@ function RootComponent() {
   const sidebarOpen = useAppStore(state => state.isSidebarOpen);
   const toggleSidebar = useAppStore(state => state.toggleSidebar);
   const location = useLocation();
+  const [isAuthenticating, setIsAuthenticating] = useState(true);
+
+  useEffect(() => {
+    const initAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session) {
+          console.log("No active session found, signing in anonymously...");
+          const { error } = await supabase.auth.signInAnonymously();
+          if (error) {
+            console.error("Failed to sign in anonymously:", error);
+          }
+        }
+      } catch (err) {
+        console.error("Auth bootstrap error:", err);
+      } finally {
+        setIsAuthenticating(false);
+      }
+    };
+
+    initAuth();
+  }, []);
 
   const menuItems = [
     { icon: LayoutDashboard, label: "Dashboard", path: "/" },
@@ -157,6 +181,17 @@ function RootComponent() {
     { icon: ShieldCheck, label: "Admin", path: "/admin" },
     { icon: BarChart3, label: "Enterprise", path: "/analytics" },
   ];
+
+  if (isAuthenticating) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+          <p className="text-sm text-muted-foreground animate-pulse">Iniciando laboratório...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
