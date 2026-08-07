@@ -1,26 +1,39 @@
+import { DiagnosticCase } from '@/types/diagnosis';
+
 export enum SessionStatus {
   IN_PROGRESS = 'IN_PROGRESS',
-  QUIZ_PENDING = 'QUIZ_PENDING',
   COMPLETED = 'COMPLETED',
   FAILED = 'FAILED',
   ERROR = 'ERROR'
 }
 
 export interface SimulationState {
-  history: any[];
-  isMotorRunning: boolean;
-  startTime: number;
   status: SessionStatus;
-  currentNodeId: string;
+  startTime: number;
+  endTime?: number;
   xp: number;
   score: number;
   error?: string | null;
-  components: any[];
-  case?: any; // Single Source of Truth reference
-  quiz?: {
-    currentQuestion: any;
-    isCorrect: boolean | null;
-  };
-  report?: any;
+  history: Array<{
+    type: string;
+    description: string;
+    timestamp: number;
+    points?: number;
+  }>;
+  case: DiagnosticCase;
+  
+  // Scenario Engine state
+  currentNodeId: string;
+  currentHypotheses: Array<{
+    id: string;
+    label: string;
+    confidence: number;
+  }>;
+  collectedEvidence: Array<{
+    id: string;
+    type: 'visual' | 'measurement' | 'inspection' | 'document';
+    label: string;
+    value: string;
+  }>;
+  unlockedTools: string[];
 }
-
