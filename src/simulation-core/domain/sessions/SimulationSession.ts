@@ -37,5 +37,6 @@ export interface SimulationState {
   }>;
   unlockedTools: string[];
   activeHints: string[];
+  measurementPoints: string[];
   timer: number;
 }
