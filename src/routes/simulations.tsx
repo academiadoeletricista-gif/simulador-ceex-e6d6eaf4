@@ -138,6 +138,13 @@ function SimulationsPage() {
         </div>
 
         <div className="flex items-center gap-4">
+           <div className="flex flex-col items-end mr-4">
+             <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Cronômetro</p>
+             <p className="text-sm font-black font-mono text-primary">
+               {Math.floor(state.timer / 60).toString().padStart(2, '0')}:{(state.timer % 60).toString().padStart(2, '0')}
+             </p>
+           </div>
+           <div className="h-8 w-px bg-muted mx-2" />
            <Badge variant="outline" className="font-mono text-[10px] bg-primary/5">{state.xp} XP</Badge>
            <Button variant="outline" size="sm" className="h-8 gap-2" onClick={() => window.location.reload()}>
              <RefreshCcw size={14} /> Reiniciar
@@ -147,6 +154,7 @@ function SimulationsPage() {
            </Button>
         </div>
       </div>
+
 
       <div className="flex-1 flex overflow-hidden">
         {/* Sidebar: Navigation & Hypotheses */}
