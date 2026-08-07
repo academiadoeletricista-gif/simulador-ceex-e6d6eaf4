@@ -45,12 +45,22 @@ function SimulationsPage() {
   const navigate = useNavigate();
   
   const { data: caseResult, isLoading: caseLoading, error: caseError } = useCase(id || '');
-  const { state, loadCase, selectChoice, useHint, isLoading: diagnosisLoading, isError, sessionError } = useDiagnosis(id);
+  const { 
+    state, 
+    loadCase, 
+    selectChoice, 
+    selectHypothesis,
+    useHint, 
+    isLoading: diagnosisLoading, 
+    isError, 
+    sessionError 
+  } = useDiagnosis(id);
   const [showDiagram, setShowDiagram] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [infoCollapsed, setInfoCollapsed] = useState(false);
   const [activeTab, setActiveTab] = useState<'work-order' | 'investigation' | 'report'>('work-order');
   const [lastMessage, setLastMessage] = useState<string | null>(null);
+
 
 
   useEffect(() => {
@@ -238,12 +248,26 @@ function SimulationsPage() {
               <div className="space-y-4">
                 {state.currentHypotheses.length > 0 ? (
                   state.currentHypotheses.map((h) => (
-                    <div key={h.id} className="space-y-2">
+                    <div 
+                      key={h.id} 
+                      className={cn(
+                        "space-y-2 p-3 rounded-lg border-2 transition-all cursor-pointer",
+                        state.selectedHypothesisId === h.id ? "border-primary bg-primary/5" : "border-muted hover:border-primary/30",
+                        h.status === 'confirmed' && "border-green-500 bg-green-500/5",
+                        h.status === 'discarded' && "border-red-500 bg-red-500/5 opacity-60"
+                      )}
+                      onClick={() => !isCompleted && selectHypothesis(h.id)}
+                    >
                       <div className="flex justify-between text-[10px]">
                         <span className="font-bold truncate max-w-[140px]">{h.label}</span>
-                        <span className="font-mono text-primary">{h.confidence}%</span>
+                        <span className={cn(
+                          "font-mono font-bold",
+                          h.status === 'confirmed' ? "text-green-500" : h.status === 'discarded' ? "text-red-500" : "text-primary"
+                        )}>
+                          {h.status === 'confirmed' ? "Confirmada" : h.status === 'discarded' ? "Descartada" : `${h.confidence}%`}
+                        </span>
                       </div>
-                      <Progress value={h.confidence} className="h-1" />
+                      <Progress value={h.confidence} className={cn("h-1", h.status === 'confirmed' && "bg-green-500")} />
                     </div>
                   ))
                 ) : (
@@ -251,6 +275,7 @@ function SimulationsPage() {
                 )}
               </div>
             </div>
+
 
             {/* History */}
             <div className="space-y-4 pt-4 border-t">
@@ -375,23 +400,29 @@ function SimulationsPage() {
                     {!infoCollapsed && (
                       <CardContent className="p-4">
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                          {state.measurementPoints.map((point) => (
-                            <Button 
-                              key={point} 
-                              variant="outline" 
-                              size="sm" 
-                              className="text-[10px] font-mono h-8 flex justify-between group/btn"
-                              onClick={() => {
-                                const evidence = (activeCase as any).evidenceData?.find((e: any) => e.label.includes(point));
-                                if (evidence) {
-                                  selectChoice(state.currentNodeId, { evidenceId: evidence.id });
-                                }
-                              }}
-                            >
-                              <span>{point}</span>
-                              <ArrowRight size={10} className="opacity-0 group-hover/btn:opacity-100 transition-opacity" />
-                            </Button>
-                          ))}
+                          {state.measurementPoints.map((point) => {
+                            const isRequired = state.selectedHypothesisId && 
+                              (activeCase as any).hypotheses?.find((h: any) => h.id === state.selectedHypothesisId)?.validationLogic?.requiredMeasurement === point;
+
+                            return (
+                              <Button 
+                                key={point} 
+                                variant={isRequired ? "default" : "outline"} 
+                                size="sm" 
+                                className={cn(
+                                  "text-[10px] font-mono h-8 flex justify-between group/btn relative overflow-hidden",
+                                  isRequired && "ring-2 ring-primary ring-offset-2 animate-pulse"
+                                )}
+                                onClick={() => {
+                                  selectChoice('MEASURE', { point });
+                                }}
+                              >
+                                <span>{point}</span>
+                                <ArrowRight size={10} className="group-hover/btn:translate-x-1 transition-transform" />
+                              </Button>
+                            );
+                          })}
+
                         </div>
                       </CardContent>
                     )}
@@ -412,26 +443,38 @@ function SimulationsPage() {
                       <p className="text-2xl font-bold leading-tight text-foreground">{currentNode.situation || 'O que você deseja fazer em seguida?'}</p>
                       
                       <div className="grid gap-3 pt-4">
-                         {currentNode.options?.map((option: any, i: number) => (
-                           <Button 
-                             key={i} 
-                             variant="outline" 
-                             className="justify-start text-left h-auto py-5 px-6 hover:bg-primary/5 hover:border-primary/50 transition-all border-2 group"
-                             onClick={() => {
-                               if (option.consequence) setLastMessage(option.consequence);
-                               selectChoice(option.nextNodeId || currentNode.id, { xp: option.xpReward });
-                             }}
-                           >
-                             <span className="h-8 w-8 rounded-full border-2 border-muted flex items-center justify-center mr-6 text-xs font-black text-muted-foreground group-hover:border-primary group-hover:text-primary transition-colors">
-                               {String.fromCharCode(65 + i)}
-                             </span>
-                             <div>
-                               <p className="font-bold text-lg">{option.label}</p>
-                               {option.detail && <p className="text-xs text-muted-foreground mt-0.5">{option.detail}</p>}
-                             </div>
-                           </Button>
-                         ))}
+                         {currentNode.options?.map((option: any, i: number) => {
+                           const isRepairAction = option.nextNodeId === 'REPAIR' || option.nextNodeId === 'SUBSTITUTE' || option.label.toLowerCase().includes('reparar') || option.label.toLowerCase().includes('substituir');
+                           
+                           return (
+                             <Button 
+                               key={i} 
+                               variant={isRepairAction ? "default" : "outline"}
+                               className={cn(
+                                 "justify-start text-left h-auto py-5 px-6 hover:bg-primary/5 hover:border-primary/50 transition-all border-2 group",
+                                 isRepairAction && !state.confirmedRootCause && "opacity-50 grayscale cursor-not-allowed"
+                               )}
+                               onClick={() => {
+                                 if (isRepairAction && !state.confirmedRootCause) {
+                                   setLastMessage("Bloqueio Pedagógico: Você não pode realizar o reparo sem antes confirmar a causa raiz através de medições. Pulou etapas essenciais do diagnóstico!");
+                                   return;
+                                 }
+                                 if (option.consequence) setLastMessage(option.consequence);
+                                 selectChoice(option.nextNodeId || currentNode.id, { xp: option.xpReward });
+                               }}
+                             >
+                               <span className="h-8 w-8 rounded-full border-2 border-muted flex items-center justify-center mr-6 text-xs font-black text-muted-foreground group-hover:border-primary group-hover:text-primary transition-colors">
+                                 {isRepairAction ? <Hammer size={14} /> : String.fromCharCode(65 + i)}
+                               </span>
+                               <div>
+                                 <p className="font-bold text-lg">{option.label}</p>
+                                 {option.detail && <p className="text-xs text-muted-foreground mt-0.5">{option.detail}</p>}
+                               </div>
+                             </Button>
+                           );
+                         })}
                       </div>
+
                     </CardContent>
                     <div className="px-8 pb-6 flex justify-between items-center border-t pt-4 bg-primary/5">
                       <div className="flex gap-2">
