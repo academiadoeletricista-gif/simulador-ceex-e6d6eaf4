@@ -216,7 +216,7 @@ export class ScenarioRuntime {
 
   private handleTest(params: any) {
     const desc = this.isFaultActive 
-      ? (this.currentCase?.content?.failureSymptom || "O motor não parte ou apresenta comportamento irregular.") 
+      ? (this.currentCase?.description || "O motor não parte ou apresenta comportamento irregular.") 
       : "O motor está operando normalmente conforme especificações técnicas.";
     
     this.addActionRecord('TEST', `Teste funcional: ${desc}`, 10);
