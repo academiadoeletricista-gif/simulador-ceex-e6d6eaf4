@@ -264,19 +264,54 @@ function RootLayout() {
             </button>
             <div className="flex-1" />
             <div className="flex items-center gap-4">
-              <div className="text-right hidden sm:block">
-                <div className="text-sm font-medium">{profile?.full_name || "Carregando..."}</div>
-                <div className="text-xs text-muted-foreground">{profile?.role || (profile?.level ? `Nível ${profile.level}` : "Membro")}</div>
-              </div>
-              <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center border-2 border-primary/40">
-                <User size={20} className="text-primary" />
-              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center gap-3 hover:bg-accent p-1.5 rounded-lg transition-colors group">
+                    <div className="text-right hidden sm:block">
+                      <div className="text-sm font-bold group-hover:text-primary transition-colors">
+                        {profile?.full_name || "Visitante"}
+                      </div>
+                      <div className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">
+                        {profile?.role === 'admin' ? "Administrador" : (profile?.level ? `Nível ${profile.level}` : "Membro")}
+                      </div>
+                    </div>
+                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center border-2 border-primary/20 group-hover:border-primary/50 transition-all overflow-hidden">
+                      {profile?.avatar_url ? (
+                        <img src={profile.avatar_url} alt="Avatar" className="h-full w-full object-cover" />
+                      ) : (
+                        <User size={20} className="text-primary" />
+                      )}
+                    </div>
+                    <ChevronDown size={14} className="text-muted-foreground group-hover:text-primary transition-colors" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate({ to: '/profile' })}>
+                    <User className="mr-2 h-4 w-4" /> Perfil
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate({ to: '/settings' })}>
+                    <Settings className="mr-2 h-4 w-4" /> Configurações
+                  </DropdownMenuItem>
+                  {isAdmin && (
+                    <DropdownMenuItem onClick={() => navigate({ to: '/admin' })}>
+                      <ShieldCheck className="mr-2 h-4 w-4" /> Painel Admin
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="text-red-600 focus:text-red-600" onClick={() => supabase.auth.signOut()}>
+                    <LogOut className="mr-2 h-4 w-4" /> Sair
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </header>
 
-          <main className="flex-1 overflow-y-auto">
+          <main className="flex-1 overflow-y-auto bg-muted/20">
             <Outlet />
           </main>
+
         </div>
       </div>
       <Toaster />
