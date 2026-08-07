@@ -43,8 +43,8 @@ export const useDiagnosis = (caseId?: string) => {
           console.log(`[useDiagnosis] Auto-loading case: ${result.data.code}`);
           player.startSession(result.data);
           setState(player.getPlayerState());
-        } else {
-          console.error(`[useDiagnosis] Failed to fetch case data for initialization:`, result.error);
+        } else if (!result.success) {
+          console.error(`[useDiagnosis] Failed to fetch case data for initialization:`, result.error.message);
         }
       }).finally(() => {
         setIsInitializing(false);
@@ -87,8 +87,6 @@ export const useDiagnosis = (caseId?: string) => {
     setState(player.getPlayerState());
   }, [player]);
 
-  // If the engine state is already ERROR, we show it.
-  // We ONLY show the error screen if we are NOT loading and have a genuine session/engine error.
   const isEngineError = state?.status === SessionStatus.ERROR;
   const isSessionError = !!sessionResult && !sessionResult.success;
   
