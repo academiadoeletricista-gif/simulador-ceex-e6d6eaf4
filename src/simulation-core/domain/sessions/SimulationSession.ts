@@ -24,6 +24,7 @@ export interface SimulationState {
   
   // Scenario Engine state
   currentNodeId: string;
+  lesson?: any;
   selectedHypothesisId?: string | null;
   confirmedRootCause?: boolean;
   currentHypotheses: Array<{

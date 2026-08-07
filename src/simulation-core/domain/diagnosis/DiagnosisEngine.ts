@@ -97,12 +97,12 @@ export class DiagnosisEngine {
       })),
       case: this.currentCase,
       currentNodeId: scenario.currentStepId || 'start',
-      selectedHypothesisId: scenario.hypotheses.find(h => h.status === 'PENDING')?.id || null, // Rough mapping
+      selectedHypothesisId: scenario.hypotheses.find(h => h.status === 'PENDING')?.id || null, lesson: scenario.status === 'COMPLETED' ? (this.currentCase as any).decisionTree?.find((n: any) => n.isCompletion)?.lesson : null, 
       confirmedRootCause: scenario.hypotheses.some(h => h.isRootCause && h.status === 'CONFIRMED'),
       currentHypotheses: scenario.hypotheses.map(h => ({
         id: h.id,
         label: h.title,
-        confidence: h.status === 'CONFIRMED' ? 100 : (h.status === 'DISCARDED' ? 0 : 50),
+        confidence: (h as any).confidence || (h.status === 'CONFIRMED' ? 100 : (h.status === 'DISCARDED' ? 0 : 50)),
         description: h.description,
         status: h.status.toLowerCase() as any
       })),
@@ -113,12 +113,22 @@ export class DiagnosisEngine {
         value: e.value
       })),
       unlockedTools: scenario.availableTools.map(t => t.label),
-      activeHints: [], // Pending
-      measurementPoints: (this.currentCase as any).topology === 'Reversing' 
-        ? ['L1-L2', 'L2-L3', 'L1-L3', 'F1_in-F1_out', 'K1_1-K1_2', 'K2_1-K2_2', 'Motor_U-Motor_V']
-        : ['L1-N', 'F1_in-F1_out', '95-96', 'Start-A1', 'K1_A1-K1_A2'],
+      activeHints: [],
+      measurementPoints: this.getMeasurementPoints(this.currentCase),
       timer: Math.floor((Date.now() - new Date(scenario.startedAt).getTime()) / 1000)
     };
+  }
+
+  private getMeasurementPoints(caseData: DiagnosticCase): string[] {
+    if (caseData.code === 'PD-001') {
+      return ['L1-N', 'F1_in-F1_out', '95-96', 'Start-A1', 'K1_A1-K1_A2'];
+    }
+    
+    if (caseData.topology === 'Reversing') {
+       return ['L1-L2', 'L2-L3', 'L1-L3', 'F1_in-F1_out', 'K1_1-K1_2', 'K2_1-K2_2', 'Motor_U-Motor_V'];
+    }
+    
+    return ['L1-N', 'F1_in-F1_out', '95-96', 'Start-A1', 'K1_A1-K1_A2'];
   }
 
   private mapStatus(status: ScenarioStatus): SessionStatus {

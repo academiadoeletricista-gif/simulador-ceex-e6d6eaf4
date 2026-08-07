@@ -2,7 +2,6 @@ import { DiagnosticCase } from "@/types/diagnosis";
 import { 
   ScenarioState, 
   ScenarioStatus, 
-  Hypothesis, 
   DiagnosticAction, 
   ActionRecord, 
   Evidence, 
@@ -10,10 +9,14 @@ import {
   RepairRecord,
   Symptom
 } from "./ScenarioState";
+import { EvidenceEngine } from "./EvidenceEngine";
+import { HypothesisEngine } from "./HypothesisEngine";
+import { MeasurementEngine, MeasurementMode } from "./MeasurementEngine";
 
 export class ScenarioRuntime {
   private state: ScenarioState;
   private currentCase: DiagnosticCase | null = null;
+  private isFaultActive: boolean = true;
 
   constructor(sessionId: string, caseId: string) {
     this.state = this.createInitialState(sessionId, caseId);
@@ -24,7 +27,7 @@ export class ScenarioRuntime {
       sessionId,
       caseId,
       status: "READY",
-      currentStepId: "start",
+      currentStepId: "OBSERVE",
       symptoms: [],
       observations: [],
       hypotheses: [],
@@ -50,7 +53,6 @@ export class ScenarioRuntime {
       { id: 'inspect_visual', label: 'Inspeção Visual', type: 'INSPECT', enabled: true },
       { id: 'measure_voltage', label: 'Medir Tensão', type: 'MEASURE', enabled: true },
       { id: 'test_operation', label: 'Testar Operação', type: 'TEST', enabled: true },
-      { id: 'formulate_hypothesis', label: 'Formular Hipótese', type: 'TALK', enabled: true },
       { id: 'perform_repair', label: 'Realizar Reparo', type: 'REPAIR', enabled: false },
     ];
   }
@@ -58,8 +60,8 @@ export class ScenarioRuntime {
   public loadCase(caseData: DiagnosticCase) {
     this.currentCase = caseData;
     this.state.status = "INVESTIGATING";
+    this.isFaultActive = true;
     
-    // Load symptoms from work order
     if (caseData.workOrder) {
       this.state.symptoms = [{
         id: 'symptom_primary',
@@ -69,7 +71,6 @@ export class ScenarioRuntime {
       }];
     }
 
-    // Load hypotheses from case data
     if (caseData.hypotheses) {
       this.state.hypotheses = caseData.hypotheses.map(h => ({
         id: h.id,
@@ -78,23 +79,25 @@ export class ScenarioRuntime {
         status: 'PENDING',
         isCorrect: h.isCorrect,
         isRootCause: h.isRootCause,
-        validationLogic: h.validationLogic
-      }));
+        validationLogic: h.validationLogic,
+        confidence: 0
+      } as any));
     }
 
     this.addActionRecord('LOAD_CASE', `Iniciando caso: ${caseData.code}`);
   }
 
   public performAction(actionId: string, params: any = {}) {
-    const action = this.state.availableActions.find(a => a.id === actionId);
-    if (!action || !action.enabled) {
-      console.warn(`Action ${actionId} not available or disabled`);
+    if (this.state.status === 'COMPLETED' || this.state.status === 'ERROR') return;
+
+    const action = this.state.availableActions.find(a => a.id === actionId) || 
+                   (actionId === 'inspect_visual' ? { id: 'inspect_visual', label: 'Inspeção Visual', type: 'INSPECT', enabled: true } : null);
+    
+    if (!action) {
+      console.warn(`Action ${actionId} not found`);
       return;
     }
 
-    this.addActionRecord(actionId, action.label, 10);
-
-    // Context-sensitive logic
     switch (action.type) {
       case 'MEASURE':
         this.handleMeasurement(params);
@@ -105,101 +108,117 @@ export class ScenarioRuntime {
       case 'INSPECT':
         this.handleInspection(params);
         break;
+      case 'TEST':
+        this.handleTest(params);
+        break;
     }
 
     this.evaluateScenarioProgress();
   }
 
   private handleMeasurement(params: any) {
-    const { point } = params;
-    if (!point) return;
+    const { pointA, pointB, mode = 'VOLTAGE_AC' } = params;
+    if (!pointA) return;
 
-    // Simulate measurement result from case evidence or logic
-    const evidence = this.currentCase?.evidenceData?.find(e => 
-      e.type === 'measurement' && (e.label === point || e.label.includes(point))
+    if (!this.currentCase) return;
+
+    const result = MeasurementEngine.calculate(
+      { instrument: 'multimeter', mode: mode as MeasurementMode, pointA, pointB },
+      this.currentCase,
+      this.isFaultActive
     );
 
+    const pointLabel = pointB ? `${pointA}-${pointB}` : pointA;
     const measurement: Measurement = {
       id: `m_${Date.now()}`,
-      point,
-      value: evidence?.value || '220V', // Default to 220V if no fault data
-      unit: 'V',
+      point: pointLabel,
+      value: result.value,
+      unit: result.unit,
       timestamp: new Date().toISOString()
     };
 
     this.state.measurements.push(measurement);
     
-    // Check if this measurement validates any hypothesis
-    this.validateHypothesesByAction('measurement', point, measurement.value);
-    
-    // The description for the record is updated after validation
-    const hConfirmed = this.state.hypotheses.find(h => h.status === 'CONFIRMED' && h.validationLogic?.requiredMeasurement === point);
-    const desc = hConfirmed 
-      ? `Medição em ${point}: ${measurement.value} (Confirma: ${hConfirmed.title})`
-      : `Medição em ${point}: ${measurement.value}`;
-      
-    this.addActionRecord('MEASUREMENT', desc);
+    // Create evidence
+    const evidence = EvidenceEngine.createEvidence(
+      { actionId: 'measure_voltage', point: pointLabel },
+      'MEASUREMENT',
+      `Medição em ${pointLabel}`,
+      `${result.value}${result.unit}`
+    );
+    this.state.evidence.push(evidence);
+
+    // Update Hypotheses
+    this.state.hypotheses = this.state.hypotheses.map(h => 
+      HypothesisEngine.updateHypothesis(h, { point: pointLabel, value: result.value })
+    );
+
+    const confirmed = this.state.hypotheses.find(h => h.status === 'CONFIRMED');
+    const desc = confirmed 
+      ? `Medição em ${pointLabel}: ${result.value}${result.unit} (Confirma: ${confirmed.title})`
+      : `Medição em ${pointLabel}: ${result.value}${result.unit}`;
+
+    this.addActionRecord('MEASURE', desc, 20);
+
+    // Check for root cause confirmation to enable repair
+    const rootCauseConfirmed = this.state.hypotheses.some(h => h.isRootCause && h.status === 'CONFIRMED');
+    if (rootCauseConfirmed) {
+      const repairAction = this.state.availableActions.find(a => a.type === 'REPAIR');
+      if (repairAction) repairAction.enabled = true;
+      this.state.status = 'DIAGNOSING';
+    }
   }
 
-
   private handleRepair(params: any) {
-    const { componentId } = params;
+    const { componentId = 'F1' } = params; // Default for PD-001
     
-    // Check if root cause is confirmed
     const rootCauseConfirmed = this.state.hypotheses.some(h => h.isRootCause && h.status === 'CONFIRMED');
     
-    const repair: RepairRecord = {
-      id: `r_${Date.now()}`,
-      componentId: componentId || 'main',
-      action: 'REPAIR',
-      timestamp: new Date().toISOString(),
-      success: rootCauseConfirmed
-    };
-
-    this.state.repairs.push(repair);
-
-    if (repair.success) {
-      this.state.status = "VALIDATING";
-      this.addActionRecord('REPAIR_SUCCESS', `Componente reparado com sucesso!`, 100);
-      this.completeScenario();
-    } else {
+    if (!rootCauseConfirmed) {
       this.state.mistakes += 1;
       this.state.score -= 20;
-      this.addActionRecord('REPAIR_FAIL', `Falha no reparo: Causa raiz não confirmada.`, -50);
+      this.addActionRecord('REPAIR_ERROR', `Diagnóstico Prematuro: Tente confirmar a causa raiz antes de reparar.`, -20);
+      return;
+    }
+
+    // Success logic for PD-001
+    const isCorrectComponent = componentId === 'F1';
+    
+    if (isCorrectComponent) {
+      this.isFaultActive = false;
+      this.state.status = 'VALIDATING';
+      this.addActionRecord('REPAIR', `Componente ${componentId} substituído. Realize o teste funcional.`, 50);
+      
+      const repairRecord: RepairRecord = {
+        id: `r_${Date.now()}`,
+        componentId,
+        action: 'REPLACE',
+        timestamp: new Date().toISOString(),
+        success: true
+      };
+      this.state.repairs.push(repairRecord);
+    } else {
+      this.state.mistakes += 1;
+      this.state.score -= 50;
+      this.addActionRecord('REPAIR_ERROR', `Componente incorreto: ${componentId} não é a causa raiz.`, -50);
     }
   }
 
   private handleInspection(params: any) {
-    // Similar to measurement but for visual things
-    this.addActionRecord('INSPECTION', `Inspeção visual realizada.`);
-    this.validateHypothesesByAction('inspection', params.target);
+    const target = params.target || 'Painel';
+    this.addActionRecord('INSPECT', `Inspeção visual em ${target} realizada.`, 5);
   }
 
-  private validateHypothesesByAction(type: string, target: string, value?: string) {
-    this.state.hypotheses.forEach(h => {
+  private handleTest(params: any) {
+    const desc = this.isFaultActive 
+      ? "O motor não parte. Contator K1 não atracou." 
+      : "O motor partiu normalmente. K1 atracou e M1 está girando.";
+    
+    this.addActionRecord('TEST', `Teste funcional: ${desc}`, 10);
 
-      if (h.status !== 'PENDING') return;
-
-      const logic = h.validationLogic;
-      if (logic && logic.requiredMeasurement === target) {
-        // If an expected value is provided, we compare it
-        const isMatch = logic.expectedResult ? value === logic.expectedResult : true;
-        
-        h.status = isMatch 
-          ? (logic.ifMatch === 'confirma' ? 'CONFIRMED' : 'DISCARDED')
-          : (logic.ifMatch === 'confirma' ? 'DISCARDED' : 'CONFIRMED');
-
-        this.addActionRecord('HYPOTHESIS_UPDATE', `Hipótese "${h.title}" -> ${h.status}`);
-
-        if (h.isRootCause && h.status === 'CONFIRMED') {
-          // Enable repair action
-          const repairAction = this.state.availableActions.find(a => a.type === 'REPAIR');
-          if (repairAction) repairAction.enabled = true;
-          this.state.status = "DIAGNOSING";
-        }
-      }
-
-    });
+    if (!this.isFaultActive && this.state.status === 'VALIDATING') {
+      this.completeScenario();
+    }
   }
 
   private addActionRecord(type: string, label: string, xp: number = 0) {
@@ -215,16 +234,16 @@ export class ScenarioRuntime {
   }
 
   private evaluateScenarioProgress() {
-    // State machine transitions based on history
-    if (this.state.status === "INVESTIGATING" && this.state.measurements.length > 0) {
-      // Potentially move to DIAGNOSING
+    // Phase transitions
+    if (this.state.status === 'INVESTIGATING' && this.state.evidence.length > 2) {
+      this.state.currentStepId = 'MEASURE';
     }
   }
 
   private completeScenario() {
     this.state.status = "COMPLETED";
     this.state.completedAt = new Date().toISOString();
-    this.state.xp += 500; // Finish bonus
+    this.state.xp += 200;
   }
 
   public getState(): ScenarioState {
@@ -232,7 +251,9 @@ export class ScenarioRuntime {
   }
 
   public selectHypothesis(id: string) {
-    // User focusing on a hypothesis
-    this.addActionRecord('SELECT_HYPOTHESIS', `Focando na hipótese: ${id}`);
+    const h = this.state.hypotheses.find(h => h.id === id);
+    if (h) {
+      this.addActionRecord('SELECT_HYPOTHESIS', `Analisando hipótese: ${h.title}`);
+    }
   }
 }
