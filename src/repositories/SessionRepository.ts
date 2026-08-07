@@ -16,15 +16,16 @@ export interface CaseSession {
 export class SessionRepository {
   async findByUserIdAndCaseId(userId: string, caseId: string): Promise<Result<CaseSession | null>> {
     try {
+      console.log(`[SessionRepository] Finding session for ${userId} / ${caseId}`);
       const { data, error } = await supabase
         .from('case_sessions')
         .select('*')
         .eq('user_id', userId)
         .eq('case_id', caseId)
-        .single();
+        .maybeSingle();
 
       if (error) {
-        if (error.code === 'PGRST116') return ok(null);
+        console.error("[SessionRepository] Fetch error:", error);
         return fail(error.message, error.code);
       }
       return ok(data as unknown as CaseSession);
@@ -49,13 +50,23 @@ export class SessionRepository {
 
   async upsert(session: Partial<CaseSession>): Promise<Result<CaseSession>> {
     try {
+      // Manual check to avoid RLS conflicts on upsert if necessary
+      const { data: existing } = await this.findByUserIdAndCaseId(session.user_id!, session.case_id!);
+      
+      if (existing) {
+        return this.update(existing.id, session);
+      }
+
       const { data, error } = await supabase
         .from('case_sessions')
-        .upsert(session as any, { onConflict: 'user_id,case_id' })
+        .insert([session as any])
         .select()
         .single();
 
-      if (error) return fail(error.message, error.code);
+      if (error) {
+        console.error("[SessionRepository] Insert error:", error);
+        return fail(error.message, error.code);
+      }
       return ok(data as unknown as CaseSession);
     } catch (e: any) {
       return fail(e.message);

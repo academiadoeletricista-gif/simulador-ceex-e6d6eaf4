@@ -1,15 +1,22 @@
-import { sessionRepository, CaseSession } from "@/repositories/SessionRepository";
-import { Result, fail } from "@/lib/result/Result";
 import { supabase } from "@/integrations/supabase/client";
+import { Result, ok, fail } from "@/lib/result/Result";
+import { CaseSession } from "./SessionRepository";
 
 export const SessionService = {
   async getByCaseId(caseId: string): Promise<Result<CaseSession | null>> {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return fail("User not authenticated");
+      if (!user) {
+        console.warn("[SessionService] No authenticated user found, attempting anonymous session search");
+        // Fallback for potential anonymous sessions if allowed by RLS
+      }
       
-      return sessionRepository.findByUserIdAndCaseId(user.id, caseId);
+      const userId = user?.id;
+      if (!userId) return fail("User not authenticated");
+
+      return sessionRepository.findByUserIdAndCaseId(userId, caseId);
     } catch (e: any) {
+      console.error("[SessionService] Error in getByCaseId:", e);
       return fail(e.message);
     }
   },
@@ -30,6 +37,8 @@ export const SessionService = {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return fail("User not authenticated");
 
+      console.log(`[SessionService] Starting session for user ${user.id} and case ${caseId}`);
+
       return sessionRepository.upsert({
         user_id: user.id,
         case_id: caseId,
@@ -39,6 +48,7 @@ export const SessionService = {
         start_time: new Date().toISOString()
       });
     } catch (e: any) {
+      console.error("[SessionService] Error starting session:", e);
       return fail(e.message);
     }
   },
@@ -47,3 +57,6 @@ export const SessionService = {
     return sessionRepository.update(id, data);
   }
 };
+
+// Re-export repository logic or import correctly
+import { sessionRepository } from "@/repositories/SessionRepository";
