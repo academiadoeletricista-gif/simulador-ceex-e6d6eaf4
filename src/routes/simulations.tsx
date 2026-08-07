@@ -128,35 +128,40 @@ function SimulationsPage() {
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)] overflow-hidden bg-background">
       {/* Header Bar */}
-      <div className="border-b bg-card px-8 py-3 flex items-center justify-between">
+      <div className="border-b bg-card px-8 py-3 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-6">
            <Button variant="ghost" size="sm" onClick={() => navigate({ to: "/library" })} className="gap-2">
-             <ArrowLeft size={16} /> Voltar
+             <ArrowLeft size={16} /> Sair
            </Button>
            <div className="h-6 w-px bg-muted" />
            <div>
-             <h2 className="text-sm font-bold uppercase tracking-tight">{activeCase.title}</h2>
-             <p className="text-[10px] text-muted-foreground font-mono">CODE: {activeCase.code}</p>
+             <h2 className="text-sm font-black uppercase tracking-tight leading-none">{activeCase.title}</h2>
+             <p className="text-[10px] text-muted-foreground font-mono mt-1 leading-none uppercase">ID: {activeCase.code}</p>
            </div>
         </div>
 
-        <div className="flex items-center gap-4">
-           <div className="flex flex-col items-end mr-4">
-             <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Cronômetro</p>
-             <p className="text-sm font-black font-mono text-primary">
+        <div className="flex items-center gap-6">
+           <div className="flex items-center gap-2 bg-primary/5 px-3 py-1.5 rounded-lg border border-primary/10">
+             <Clock size={14} className="text-primary" />
+             <p className="text-lg font-black font-mono text-primary leading-none">
                {Math.floor(state.timer / 60).toString().padStart(2, '0')}:{(state.timer % 60).toString().padStart(2, '0')}
              </p>
            </div>
-           <div className="h-8 w-px bg-muted mx-2" />
-           <Badge variant="outline" className="font-mono text-[10px] bg-primary/5">{state.xp} XP</Badge>
-           <Button variant="outline" size="sm" className="h-8 gap-2" onClick={() => window.location.reload()}>
-             <RefreshCcw size={14} /> Reiniciar
-           </Button>
-           <Button variant="outline" size="sm" className="h-8 gap-2" onClick={() => setShowDiagram(true)}>
-             <BookOpen size={14} /> Diagrama
-           </Button>
+           
+           <div className="h-8 w-px bg-muted" />
+           
+           <div className="flex items-center gap-4">
+             <div className="text-right hidden sm:block">
+               <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest leading-none">Status</p>
+               <p className="text-xs font-bold mt-1 leading-none">{isCompleted ? "Diagnóstico Concluído" : "Em Investigação"}</p>
+             </div>
+             <Button variant="outline" size="sm" className="h-9 gap-2 font-bold uppercase text-[10px]" onClick={() => setShowDiagram(true)}>
+               <BookOpen size={14} /> Diagrama
+             </Button>
+           </div>
         </div>
       </div>
+
 
 
       <div className="flex-1 flex overflow-hidden">
