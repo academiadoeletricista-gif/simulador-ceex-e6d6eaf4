@@ -132,8 +132,9 @@ function SimulationsPage() {
   const isCompleted = state.status === 'COMPLETED';
 
   // Find current decision node
-  const currentNode = (activeCase as any).decisionTree?.find((n: any) => n.id === state.currentNodeId) || 
-                     (activeCase as any).decisionTree?.[0];
+  const currentNode = state.lesson ? { id: 'COMPLETED', lesson: state.lesson } : 
+                     ((activeCase as any).decisionTree?.find((n: any) => n.id === state.currentNodeId) || 
+                      (activeCase as any).decisionTree?.[0]);
 
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)] overflow-hidden bg-background">
