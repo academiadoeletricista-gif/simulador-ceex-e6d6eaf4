@@ -115,25 +115,32 @@ export class ScenarioRuntime {
     if (!point) return;
 
     // Simulate measurement result from case evidence or logic
-    // For now, simple mock or lookup in evidenceData
     const evidence = this.currentCase?.evidenceData?.find(e => 
-      e.type === 'measurement' && e.label.includes(point)
+      e.type === 'measurement' && (e.label === point || e.label.includes(point))
     );
 
     const measurement: Measurement = {
       id: `m_${Date.now()}`,
       point,
-      value: evidence?.value || '0V',
+      value: evidence?.value || '220V', // Default to 220V if no fault data
       unit: 'V',
       timestamp: new Date().toISOString()
     };
 
     this.state.measurements.push(measurement);
-    this.addActionRecord('MEASUREMENT', `Medição em ${point}: ${measurement.value}`);
-
+    
     // Check if this measurement validates any hypothesis
-    this.validateHypothesesByAction('measurement', point);
+    this.validateHypothesesByAction('measurement', point, measurement.value);
+    
+    // The description for the record is updated after validation
+    const hConfirmed = this.state.hypotheses.find(h => h.status === 'CONFIRMED' && h.validationLogic?.requiredMeasurement === point);
+    const desc = hConfirmed 
+      ? `Medição em ${point}: ${measurement.value} (Confirma: ${hConfirmed.title})`
+      : `Medição em ${point}: ${measurement.value}`;
+      
+    this.addActionRecord('MEASUREMENT', desc);
   }
+
 
   private handleRepair(params: any) {
     const { componentId } = params;
