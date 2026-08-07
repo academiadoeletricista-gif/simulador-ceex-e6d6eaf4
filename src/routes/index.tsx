@@ -88,7 +88,7 @@ function Index() {
               Bem-vindo, <span className="text-primary">{userName.split(' ')[0]}</span>
             </h1>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto md:mx-0">
-              Sua jornada para se tornar uma lenda industrial continua. Analise casos, realize medições e resolva defeitos complexos.
+              O usuário consegue iniciar uma simulação sem erros? Existe algum momento em que ele fica sem saber o que fazer? A árvore de decisão realmente muda conforme as escolhas? As hipóteses evoluem de forma lógica? O diagrama é útil durante a investigação? O relatório final reflete as decisões tomadas? Existe algum caminho que trava a simulação? É possível concluir o caso por mais de um caminho válido? Há decisões que parecem "decorativas", sem impacto?
             </p>
             
             <div className="flex flex-wrap gap-4 pt-4 justify-center md:justify-start">
