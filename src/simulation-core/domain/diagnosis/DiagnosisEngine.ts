@@ -130,7 +130,10 @@ export class DiagnosisEngine {
       currentNodeId: this.currentNodeId,
       currentHypotheses: this.hypotheses,
       collectedEvidence: this.evidence,
-      unlockedTools: this.unlockedTools
+      unlockedTools: this.unlockedTools,
+      activeHints: this.activeHints,
+      timer: Math.floor((Date.now() - this.startTime) / 1000)
+
     };
   }
 }
