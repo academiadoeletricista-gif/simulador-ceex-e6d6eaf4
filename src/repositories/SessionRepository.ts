@@ -17,12 +17,14 @@ export class SessionRepository {
   async findByUserIdAndCaseId(userId: string, caseId: string): Promise<Result<CaseSession | null>> {
     try {
       console.log(`[SessionRepository] Finding session for ${userId} / ${caseId}`);
-      const { data, error } = await supabase
+      const { data: sessionData, error } = await supabase
         .from('case_sessions')
         .select('*')
         .eq('user_id', userId)
         .eq('case_id', caseId)
-        .maybeSingle();
+        .limit(1);
+
+      const data = sessionData && sessionData.length > 0 ? sessionData[0] : null;
 
       if (error) {
         console.error("[SessionRepository] Fetch error:", error);

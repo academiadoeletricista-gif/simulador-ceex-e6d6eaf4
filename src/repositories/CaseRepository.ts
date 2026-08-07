@@ -31,11 +31,13 @@ export class CaseRepository {
     console.log(`Repository: findById ${id}`);
     try {
       // 1. Try diagnostic_cases first
-      const { data: diagCase, error: diagError } = await supabase
+      const { data: diagCases, error: diagError } = await supabase
         .from('diagnostic_cases')
         .select('*')
         .eq('id', id)
-        .maybeSingle();
+        .limit(1);
+
+      const diagCase = diagCases && diagCases.length > 0 ? diagCases[0] : null;
 
       if (!diagError && diagCase) {
         const { data: hypotheses } = await supabase
@@ -47,11 +49,13 @@ export class CaseRepository {
       }
 
       // 2. Fallback to cases
-      const { data: caseData, error: caseError } = await supabase
+      const { data: casesData, error: caseError } = await supabase
         .from('cases')
         .select('*')
         .eq('id', id)
-        .maybeSingle();
+        .limit(1);
+
+      const caseData = casesData && casesData.length > 0 ? casesData[0] : null;
 
       if (caseError) {
         if (caseError.code === 'PGRST116') return ok(null);
@@ -73,11 +77,13 @@ export class CaseRepository {
     console.log(`Repository: findByCode ${code}`);
     try {
       // 1. Try to fetch from diagnostic_cases first
-      const { data: diagCase, error: diagError } = await supabase
+      const { data: diagCases, error: diagError } = await supabase
         .from('diagnostic_cases')
         .select('*')
         .eq('code', code)
-        .maybeSingle();
+        .limit(1);
+
+      const diagCase = diagCases && diagCases.length > 0 ? diagCases[0] : null;
 
       if (!diagError && diagCase) {
         const { data: hypotheses } = await supabase
@@ -89,11 +95,13 @@ export class CaseRepository {
       }
 
       // 2. Fallback to cases table
-      const { data: caseItem, error: caseError } = await supabase
+      const { data: caseItems, error: caseError } = await supabase
         .from('cases')
         .select('*')
         .eq('code', code)
-        .maybeSingle();
+        .limit(1);
+
+      const caseItem = caseItems && caseItems.length > 0 ? caseItems[0] : null;
 
       if (caseError) {
         return fail(caseError.message, caseError.code);
