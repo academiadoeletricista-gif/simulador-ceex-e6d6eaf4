@@ -70,15 +70,6 @@ export class CaseRepository {
 
       return ok([]);
     } catch (e: any) {
-
-
-        if (filtered.length > 0) {
-          return ok(filtered.map(this.mapToCamelCase));
-        }
-      }
-
-      return ok([]);
-    } catch (e: any) {
       console.error('Exception in findByLaboratoryId:', e);
       return fail(e.message);
     }
