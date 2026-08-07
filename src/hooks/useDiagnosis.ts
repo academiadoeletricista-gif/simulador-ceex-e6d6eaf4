@@ -46,6 +46,8 @@ export const useDiagnosis = (caseId?: string) => {
         } else if (!result.success) {
           console.error(`[useDiagnosis] Failed to fetch case data for initialization:`, result.error.message);
         }
+      }).catch(err => {
+         console.error(`[useDiagnosis] Exception during case fetch:`, err);
       }).finally(() => {
         setIsInitializing(false);
       });
@@ -87,10 +89,21 @@ export const useDiagnosis = (caseId?: string) => {
     setState(player.getPlayerState());
   }, [player]);
 
+  // If the engine state is already ERROR, we show it.
   const isEngineError = state?.status === SessionStatus.ERROR;
   const isSessionError = !!sessionResult && !sessionResult.success;
   
-  const derivedIsError = !sessionLoading && (isSessionError || isEngineError || !!sessionError);
+  // LOG THE ERRORS FOR DEBUGGING IN PREVIEW
+  if (isEngineError || isSessionError || !!sessionError) {
+    console.log("[useDiagnosis] Error Detected:", { 
+      isEngineError, 
+      isSessionError, 
+      sessionError: sessionError ? (sessionError as any).message : null,
+      sessionResultError: sessionResult && !sessionResult.success ? sessionResult.error.message : null
+    });
+  }
+
+  const derivedIsError = !sessionLoading && !isInitializing && (isSessionError || isEngineError || !!sessionError);
 
   return {
     state: state || player.getPlayerState(), 
