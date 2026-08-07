@@ -42,8 +42,8 @@ export const useDiagnosis = (caseId?: string) => {
     }
   }, [caseId, sessionResult, updateSessionMutation, player]);
 
-  const answerQuiz = useCallback((optionIndex: number) => {
-    player.submitQuizAnswer(optionIndex);
+  const collectEvidence = useCallback((evidenceId: string) => {
+    player.collectEvidence(evidenceId);
     setState(player.getPlayerState());
   }, [player]);
 
@@ -51,9 +51,9 @@ export const useDiagnosis = (caseId?: string) => {
     state,
     loadCase,
     selectChoice,
-    answerQuiz,
-    measure: player.performMeasurement.bind(player),
+    collectEvidence,
     isLoading: sessionLoading,
     isError: (!!sessionResult && !sessionResult.success) || state.status === SessionStatus.ERROR || !!sessionError
   };
 };
+
