@@ -36,10 +36,29 @@ export class LaboratoryRepository {
     }
   }
 
+  async findByName(name: string): Promise<Result<Laboratory | null>> {
+    try {
+      const { data, error } = await supabase
+        .from('laboratories')
+        .select('*')
+        .ilike('name', `%${name}%`)
+        .limit(1)
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') return ok(null);
+        return fail(error.message, error.code);
+      }
+      return ok(this.mapToDomain(data));
+    } catch (e: any) {
+      return fail(e.message);
+    }
+  }
+
   private mapToDomain(l: any): Laboratory {
     return {
       id: l.id,
-      code: l.code,
+      code: l.code || 'LAB-00',
       slug: l.slug || '',
       name: l.name,
       description: l.description || '',
@@ -50,7 +69,7 @@ export class LaboratoryRepository {
       estimatedDuration: l.estimated_duration || l.estimated_time || '',
       estimatedTime: l.estimated_time || '',
       totalXp: l.total_xp || 0,
-      defectCount: 0, // Should be calculated or fetched separately if needed
+      defectCount: 0, 
       componentCount: l.component_count || 0,
       measurementPointCount: l.measurement_point_count || 0,
       diagramCount: l.diagram_count || 0,
