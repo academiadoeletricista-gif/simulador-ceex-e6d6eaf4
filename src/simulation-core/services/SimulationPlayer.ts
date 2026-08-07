@@ -61,9 +61,14 @@ export class SimulationPlayer {
     this.api.executeAction(action, params);
   }
 
+  public selectHypothesis(hypothesisId: string) {
+    this.api.selectHypothesis(hypothesisId);
+  }
+
   /**
    * Collects evidence during investigation
    */
+
   public collectEvidence(evidenceId: string) {
     this.api.collectEvidence(evidenceId);
   }

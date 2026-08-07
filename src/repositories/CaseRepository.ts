@@ -8,7 +8,7 @@ export class CaseRepository {
     try {
       const { data, error } = await supabase
         .from('cases')
-        .select('*')
+        .select('*, case_hypotheses(*)')
         .order('created_at', { ascending: false });
 
       if (error) return fail(error.message, error.code);
@@ -22,7 +22,7 @@ export class CaseRepository {
     try {
       const { data, error } = await supabase
         .from('cases')
-        .select('*')
+        .select('*, case_hypotheses(*)')
         .eq('id', id)
         .single();
 
@@ -40,7 +40,7 @@ export class CaseRepository {
     try {
       const { data, error } = await supabase
         .from('cases')
-        .select('*')
+        .select('*, case_hypotheses(*)')
         .eq('laboratory_id', labId);
 
       if (error) return fail(error.message, error.code);
@@ -52,6 +52,14 @@ export class CaseRepository {
 
   private mapToCamelCase(item: any): DiagnosticCase {
     const content = item.content || {};
+    const hypotheses = (item.case_hypotheses || []).map((h: any) => ({
+      id: h.id,
+      title: h.title,
+      description: h.description,
+      isCorrect: h.is_correct,
+      isRootCause: h.is_root_cause,
+      validationLogic: h.validation_logic
+    }));
     
     return {
       id: item.id,
@@ -73,8 +81,8 @@ export class CaseRepository {
       possibleFaults: content.possibleFaults || [],
       evidenceData: content.evidenceData || [],
       hints: content.hints || [],
+      hypotheses: hypotheses.length > 0 ? hypotheses : content.hypotheses || [],
       availableTools: content.availableTools || ['Multímetro', 'Inspeção Visual'],
-
 
       topology: content.topology,
       category: item.category,
@@ -83,6 +91,7 @@ export class CaseRepository {
       updatedAt: item.updated_at,
     };
   }
+
 
 
 }

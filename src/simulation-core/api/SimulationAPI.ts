@@ -31,7 +31,12 @@ export class SimulationAPI {
     return this.engine.getState();
   }
 
+  public selectHypothesis(hypothesisId: string) {
+    this.engine.selectHypothesis(hypothesisId);
+  }
+
   public executeAction(actionId: string, params: any = {}) {
+
     this.engine.performAction(actionId, params);
   }
 

@@ -69,12 +69,20 @@ export const useDiagnosis = (caseId?: string) => {
     setState(player.getPlayerState());
   }, [player]);
 
+  const selectHypothesis = useCallback((hypothesisId: string) => {
+    player.selectHypothesis(hypothesisId);
+    setState(player.getPlayerState());
+  }, [player]);
+
   return {
+
 
     state: player.getPlayerState(), // Always get fresh state for timer
     loadCase,
     selectChoice,
+    selectHypothesis,
     collectEvidence,
+
     useHint,
     isLoading: sessionLoading,
     sessionError: sessionError ? (sessionError as any).message : (sessionResult && !sessionResult.success ? sessionResult.error.message : null),
