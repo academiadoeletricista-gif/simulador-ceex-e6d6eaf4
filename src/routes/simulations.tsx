@@ -45,7 +45,7 @@ function SimulationsPage() {
   const navigate = useNavigate();
   
   const { data: caseResult, isLoading: caseLoading, error: caseError } = useCase(id || '');
-  const { state, loadCase, selectChoice, isLoading: diagnosisLoading, isError, sessionError } = useDiagnosis(id);
+  const { state, loadCase, selectChoice, useHint, isLoading: diagnosisLoading, isError, sessionError } = useDiagnosis(id);
   const [showDiagram, setShowDiagram] = useState(false);
   const [activeTab, setActiveTab] = useState<'work-order' | 'investigation' | 'report'>('work-order');
   const [lastMessage, setLastMessage] = useState<string | null>(null);
