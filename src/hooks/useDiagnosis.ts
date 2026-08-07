@@ -9,11 +9,28 @@ import { DiagnosticCase } from '../types/diagnosis';
  * which centralizes all diagnostic session logic.
  */
 export const useDiagnosis = (caseId?: string) => {
+  const [ticker, setTicker] = useState(0);
+
   const player = SimulationPlayer.getInstance();
   const [state, setState] = useState<SimulationState | null>(player.getPlayerState());
   
   const { data: sessionResult, isLoading: sessionLoading, error: sessionError } = useSession(caseId || '');
   const updateSessionMutation = useUpdateSession();
+
+  // Force re-renders for the timer
+  useState(() => {
+    const interval = setInterval(() => {
+      setTicker(t => t + 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  });
+
+  const getLatestState = useCallback(() => {
+    const newState = player.getPlayerState();
+    setState(newState);
+    return newState;
+  }, [player]);
+
 
   const loadCase = useCallback((dbCase: DiagnosticCase) => {
     player.startSession(dbCase);
@@ -22,10 +39,10 @@ export const useDiagnosis = (caseId?: string) => {
 
   const selectChoice = useCallback(async (choiceId: string, params: any = {}) => {
     player.handleAction(choiceId, params);
-    const newState = player.getPlayerState();
-    setState(newState);
-
+    const newState = getLatestState();
+    
     // Persist session to database
+
     if (newState && caseId && sessionResult?.success && sessionResult.data) {
       await updateSessionMutation.mutateAsync({
         id: sessionResult.data.id,
@@ -46,15 +63,23 @@ export const useDiagnosis = (caseId?: string) => {
     player.collectEvidence(evidenceId);
     setState(player.getPlayerState());
   }, [player]);
+  
+  const useHint = useCallback(() => {
+    player.useHint();
+    setState(player.getPlayerState());
+  }, [player]);
 
   return {
-    state,
+
+    state: player.getPlayerState(), // Always get fresh state for timer
     loadCase,
     selectChoice,
     collectEvidence,
+    useHint,
     isLoading: sessionLoading,
     sessionError: sessionError ? (sessionError as any).message : (sessionResult && !sessionResult.success ? sessionResult.error.message : null),
     isError: (!!sessionResult && !sessionResult.success) || state?.status === SessionStatus.ERROR || !!sessionError
   };
 };
+
 

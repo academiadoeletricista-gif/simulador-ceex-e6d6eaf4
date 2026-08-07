@@ -45,7 +45,7 @@ function SimulationsPage() {
   const navigate = useNavigate();
   
   const { data: caseResult, isLoading: caseLoading, error: caseError } = useCase(id || '');
-  const { state, loadCase, selectChoice, isLoading: diagnosisLoading, isError, sessionError } = useDiagnosis(id);
+  const { state, loadCase, selectChoice, useHint, isLoading: diagnosisLoading, isError, sessionError } = useDiagnosis(id);
   const [showDiagram, setShowDiagram] = useState(false);
   const [activeTab, setActiveTab] = useState<'work-order' | 'investigation' | 'report'>('work-order');
   const [lastMessage, setLastMessage] = useState<string | null>(null);
@@ -138,6 +138,13 @@ function SimulationsPage() {
         </div>
 
         <div className="flex items-center gap-4">
+           <div className="flex flex-col items-end mr-4">
+             <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Cronômetro</p>
+             <p className="text-sm font-black font-mono text-primary">
+               {Math.floor(state.timer / 60).toString().padStart(2, '0')}:{(state.timer % 60).toString().padStart(2, '0')}
+             </p>
+           </div>
+           <div className="h-8 w-px bg-muted mx-2" />
            <Badge variant="outline" className="font-mono text-[10px] bg-primary/5">{state.xp} XP</Badge>
            <Button variant="outline" size="sm" className="h-8 gap-2" onClick={() => window.location.reload()}>
              <RefreshCcw size={14} /> Reiniciar
@@ -148,13 +155,22 @@ function SimulationsPage() {
         </div>
       </div>
 
+
       <div className="flex-1 flex overflow-hidden">
         {/* Sidebar: Navigation & Hypotheses */}
         <aside className="w-80 border-r bg-card/30 flex flex-col p-6 space-y-8 overflow-y-auto">
           <div className="space-y-4">
-            <h3 className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest flex items-center gap-2">
-              <Layers size={12} /> Fluxo de Trabalho
-            </h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest flex items-center gap-2">
+                <Layers size={12} /> Fluxo de Trabalho
+              </h3>
+              <div className="flex items-center gap-1">
+                <div className="h-1 w-8 bg-primary rounded-full" />
+                <div className={cn("h-1 w-8 rounded-full", activeTab === 'investigation' || activeTab === 'report' ? "bg-primary" : "bg-muted")} />
+                <div className={cn("h-1 w-8 rounded-full", activeTab === 'report' ? "bg-primary" : "bg-muted")} />
+              </div>
+            </div>
+
             <div className="space-y-2">
               {[
                 { id: 'work-order', label: 'Ordem de Serviço', icon: FileText },
@@ -174,6 +190,22 @@ function SimulationsPage() {
                   <tab.icon size={16} /> {tab.label}
                 </Button>
               ))}
+            </div>
+          </div>
+
+          {/* Active Symptoms Panel */}
+          <div className="space-y-4">
+            <h3 className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest flex items-center gap-2">
+              <AlertTriangle size={12} /> Sintomas Ativos
+            </h3>
+            <div className="space-y-2">
+              {currentNode?.situation ? (
+                <div className="p-3 bg-red-500/5 border border-red-500/10 rounded-lg">
+                  <p className="text-[10px] leading-tight text-red-600 italic">"{currentNode.situation}"</p>
+                </div>
+              ) : (
+                <p className="text-[10px] italic text-muted-foreground">Nenhum sintoma observado.</p>
+              )}
             </div>
           </div>
 
@@ -198,6 +230,7 @@ function SimulationsPage() {
               )}
             </div>
           </div>
+
 
           {/* History */}
           <div className="space-y-4 pt-4 border-t">
@@ -300,7 +333,39 @@ function SimulationsPage() {
                    <Badge variant="outline" className="font-mono">{state.collectedEvidence.length} Evidências</Badge>
                 </div>
 
+                {/* Multimeter Tool */}
+                <Card className="border-2 border-primary/20 bg-card/50">
+                    <CardHeader className="py-4 border-b">
+                      <CardTitle className="text-xs font-black uppercase tracking-widest flex items-center gap-2">
+                        <Zap size={14} className="text-primary" /> Multímetro (Pontos de Medição)
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-4">
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                        {state.measurementPoints.map((point) => (
+                          <Button 
+                            key={point} 
+                            variant="outline" 
+                            size="sm" 
+                            className="text-[10px] font-mono h-8 flex justify-between"
+                            onClick={() => {
+                              const evidence = (activeCase as any).evidenceData?.find((e: any) => e.label.includes(point));
+                              if (evidence) {
+                                // Simplified for now: just trigger evidence collection if found
+                                selectChoice(state.currentNodeId, { evidenceId: evidence.id });
+                              }
+                            }}
+                          >
+                            <span>{point}</span>
+                            <ArrowRight size={10} className="opacity-50" />
+                          </Button>
+                        ))}
+                      </div>
+                    </CardContent>
+                </Card>
+
                 {/* Scenario Node Context */}
+
                 {currentNode && (
                   <Card className="border-primary shadow-xl overflow-hidden ring-4 ring-primary/5">
                     <CardHeader className="bg-primary/5 border-b py-4">
@@ -334,8 +399,27 @@ function SimulationsPage() {
                          ))}
                       </div>
                     </CardContent>
+                    <div className="px-8 pb-6 flex justify-between items-center border-t pt-4 bg-primary/5">
+                      <div className="flex gap-2">
+                        {state.activeHints.map((hint, idx) => (
+                          <Badge key={idx} variant="secondary" className="text-[10px] bg-primary/10 border-primary/20">
+                            Dica: {hint}
+                          </Badge>
+                        ))}
+                      </div>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="text-[10px] font-bold uppercase gap-2 hover:bg-primary/10"
+                        onClick={useHint}
+                        disabled={isCompleted}
+                      >
+                        <HelpCircle size={14} /> Solicitar Dica
+                      </Button>
+                    </div>
                   </Card>
                 )}
+
 
                 {lastMessage && (
                   <div className="p-6 bg-red-500/10 border-2 border-red-500/20 rounded-xl text-red-600 animate-in slide-in-from-top-4 duration-300">
@@ -381,7 +465,7 @@ function SimulationsPage() {
                     <CardTitle className="text-3xl font-black uppercase italic">RELATÓRIO TÉCNICO FINAL</CardTitle>
                     <CardDescription className="text-green-600 font-bold uppercase tracking-widest">Diagnóstico Concluído com Sucesso</CardDescription>
                   </CardHeader>
-                  <CardContent className="p-10 space-y-8">
+                  <CardContent className="p-10 space-y-10">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
                       <div className="space-y-1">
                         <p className="text-[10px] text-muted-foreground uppercase font-black">Nota Técnica</p>
@@ -396,10 +480,52 @@ function SimulationsPage() {
                         <p className="text-4xl font-black text-foreground">{state.score}%</p>
                       </div>
                       <div className="space-y-1">
-                        <p className="text-[10px] text-muted-foreground uppercase font-black">Status</p>
-                        <p className="text-4xl font-black text-blue-500">OPK</p>
+                        <p className="text-[10px] text-muted-foreground uppercase font-black">Tempo</p>
+                        <p className="text-4xl font-black text-blue-500 font-mono">
+                          {Math.floor(state.timer / 60)}:{(state.timer % 60).toString().padStart(2, '0')}
+                        </p>
                       </div>
                     </div>
+
+                    {/* Pedagogical Lesson Content */}
+                    {currentNode?.lesson && (
+                      <div className="space-y-8 animate-in fade-in duration-700 delay-300">
+                        <div className="p-6 bg-primary/5 border-l-4 border-primary rounded-r-xl space-y-3">
+                          <h4 className="text-sm font-black uppercase tracking-widest text-primary flex items-center gap-2">
+                            <BookOpen size={16} /> Resumo Técnico do Caso
+                          </h4>
+                          <p className="text-lg font-medium leading-relaxed italic">
+                            "{currentNode.lesson.technicalSummary}"
+                          </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                          <div className="space-y-3">
+                            <h5 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Explicação da Falha</h5>
+                            <p className="text-sm leading-relaxed">{currentNode.lesson.failureExplanation}</p>
+                          </div>
+                          <div className="space-y-3">
+                            <h5 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Teoria de Circuitos</h5>
+                            <p className="text-sm leading-relaxed">{currentNode.lesson.circuitTheory}</p>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                           <div className="p-4 bg-muted/30 rounded-lg border space-y-2">
+                             <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Base Fundamental</p>
+                             <p className="text-xs font-medium">{currentNode.lesson.fundamentalBasis}</p>
+                           </div>
+                           <div className="p-4 bg-green-500/5 rounded-lg border border-green-500/10 space-y-2">
+                             <p className="text-[10px] font-black uppercase tracking-widest text-green-600">Melhores Práticas</p>
+                             <p className="text-xs">{currentNode.lesson.bestPractices || "Siga sempre o diagrama elétrico e utilize EPIs adequados."}</p>
+                           </div>
+                           <div className="p-4 bg-red-500/5 rounded-lg border border-red-500/10 space-y-2">
+                             <p className="text-[10px] font-black uppercase tracking-widest text-red-600">Alertas de Segurança</p>
+                             <p className="text-xs">{currentNode.lesson.safetyWarnings || "Nunca realize medições de continuidade em circuitos energizados."}</p>
+                           </div>
+                        </div>
+                      </div>
+                    )}
 
                     <div className="space-y-4 border-t pt-8">
                       <h4 className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-4">Cronologia do Diagnóstico</h4>
@@ -409,7 +535,11 @@ function SimulationsPage() {
                             <span className="text-[10px] font-mono text-muted-foreground mt-1 shrink-0">{new Date(h.timestamp).toLocaleTimeString()}</span>
                             <div className="space-y-1">
                               <p className="font-bold">{h.description}</p>
-                              {h.points && h.points > 0 && <span className="text-[10px] font-bold text-green-500">+{h.points} XP</span>}
+                              {h.points !== undefined && h.points !== 0 && (
+                                <span className={cn("text-[10px] font-bold", h.points > 0 ? "text-green-500" : "text-red-500")}>
+                                  {h.points > 0 ? '+' : ''}{h.points} XP
+                                </span>
+                              )}
                             </div>
                           </div>
                         ))}
@@ -420,6 +550,7 @@ function SimulationsPage() {
                       Finalizar e Sair do Laboratório
                     </Button>
                   </CardContent>
+
                 </Card>
               </div>
             )}
