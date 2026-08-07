@@ -182,9 +182,13 @@ export class ScenarioRuntime {
 
       const logic = h.validationLogic;
       if (logic && logic.requiredMeasurement === target) {
-        // Logic: if current state matches expected (always true for the "correct" path in this simplified version)
-        // In PD-001, if we measure F1 and it's 0V, we confirm "F1 Queimado"
-        h.status = logic.ifMatch === 'confirma' ? 'CONFIRMED' : 'DISCARDED';
+        // If an expected value is provided, we compare it
+        const isMatch = logic.expectedResult ? value === logic.expectedResult : true;
+        
+        h.status = isMatch 
+          ? (logic.ifMatch === 'confirma' ? 'CONFIRMED' : 'DISCARDED')
+          : (logic.ifMatch === 'confirma' ? 'DISCARDED' : 'CONFIRMED');
+
         this.addActionRecord('HYPOTHESIS_UPDATE', `Hipótese "${h.title}" -> ${h.status}`);
 
         if (h.isRootCause && h.status === 'CONFIRMED') {
@@ -194,6 +198,7 @@ export class ScenarioRuntime {
           this.state.status = "DIAGNOSING";
         }
       }
+
     });
   }
 
