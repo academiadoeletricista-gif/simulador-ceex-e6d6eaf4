@@ -33,9 +33,11 @@ function LabDetail() {
   const navigate = useNavigate();
 
   const { data: labResult, isLoading: labLoading } = useLaboratory(labId);
-  const { data: casesResult, isLoading: casesLoading } = useCasesByLab(labId);
+  const { data: casesResult, isLoading: casesLoading, error: casesError } = useCasesByLab(labId);
   const { data: sessionsResult, isLoading: sessionsLoading } = useSessions();
   const startSessionMutation = useStartSession();
+
+  console.log('LabDetail:', { labId, casesLoading, casesError, casesResult });
 
   const isLoading = labLoading || casesLoading || sessionsLoading;
 
