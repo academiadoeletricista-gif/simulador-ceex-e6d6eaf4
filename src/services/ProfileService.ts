@@ -16,8 +16,8 @@ export const ProfileService = {
         console.log("Profile not found for user, creating default...");
         const newProfile: Partial<Profile> = {
           id: user.id,
-          full_name: user.is_anonymous ? 'Visitante Anônimo' : (user.user_metadata?.full_name || 'Usuário'),
-          avatar_url: user.user_metadata?.avatar_url || '',
+          full_name: user.is_anonymous ? 'Visitante Anônimo' : (user.user_metadata?.['full_name'] || 'Usuário'),
+          avatar_url: user.user_metadata?.['avatar_url'] || '',
           xp: 0,
           level: 1,
           theme: 'dark',
