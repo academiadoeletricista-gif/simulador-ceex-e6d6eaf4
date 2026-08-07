@@ -22,7 +22,7 @@ export class SessionRepository {
         .select('*')
         .eq('user_id', userId)
         .eq('case_id', caseId)
-        .limit(1);
+        
 
       const data = sessionData && sessionData.length > 0 ? sessionData[0] : null;
 

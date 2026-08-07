@@ -83,7 +83,7 @@ function SimulationsPage() {
   const anyError = isError || !caseResult?.success || !!caseError;
 
   // Waiting for state initialization after case is loaded
-  if (activeCase && !anyError && (!state || state.status === 'ERROR')) {
+  if (activeCase && !anyError && !state) {
     return (
       <div className="flex flex-col items-center justify-center h-[calc(100vh-4rem)] space-y-4">
         <Activity size={48} className="text-primary animate-pulse" />
@@ -93,7 +93,7 @@ function SimulationsPage() {
   }
 
   // Error handling
-  if (!activeCase || !id || anyError) {
+  if (!activeCase || !id || anyError || !state) {
     const errorDetail = state?.error || (caseResult && !caseResult.success ? caseResult.error.message : null) || caseError?.message;
     
     return (
@@ -129,14 +129,12 @@ function SimulationsPage() {
     );
   }
 
-  const isCompleted = state?.status === 'COMPLETED';
+  const isCompleted = state.status === 'COMPLETED';
 
   // Find current decision node
-  const currentNode = state?.lesson ? { id: 'COMPLETED', lesson: state.lesson } : 
-                     (state ? ((activeCase as any).decisionTree?.find((n: any) => n.id === state.currentNodeId) || 
-                      (activeCase as any).decisionTree?.[0]) : null);
-
-  if (!state) return null;
+  const currentNode = state.lesson ? { id: 'COMPLETED', lesson: state.lesson } : 
+                     ((activeCase as any).decisionTree?.find((n: any) => n.id === state.currentNodeId) || 
+                      (activeCase as any).decisionTree?.[0]);
 
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)] overflow-hidden bg-background">

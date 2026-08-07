@@ -35,7 +35,6 @@ export class CaseRepository {
         .from('diagnostic_cases')
         .select('*')
         .eq('id', id)
-        .limit(1);
 
       const diagCase = diagCases && diagCases.length > 0 ? diagCases[0] : null;
 
@@ -53,7 +52,6 @@ export class CaseRepository {
         .from('cases')
         .select('*')
         .eq('id', id)
-        .limit(1);
 
       const caseData = casesData && casesData.length > 0 ? casesData[0] : null;
 
@@ -81,7 +79,6 @@ export class CaseRepository {
         .from('diagnostic_cases')
         .select('*')
         .eq('code', code)
-        .limit(1);
 
       const diagCase = diagCases && diagCases.length > 0 ? diagCases[0] : null;
 
@@ -99,7 +96,7 @@ export class CaseRepository {
         .from('cases')
         .select('*')
         .eq('code', code)
-        .limit(1);
+        
 
       const caseItem = caseItems && caseItems.length > 0 ? caseItems[0] : null;
 
