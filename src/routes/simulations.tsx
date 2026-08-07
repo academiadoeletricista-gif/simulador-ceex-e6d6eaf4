@@ -342,8 +342,27 @@ function SimulationsPage() {
                          ))}
                       </div>
                     </CardContent>
+                    <div className="px-8 pb-6 flex justify-between items-center border-t pt-4 bg-primary/5">
+                      <div className="flex gap-2">
+                        {state.activeHints.map((hint, idx) => (
+                          <Badge key={idx} variant="secondary" className="text-[10px] bg-primary/10 border-primary/20">
+                            Dica: {hint}
+                          </Badge>
+                        ))}
+                      </div>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="text-[10px] font-bold uppercase gap-2 hover:bg-primary/10"
+                        onClick={useHint}
+                        disabled={isCompleted}
+                      >
+                        <HelpCircle size={14} /> Solicitar Dica
+                      </Button>
+                    </div>
                   </Card>
                 )}
+
 
                 {lastMessage && (
                   <div className="p-6 bg-red-500/10 border-2 border-red-500/20 rounded-xl text-red-600 animate-in slide-in-from-top-4 duration-300">
