@@ -68,8 +68,16 @@ export class SimulationPlayer {
     this.api.collectEvidence(evidenceId);
   }
 
+  /**
+   * Uses a hint and deducts XP
+   */
+  public useHint() {
+    this.api.useHint();
+  }
+
 
   /**
+
    * Gets the current observable state of the simulation
    */
   public getPlayerState(): SimulationState | null {
