@@ -364,13 +364,30 @@ function SimulationsPage() {
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="p-4">
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                        {state.measurementPoints.map((point) => (
-                          <Button 
-                            key={point} 
-                            variant="outline" 
-                            size="sm" 
-                            className="text-[10px] font-mono h-8 flex justify-between"
+                      <div className="flex justify-between items-center mb-4">
+                        <CardTitle className="text-xs font-black uppercase tracking-widest flex items-center gap-2">
+                          <Zap size={14} className="text-primary" /> Pontos de Medição
+                        </CardTitle>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-6 text-[10px] uppercase font-bold text-muted-foreground hover:text-primary transition-colors"
+                          onClick={() => setInfoCollapsed(!infoCollapsed)}
+                        >
+                          {infoCollapsed ? "Expandir" : "Recolher"}
+                        </Button>
+                      </div>
+                    </CardHeader>
+                    {!infoCollapsed && (
+                      <CardContent className="p-4 pt-0">
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                          {state.measurementPoints.map((point) => (
+                            <Button 
+                              key={point} 
+                              variant="outline" 
+                              size="sm" 
+                              className="text-[10px] font-mono h-8 flex justify-between group/btn"
+
                             onClick={() => {
                               const evidence = (activeCase as any).evidenceData?.find((e: any) => e.label.includes(point));
                               if (evidence) {
