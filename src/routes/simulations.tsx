@@ -232,30 +232,55 @@ function SimulationsPage() {
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-6 text-sm">
                       <div className="space-y-1">
                         <p className="text-[10px] font-bold text-muted-foreground uppercase">Cliente</p>
-                        <p className="font-medium">{(activeCase as any).customer || 'Planta Industrial Alpha'}</p>
+                        <p className="font-medium">{(activeCase as any).workOrder?.customer || 'Planta Industrial Alpha'}</p>
                       </div>
                       <div className="space-y-1">
                         <p className="text-[10px] font-bold text-muted-foreground uppercase">Máquina</p>
-                        <p className="font-medium">{(activeCase as any).machine || 'Painel de Partida'}</p>
+                        <p className="font-medium">{(activeCase as any).workOrder?.machine || activeCase.title}</p>
                       </div>
                       <div className="space-y-1">
                         <p className="text-[10px] font-bold text-muted-foreground uppercase">Data/Hora</p>
-                        <p className="font-medium font-mono">07/08/2026 - 08:30</p>
+                        <p className="font-medium font-mono">{new Date().toLocaleDateString('pt-BR')} - {new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</p>
                       </div>
                     </div>
 
                     <div className="p-5 bg-background rounded-lg border-2 border-primary/10 space-y-3">
                       <h4 className="text-sm font-bold flex items-center gap-2"><AlertTriangle size={16} className="text-primary" /> Sintomas Relatados pelo Operador:</h4>
                       <p className="text-lg italic text-muted-foreground leading-relaxed">
-                        "{(activeCase as any).occurrence?.operatorMessage || activeCase.description}"
+                        "{(activeCase as any).workOrder?.symptoms || activeCase.description}"
                       </p>
                     </div>
 
                     <div className="p-5 bg-background rounded-lg border space-y-3">
-                      <h4 className="text-sm font-bold">Objetivo Técnico:</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Diagnosticar a causa raiz da falha e restaurar a operação normal do equipamento seguindo as normas de segurança NR-10 e NR-12.
-                      </p>
+                      <h4 className="text-sm font-bold">Guia de Procedimentos:</h4>
+                      <div className="space-y-4">
+                        {currentNode?.steps ? (
+                          currentNode.steps.map((step: any, idx: number) => (
+                            <div key={idx} className="flex gap-4 items-start">
+                              <div className="h-6 w-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
+                                {idx + 1}
+                              </div>
+                              <div className="space-y-1">
+                                <p className="text-sm font-bold">{step.situation}</p>
+                                <p className="text-xs text-muted-foreground">{step.correct}</p>
+                                {step.reading && (
+                                  <Badge variant="outline" className="mt-1 font-mono text-[10px]">Leitura: {step.reading}</Badge>
+                                )}
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="flex gap-4 items-start">
+                            <div className="h-6 w-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
+                              1
+                            </div>
+                            <div className="space-y-1">
+                              <p className="text-sm font-bold">Inicie a investigação técnica</p>
+                              <p className="text-xs text-muted-foreground">Analise o painel e realize as medições necessárias para isolar a falha.</p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
 
                     <Button size="lg" className="w-full h-14 text-lg gap-3" onClick={() => setActiveTab('investigation')}>
