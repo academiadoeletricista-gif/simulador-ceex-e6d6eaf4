@@ -33,6 +33,7 @@ import {
   BarChart3,
   LogOut,
 } from "lucide-react";
+import { useProfile } from "@/hooks/useProfile";
 
 import appCss from "../styles.css?url";
 
@@ -136,11 +137,13 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
-function RootComponent() {
+function RootContent() {
   const { queryClient } = Route.useRouteContext();
   const sidebarOpen = useAppStore(state => state.isSidebarOpen);
   const toggleSidebar = useAppStore(state => state.toggleSidebar);
   const location = useLocation();
+  const { data: profileResult } = useProfile();
+  const profile = profileResult?.success ? profileResult.data : null;
   const [isAuthenticating, setIsAuthenticating] = useState(true);
 
   useEffect(() => {
@@ -251,8 +254,8 @@ function RootComponent() {
             <div className="flex-1" />
             <div className="flex items-center gap-4">
               <div className="text-right hidden sm:block">
-                <div className="text-sm font-medium">Eng. Carlos Alberto</div>
-                <div className="text-xs text-muted-foreground">Membro Premium</div>
+                <div className="text-sm font-medium">{profile?.full_name || "Carregando..."}</div>
+                <div className="text-xs text-muted-foreground">{profile?.role || (profile?.level ? `Nível ${profile.level}` : "Membro")}</div>
               </div>
               <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center border-2 border-primary/40">
                 <User size={20} className="text-primary" />
